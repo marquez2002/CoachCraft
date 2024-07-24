@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "201135652207",
+    "project_id": "coachcraft",
+    "storage_bucket": "coachcraft.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201135652207:android:5da8f43095d4884691fc9a",
+        "android_client_info": {
+          "package_name": "com.example.pizzaratech"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLix7bf2J3zNr8i1dvNG_dQVk0vqXktYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

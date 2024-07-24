@@ -1,0 +1,25 @@
+// Configuraciones globales
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Configuraciones específicas del proyecto raíz
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+
+dependencies {
+    // Agrega la línea siguiente
+    classpath 'com.google.gms:google-services:4.3.3'
+}
