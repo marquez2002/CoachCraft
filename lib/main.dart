@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-  ); 
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   // Orientación horizontal
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       
-      home: const HomeScreen(), // Define la pantalla principal
+      home: const HomeScreen(), // Cambia la pantalla principal a MainWidget
     );
   }
 }

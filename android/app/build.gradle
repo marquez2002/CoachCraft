@@ -61,6 +61,12 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    
+    buildscript {
+        dependencies {
+            classpath 'com.google.gms:google-services:4.3.15'
+        }
+    }
 }
 
 flutter {
@@ -68,7 +74,8 @@ flutter {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services' // Añadir esta línea
+apply plugin: 'com.google.gms.google-services'
+
 
 dependencies {
     implementation 'com.google.firebase:firebase-analytics'

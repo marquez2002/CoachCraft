@@ -1,8 +1,7 @@
 import 'package:CoachCraft/screens/menu_screen.dart';
-//import 'package:CoachCraft/services/loginGoogleUtil.dart';
+import 'package:CoachCraft/services/loginGoogleUtil.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-
 
 class MainWidget extends StatelessWidget {
   const MainWidget({super.key});
@@ -11,8 +10,7 @@ class MainWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        
-        // Se añade la imagen preselecionada de fondo de pantalla
+        // Se añade la imagen preseleccionada de fondo de pantalla
         Image.asset(
           'assets/image/main_football.png', // Ruta del archivo de imagen ajustada
           fit: BoxFit.cover,
@@ -32,7 +30,6 @@ class MainWidget extends StatelessWidget {
                 height: 200,
               ),
               
-              
               // Botón para pasar a la siguiente pantalla
               ElevatedButton(
                 onPressed: () {
@@ -40,21 +37,29 @@ class MainWidget extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const MenuScreen()),
-                  );                                 
+                  );
                 },
                 child: const Text('Acceder'),
               ),
-             /*Container(
-                width:double.infinity,
-                margin: const EdgeInsets.only(top: 10, bottom: 10),
-                child: GoogleSignInButton(
-                  centered: true,
-                  borderRadius: 5,
-                  onPressed: () {LoginGoogleUtils.googleSignIn().then((result))},
-                  darkMode: false,
-                  text: TextApp.GOOGLE_SIGN
-                )
-              )*/
+              
+              // Botón para conectar la cuenta de Google y crear un proyecto de Firebase
+               ElevatedButton(
+                onPressed: () async {
+                  User? user = await LoginGoogleUtil.signInWithGoogle();
+                  if (user != null) {
+                    // Lógica para manejar el inicio de sesión exitoso
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Inicio de sesión con Google exitoso: ${user.email}')),
+                    );
+                  } else {
+                    // Manejar el caso en que el inicio de sesión falla
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Falló el inicio de sesión con Google')),
+                    );
+                  }
+                },
+                child: const Text('Conectar con Google'),
+              ),
             ],
           ),
         ),
