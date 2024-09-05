@@ -15,6 +15,17 @@ class Player {
     required this.peso,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'nombre': nombre,
+      'dorsal': dorsal,
+      'posicion': posicion,
+      'edad': edad,
+      'altura': altura,
+      'peso': peso,
+    };
+  }
+
   factory Player.fromMap(Map<String, dynamic> map) {
     return Player(
       nombre: map['nombre'] ?? 'Nombre no disponible',

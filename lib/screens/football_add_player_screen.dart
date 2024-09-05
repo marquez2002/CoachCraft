@@ -1,17 +1,21 @@
+import 'package:CoachCraft/screens/menu_screen_futsal_team.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/player.dart';
+import '../services/firebase_service.dart';
+import '../widgets/player_widget.dart'; // Importa tus campos de formulario
 
-class FootballListPlayer extends StatefulWidget {
-  const FootballListPlayer({super.key});
+class FootballAddPlayer extends StatefulWidget {
+  const FootballAddPlayer({super.key});
 
   @override
-  _FootballListPlayerState createState() => _FootballListPlayerState();
+  _FootballAddPlayerState createState() => _FootballAddPlayerState();
 }
 
-class _FootballListPlayerState extends State<FootballListPlayer> {
+class _FootballAddPlayerState extends State<FootballAddPlayer> {
   final _formKey = GlobalKey<FormState>();
-
-  // Player data controllers
+  final Player player = Player(nombre: '', dorsal: 0, posicion: '', edad: 0, altura: 0.0, peso: 0.0);
+  
+  // Controladores de datos del jugador
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dorsalController = TextEditingController();
   final TextEditingController _positionController = TextEditingController();
@@ -21,7 +25,6 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
   
   @override
   void dispose() {
-    // Dispose the controllers to prevent memory leaks
     _nameController.dispose();
     _dorsalController.dispose();
     _positionController.dispose();
@@ -33,17 +36,17 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
 
   Future<void> _submitPlayer() async {
     if (_formKey.currentState!.validate()) {
-      Map<String, dynamic> playerData = {
-        'nombre': _nameController.text,
-        'dorsal': int.tryParse(_dorsalController.text) ?? 0,
-        'posicion': _positionController.text,
-        'edad': int.tryParse(_ageController.text) ?? 0,
-        'altura': double.tryParse(_heightController.text) ?? 0.0,
-        'peso': double.tryParse(_weightController.text) ?? 0.0,
-      };
+      Player player = Player(
+        nombre: _nameController.text,
+        dorsal: int.tryParse(_dorsalController.text) ?? 0,
+        posicion: _positionController.text,
+        edad: int.tryParse(_ageController.text) ?? 0,
+        altura: double.tryParse(_heightController.text) ?? 0.0,
+        peso: double.tryParse(_weightController.text) ?? 0.0,
+      );
 
       try {
-        await addPlayer(playerData);
+        await addPlayer(player.toJson());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Jugador añadido correctamente')),
         );
@@ -68,74 +71,26 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese un nombre';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _dorsalController,
-                  decoration: const InputDecoration(labelText: 'Dorsal'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese un dorsal';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _positionController,
-                  decoration: const InputDecoration(labelText: 'Posición'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese la posición';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _ageController,
-                  decoration: const InputDecoration(labelText: 'Edad'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese la edad';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _heightController,
-                  decoration: const InputDecoration(labelText: 'Altura (cm)'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese la altura';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _weightController,
-                  decoration: const InputDecoration(labelText: 'Peso (kg)'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese el peso';
-                    }
-                    return null;
-                  },
-                ),
+                buildPlayerFormField(_nameController, 'Nombre', 'Por favor ingrese un nombre'),
+                buildPlayerFormField(_dorsalController, 'Dorsal', 'Por favor ingrese un dorsal', isNumber: true),
+                buildPlayerFormField(_positionController, 'Posición', 'Por favor ingrese la posición'),
+                buildPlayerFormField(_ageController, 'Edad', 'Por favor ingrese la edad', isNumber: true),
+                buildPlayerFormField(_heightController, 'Altura (cm)', 'Por favor ingrese la altura', isNumber: true),
+                buildPlayerFormField(_weightController, 'Peso (kg)', 'Por favor ingrese el peso', isNumber: true),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _submitPlayer,
-                  child: const Text('Añadir Jugador'),
+                  onPressed: () async {                    
+                    await _submitPlayer();
+
+                    Navigator.push(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MenuScreenFutsalTeam(), // La pantalla a la que quieres navegar
+                      ),
+                    );
+                  },
+                  child: const Text('Modificar Jugador'),
                 ),
               ],
             ),
@@ -143,15 +98,5 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
         ),
       ),
     );
-  }
-}
-
-
-Future<void> addPlayer(Map<String, dynamic> playerData) async {
-  try {
-    await FirebaseFirestore.instance.collection('teams').doc('teamID') // Replace with actual teamID
-      .collection('players').add(playerData);
-  } catch (e) {
-    throw Exception('Error adding player: $e');
   }
 }

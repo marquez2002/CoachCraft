@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/menu_widget_sports.dart';
+import '../widgets/menu_widget_futsal.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -19,7 +19,7 @@ class MenuScreen extends StatelessWidget {
 
       home: const Scaffold(
         // El cuerpo de MenuScreen se encontrará en MenuWidget
-        body: MenuWidgetSports(),
+        body: MenuWidgetFutsal(),
       ),
     );
   }

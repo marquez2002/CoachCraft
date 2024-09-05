@@ -1,4 +1,4 @@
-//import 'package:CoachCraft/screens/football_add_player_screen.dart';
+import 'package:CoachCraft/screens/football_add_player_screen.dart';
 import 'package:CoachCraft/screens/football_list_player_screen.dart';
 import 'package:CoachCraft/screens/menu_screen_futsal.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +12,7 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
   Widget build(BuildContext context) {
     // Lista de datos para los botones con las rutas determinada que deben seguir
     List<Map<String, dynamic>> buttonData = [
-      {'label': 'Añadir Jugador', 'route': ""},
-      {'label': 'Modificar Jugador', 'route': ""},
+      {'label': 'Añadir Jugador', 'route': FootballAddPlayer()},
       {'label': 'Listar Jugadores', 'route': FootballListPlayer()},
       {'label': 'Volver', 'route': const MenuScreenFutsal()},
     ];

@@ -20,3 +20,34 @@ Future<List<Map<String, dynamic>>> getPlayers() async {
   return players;
 }
 
+// Función para añadir un jugador a Firestore
+Future<void> addPlayer(Map<String, dynamic> playerData) async {
+  try {
+    await FirebaseFirestore.instance.collection('team').add(playerData);
+  } catch (e) {
+    throw Exception('Error adding player: $e');
+  }
+}
+
+// Función para modificar el jugador
+Future<void> modifyPlayer(int dorsal, Map<String, dynamic> playerData) async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('team')
+        .where('dorsal', isEqualTo: dorsal)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var docId = querySnapshot.docs.first.id;
+      await FirebaseFirestore.instance
+          .collection('team')
+          .doc(docId) // Usar el ID del documento
+          .update(playerData);
+    } else {
+      throw Exception("Jugador con dorsal $dorsal no encontrado");
+    }
+  } catch (e) {
+    throw Exception('Error al modificar jugador: $e');
+  }
+}
+
