@@ -1,74 +1,28 @@
-
 class Player {
-  final String id;
-  final String name;
+  final String nombre;
   final int dorsal;
-  final String position;
-  final double height;
-  final double weight;
-  final int age;
+  final String posicion;
+  final int edad;
+  final double altura;
+  final double peso;
 
   Player({
-    required this.id,
-    required this.name,
+    required this.nombre,
     required this.dorsal,
-    required this.position,
-    required this.height,
-    required this.weight,
-    required this.age,
+    required this.posicion,
+    required this.edad,
+    required this.altura,
+    required this.peso,
   });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'dorsal': dorsal,
-      'position': position,
-      'height': height,
-      'weight': weight,
-      'age': age,
-    };
-  }
 
   factory Player.fromMap(Map<String, dynamic> map) {
     return Player(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      dorsal: map['dorsal'] as int,
-      position: map['position'] as String,
-      height: map['height'] as double,
-      weight: map['weight'] as double,
-      age: map['age'] as int,
+      nombre: map['nombre'] ?? 'Nombre no disponible',
+      dorsal: int.tryParse(map['dorsal']?.toString() ?? '0') ?? 0,
+      posicion: map['posicion'] ?? 'Posición no disponible',
+      edad: int.tryParse(map['edad']?.toString() ?? '0') ?? 0,
+      altura: double.tryParse(map['altura']?.toString() ?? '0.0') ?? 0.0,
+      peso: double.tryParse(map['peso']?.toString() ?? '0.0') ?? 0.0,
     );
-  }
-
-  @override
-  String toString() {
-    return 'Player(id: $id, name: $name, dorsal: $dorsal, position: $position, height: $height, weight: $weight, age: $age)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-  
-    return other is Player &&
-        other.id == id &&
-        other.name == name &&
-        other.dorsal == dorsal &&
-        other.position == position &&
-        other.height == height &&
-        other.weight == weight &&
-        other.age == age;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        name.hashCode ^
-        dorsal.hashCode ^
-        position.hashCode ^
-        height.hashCode ^
-        weight.hashCode ^
-        age.hashCode;
   }
 }

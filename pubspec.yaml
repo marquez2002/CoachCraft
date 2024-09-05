@@ -16,10 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 0.1.0
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,15 +31,16 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   firebase_core: ^3.0.0
-  cloud_firestore: ^5.0.0
+  cloud_firestore: 
   firebase_auth: ^5.1.2
   firebase_core_web: ^2.3.0
   cloud_firestore_web: ^4.0.0
   google_sign_in: ^6.2.1
+  pdf: ^3.11.1
+  printing: ^5.13.1
+
 
 dev_dependencies:
   flutter_test:
@@ -68,25 +69,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/image/basketball_field.png
-    - assets/image/football_field.png
-    - assets/image/coachcraft_logo.png
-    - assets/image/main_football.png
-    - assets/image/mid_football_field.png
-    - assets/image/mid_basket_field.png
-    - assets/image/main_football2.png
-    - assets/image/balon_futsal.png
-    - assets/image/player_teamA.png
-    - assets/image/player_teamB.png
-    - assets/image/football_menu.png
-    - assets/image/football_menu2.png
-    - assets/image/football_menu3.png
-    - assets/image/basket_menu.png
-    - assets/image/basket_menu2.png
-    - assets/image/basket_menu3.png
-    - assets/image/sport_menu.png
-
-    
+    - assets/image/    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

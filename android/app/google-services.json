@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:201135652207:android:5da8f43095d4884691fc9a",
+        "mobilesdk_app_id": "1:201135652207:android:137791af67a9e65791fc9a",
         "android_client_info": {
-          "package_name": "com.example.pizzaratech"
+          "package_name": "com.example.coachcraft"
         }
       },
       "oauth_client": [],

@@ -1,44 +1,57 @@
-import 'package:CoachCraft/models/player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FootballAddPlayer extends StatefulWidget {
-  const FootballAddPlayer({super.key});
+class FootballListPlayer extends StatefulWidget {
+  const FootballListPlayer({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _FootballAddPlayerState createState() => _FootballAddPlayerState();
+  _FootballListPlayerState createState() => _FootballListPlayerState();
 }
 
-class _FootballAddPlayerState extends State<FootballAddPlayer> {
+class _FootballListPlayerState extends State<FootballListPlayer> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  int _dorsal = 0;
-  String _position = 'Portero'; // Valor predeterminado
-  double _height = 0.0;
-  double _weight = 0.0;
-  int _age = 0;
 
-  Future<void> _addPlayer() async {
+  // Player data controllers
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _dorsalController = TextEditingController();
+  final TextEditingController _positionController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();  
+  
+  @override
+  void dispose() {
+    // Dispose the controllers to prevent memory leaks
+    _nameController.dispose();
+    _dorsalController.dispose();
+    _positionController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitPlayer() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+      Map<String, dynamic> playerData = {
+        'nombre': _nameController.text,
+        'dorsal': int.tryParse(_dorsalController.text) ?? 0,
+        'posicion': _positionController.text,
+        'edad': int.tryParse(_ageController.text) ?? 0,
+        'altura': double.tryParse(_heightController.text) ?? 0.0,
+        'peso': double.tryParse(_weightController.text) ?? 0.0,
+      };
 
-      String playerId = FirebaseFirestore.instance.collection('teams').doc('teamID').collection('players').doc().id;
-
-      Player player = Player(
-        id: playerId,
-        name: _name,
-        dorsal: _dorsal,
-        position: _position,
-        height: _height,
-        weight: _weight,
-        age: _age,
-      );
-
-      await FirebaseFirestore.instance.collection('teams').doc('teamID').collection('players').doc(playerId).set(player.toMap());
-
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pop();
+      try {
+        await addPlayer(playerData);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Jugador añadido correctamente')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al añadir jugador: $e')),
+        );
+      }
     }
   }
 
@@ -46,103 +59,86 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Añadir Jugador Al Equipo'),
-        backgroundColor: Colors.white,
+        title: const Text('Añadir Jugador'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (value) {
-                  if (value == null || value.isEmpty || value.length >= 2) {
-                    return 'Introduce un nombre correctamente.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _name = value!;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Dorsal'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || int.parse(value)>=0 || int.parse(value)<=99) {
-                    return 'Introduce un dorsal en el rango de valores 1-99.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _dorsal = int.parse(value!);
-                },
-              ),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Posición'),
-                value: _position,
-                items: ['Portero', 'Ala', 'Pivot', 'Cierre'].map((position) {
-                  return DropdownMenuItem<String>(
-                    value: position,
-                    child: Text(position),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _position = value!;
-                  });
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Altura'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || double.parse(value)>=50 || double.parse(value)<=250) {
-                    return 'Introduce la altura en centimetros.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _height = double.parse(value!);
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Peso'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || double.parse(value)>=20 || double.parse(value)<=250) {
-                    return 'Introduce un peso en kilogramos correctamente.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _weight = double.parse(value!);
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Edad'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || int.parse(value)>=5 || int.parse(value)<=120) {
-                    return 'Por favor ingrese la edad';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _age = int.parse(value!);
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _addPlayer,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 54, 45, 46),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese un nombre';
+                    }
+                    return null;
+                  },
                 ),
-                child: const Text('Añadir Jugador'),
-              ),
-            ],
+                TextFormField(
+                  controller: _dorsalController,
+                  decoration: const InputDecoration(labelText: 'Dorsal'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese un dorsal';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _positionController,
+                  decoration: const InputDecoration(labelText: 'Posición'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese la posición';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _ageController,
+                  decoration: const InputDecoration(labelText: 'Edad'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese la edad';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _heightController,
+                  decoration: const InputDecoration(labelText: 'Altura (cm)'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese la altura';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _weightController,
+                  decoration: const InputDecoration(labelText: 'Peso (kg)'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese el peso';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitPlayer,
+                  child: const Text('Añadir Jugador'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -150,3 +146,12 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
   }
 }
 
+
+Future<void> addPlayer(Map<String, dynamic> playerData) async {
+  try {
+    await FirebaseFirestore.instance.collection('teams').doc('teamID') // Replace with actual teamID
+      .collection('players').add(playerData);
+  } catch (e) {
+    throw Exception('Error adding player: $e');
+  }
+}

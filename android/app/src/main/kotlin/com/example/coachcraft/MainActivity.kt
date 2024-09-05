@@ -1,4 +1,4 @@
-package com.example.pizzaratech
+package com.example.coachcraft
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle

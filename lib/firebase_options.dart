@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCLix7bf2J3zNr8i1dvNG_dQVk0vqXktYs',
-    appId: '1:201135652207:android:5da8f43095d4884691fc9a',
+    appId: '1:201135652207:android:cb08c1c981b49eb191fc9a',
     messagingSenderId: '201135652207',
     projectId: 'coachcraft',
     storageBucket: 'coachcraft.appspot.com',
@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '201135652207',
     projectId: 'coachcraft',
     storageBucket: 'coachcraft.appspot.com',
-    iosBundleId: 'com.example.pizzaratech',
+    iosBundleId: 'com.example.coachcraft',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '201135652207',
     projectId: 'coachcraft',
     storageBucket: 'coachcraft.appspot.com',
-    iosBundleId: 'com.example.pizzaratech',
+    iosBundleId: 'com.example.coachcraft',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
