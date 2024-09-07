@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../services/firebase_service.dart';
-import 'football_conv_player_screen.dart';
-import '../widgets/player_widget.dart';
+import '../../services/firebase_service.dart';
+import 'team_conv_player_screen.dart';
+import '../../widgets/player_widget.dart';
 
 class FootballListPlayer extends StatefulWidget {
   const FootballListPlayer({super.key});
@@ -29,9 +29,23 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
           } else {
             return Column(
               children: [
-                Expanded(
-                  child: PlayerDataTable(players: snapshot.data!),
+                // Ajuste aquí para que el contenido esté en la parte superior
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0), // Separar del AppBar
+                  child: Align(
+                    alignment: Alignment.topCenter, // Alinear en la parte superior y centro
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.9, // Ajusta el ancho de la tabla
+                        ),
+                        child: PlayerDataTable(players: snapshot.data!),
+                      ),
+                    ),
+                  ),
                 ),
+                const Spacer(), // Esto empuja el botón hacia la parte inferior
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(

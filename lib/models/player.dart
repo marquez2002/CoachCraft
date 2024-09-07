@@ -1,3 +1,4 @@
+
 class Player {
   final String nombre;
   final int dorsal;
@@ -26,14 +27,14 @@ class Player {
     };
   }
 
-  factory Player.fromMap(Map<String, dynamic> map) {
+  factory Player.fromJson(Map<String, dynamic> json) {
     return Player(
-      nombre: map['nombre'] ?? 'Nombre no disponible',
-      dorsal: int.tryParse(map['dorsal']?.toString() ?? '0') ?? 0,
-      posicion: map['posicion'] ?? 'Posición no disponible',
-      edad: int.tryParse(map['edad']?.toString() ?? '0') ?? 0,
-      altura: double.tryParse(map['altura']?.toString() ?? '0.0') ?? 0.0,
-      peso: double.tryParse(map['peso']?.toString() ?? '0.0') ?? 0.0,
+      nombre: json['nombre'] ?? '',
+      dorsal: json['dorsal'] ?? 0,
+      posicion: json['posicion'] ?? '',
+      edad: json['edad'] ?? 0,
+      altura: json['altura'] ?? 0.0,
+      peso: json['peso'] ?? 0.0,
     );
   }
 }

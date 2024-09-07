@@ -1,8 +1,9 @@
-import 'package:CoachCraft/screens/menu_screen_futsal_team.dart';
+// /screens/football/football_add_player.dart
+import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:flutter/material.dart';
-import '../models/player.dart';
-import '../services/firebase_service.dart';
-import '../widgets/player_widget.dart'; // Importa tus campos de formulario
+import '../../models/player.dart';
+import '../../services/firebase_service.dart';
+import '../../widgets/player_widget.dart';
 
 class FootballAddPlayer extends StatefulWidget {
   const FootballAddPlayer({super.key});
@@ -13,16 +14,13 @@ class FootballAddPlayer extends StatefulWidget {
 
 class _FootballAddPlayerState extends State<FootballAddPlayer> {
   final _formKey = GlobalKey<FormState>();
-  final Player player = Player(nombre: '', dorsal: 0, posicion: '', edad: 0, altura: 0.0, peso: 0.0);
-  
-  // Controladores de datos del jugador
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dorsalController = TextEditingController();
   final TextEditingController _positionController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();  
-  
+  final TextEditingController _weightController = TextEditingController();
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -45,10 +43,25 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
         peso: double.tryParse(_weightController.text) ?? 0.0,
       );
 
+      // Verificar si el dorsal es único
+      bool isUnique = await isDorsalUnique(player.dorsal);
+      if (!isUnique) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('El dorsal ya está en uso')),
+        );
+        return;
+      }
+
       try {
         await addPlayer(player.toJson());
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Jugador añadido correctamente')),
+          const SnackBar(content: Text('Jugador añadido correctamente')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MenuScreenFutsalTeam(),
+          ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -79,18 +92,8 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
                 buildPlayerFormField(_weightController, 'Peso (kg)', 'Por favor ingrese el peso', isNumber: true),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () async {                    
-                    await _submitPlayer();
-
-                    Navigator.push(
-                      // ignore: use_build_context_synchronously
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MenuScreenFutsalTeam(), // La pantalla a la que quieres navegar
-                      ),
-                    );
-                  },
-                  child: const Text('Modificar Jugador'),
+                  onPressed: _submitPlayer,
+                  child: const Text('Añadir Jugador'),
                 ),
               ],
             ),

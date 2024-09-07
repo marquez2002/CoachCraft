@@ -1,20 +1,22 @@
-import 'package:CoachCraft/screens/football_add_player_screen.dart';
-import 'package:CoachCraft/screens/football_list_player_screen.dart';
-import 'package:CoachCraft/screens/menu_screen_futsal.dart';
+import 'package:CoachCraft/screens/board/football_field_screen.dart';
+import 'package:CoachCraft/screens/menu/home_screen.dart';
+import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
+import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
 import 'package:flutter/material.dart';
 
 
 
-class MenuWidgetFutsalTeam extends StatelessWidget {
-  const MenuWidgetFutsalTeam({super.key});
+class MenuWidgetFutsal extends StatelessWidget {
+  const MenuWidgetFutsal({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Lista de datos para los botones con las rutas determinada que deben seguir
     List<Map<String, dynamic>> buttonData = [
-      {'label': 'Añadir Jugador', 'route': FootballAddPlayer()},
-      {'label': 'Listar Jugadores', 'route': FootballListPlayer()},
-      {'label': 'Volver', 'route': const MenuScreenFutsal()},
+      {'label': 'Gestor de Equipo', 'route': const MenuScreenFutsalTeam()},
+      {'label': 'Campo Completo', 'route': const FootballFieldScreen()},
+      {'label': 'Media Pista', 'route': const MidFootballFieldScreen()},
+      {'label': 'Volver', 'route': const HomeScreen()},
     ];
 
     return Scaffold(
@@ -22,7 +24,7 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
         children: [
           // Se añade la imagen preselecionada de fondo de pantalla
           Image.asset(
-            'assets/image/football_menu.png',
+            'assets/image/football_menu2.png',
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,

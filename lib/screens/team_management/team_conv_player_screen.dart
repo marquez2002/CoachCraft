@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart'; // Importar la biblioteca printing
-import '../services/firebase_service.dart';
+import '../../services/firebase_service.dart';
 
 class FootballConvPlayer extends StatefulWidget {
   const FootballConvPlayer({super.key});
@@ -52,8 +52,8 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                 ...selectedPlayersData.map((player) {
                   return pw.TableRow(
                     children: [
-                      pw.Center(child: pw.Text(player['nombre'] ?? 'No disponible')),
                       pw.Center(child: pw.Text(player['dorsal']?.toString() ?? 'No disponible')),
+                      pw.Center(child: pw.Text(player['nombre'] ?? 'No disponible')),                      
                       pw.Center(child: pw.Text(player['posicion'] ?? 'No disponible')),
                     ],
                   );
@@ -97,13 +97,13 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                       child: DataTable(
                         columns: const [
                           DataColumn(label: Text('Seleccionar')),
-                          DataColumn(label: Text('Nombre')),
                           DataColumn(label: Text('Dorsal')),
+                          DataColumn(label: Text('Nombre')),                          
                           DataColumn(label: Text('Posición')),
                         ],
                         rows: players.map((player) {
-                          String playerName = player['nombre'] ?? 'Nombre no disponible';
                           String playerDorsal = player['dorsal']?.toString() ?? 'Dorsal no disponible';
+                          String playerName = player['nombre'] ?? 'Nombre no disponible';                          
                           String playerPosition = player['posicion'] ?? 'Posición no disponible';
                           
                           bool isSelected = selectedPlayers[player['nombre']] ?? false;
@@ -119,8 +119,8 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                                 },
                               ),
                             ),
-                            DataCell(Text(playerName)),
                             DataCell(Text(playerDorsal)),
+                            DataCell(Text(playerName)),                          
                             DataCell(Text(playerPosition)),
                           ]);
                         }).toList(),

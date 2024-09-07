@@ -1,8 +1,8 @@
-import 'package:CoachCraft/widgets/menu_widget_futsal_team.dart';
+import 'package:CoachCraft/widgets/menu/menu_widget_futsal.dart';
 import 'package:flutter/material.dart';
 
-class MenuScreenFutsalTeam extends StatelessWidget {
-  const MenuScreenFutsalTeam({super.key});
+class MenuScreenFutsal extends StatelessWidget {
+  const MenuScreenFutsal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class MenuScreenFutsalTeam extends StatelessWidget {
 
       home: const Scaffold(
         // El cuerpo de HomeScreen se encontrará en MainWidget
-        body: MenuWidgetFutsalTeam(),
+        body: MenuWidgetFutsal(),
       ),
     );
   }

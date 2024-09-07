@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/menu_widget_futsal.dart';
+import '../../widgets/menu/menu_widget_futsal.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});

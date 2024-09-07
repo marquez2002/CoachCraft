@@ -1,4 +1,4 @@
-import 'package:CoachCraft/screens/menu_screen.dart';
+import 'package:CoachCraft/screens/menu/menu_screen.dart';
 //import 'package:CoachCraft/services/loginGoogleUtil.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -40,26 +40,7 @@ class MainWidget extends StatelessWidget {
                   );
                 },
                 child: const Text('Acceder'),
-              ),
-              
-              // Botón para conectar la cuenta de Google y crear un proyecto de Firebase
-              /* ElevatedButton(
-                onPressed: () async {
-                  User? user = await LoginGoogleUtil.signInWithGoogle();
-                  if (user != null) {
-                    // Lógica para manejar el inicio de sesión exitoso
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Inicio de sesión con Google exitoso: ${user.email}')),
-                    );
-                  } else {
-                    // Manejar el caso en que el inicio de sesión falla
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Falló el inicio de sesión con Google')),
-                    );
-                  }
-                },
-                child: const Text('Conectar con Google'),
-              ),*/
+              ),              
             ],
           ),
         ),

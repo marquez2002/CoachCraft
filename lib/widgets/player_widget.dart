@@ -1,21 +1,59 @@
 import 'package:flutter/material.dart';
-import '../screens/football_modify_player_screen.dart';
+import '../screens/team_management/team_modify_player_screen.dart';
 
-
-// Función auxiliar para construir un TextFormField
-Widget buildPlayerFormField(TextEditingController controller, String label, String errorMessage, {bool isNumber = false}) {
+// Campo de formulario reutilizable con validaciones personalizadas
+Widget buildPlayerFormField(
+  TextEditingController controller,
+  String label,
+  String validationMessage, {
+  bool isNumber = false,
+}) {
   return TextFormField(
     controller: controller,
-    decoration: InputDecoration(labelText: label),
     keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+    decoration: InputDecoration(labelText: label),
     validator: (value) {
       if (value == null || value.isEmpty) {
-        return errorMessage;
+        return validationMessage;
       }
+
+      // Validación de dorsal
+      if (label == 'Dorsal') {
+        int? dorsal = int.tryParse(value);
+        if (dorsal == null) {
+          return 'Dorsal debe ser un número';
+        }
+      }
+
+      // Validación de posición
+      if (label == 'Posición') {
+        const allowedPositions = ['Portero', 'Ala', 'Pívot', 'Cierre'];
+        if (!allowedPositions.contains(value)) {
+          return 'Posición no válida. Elige Portero, Ala, Pívot o Cierre';
+        }
+      }
+
+      // Validación de edad
+      if (label == 'Edad') {
+        int? age = int.tryParse(value);
+        if (age == null || age <= 0 || age > 70) {
+          return 'Edad debe estar entre 1 y 70 años';
+        }
+      }
+
+      // Validación de peso
+      if (label == 'Peso (kg)') {
+        double? weight = double.tryParse(value);
+        if (weight == null || weight < 30 || weight > 150) {
+          return 'Peso debe estar entre 30 kg y 150 kg';
+        }
+      }
+
       return null;
     },
   );
 }
+
 
 class PlayerDataTable extends StatelessWidget {
   final List<Map<String, dynamic>> players;
