@@ -1,3 +1,4 @@
+import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
 import 'package:CoachCraft/widgets/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/football_piece_widget.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,13 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     });
   }
 
+  void _navigateToOtherScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MidFootballFieldScreen()),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +47,14 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: _toggleDrawing,
-            icon: Icon(isDrawing ? Icons.brush : Icons.edit),
-            tooltip: isDrawing ? 'Dejar de dibujar' : 'Dibujar',
+            onPressed: _navigateToOtherScreen,
+            icon: const Icon(Icons.airline_stops_outlined),
+            tooltip: 'Ir a pizarra de media pista',
           ),
           IconButton(
-            onPressed: _clearDrawing,
-            icon: const Icon(Icons.delete),
-            tooltip: 'Borrar',
+            onPressed: _toggleDrawing,
+            icon: Icon(isDrawing ? Icons.block_outlined : Icons.edit_outlined),
+            tooltip: isDrawing ? 'Dejar de dibujar' : 'Dibujar',
           ),
         ],
       ),

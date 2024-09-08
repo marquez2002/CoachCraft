@@ -1,7 +1,7 @@
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/menu/home_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
-import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
+import 'package:CoachCraft/screens/stats/matches_screen.dart';
 import 'package:flutter/material.dart';
 
 
@@ -15,7 +15,7 @@ class MenuWidgetFutsal extends StatelessWidget {
     List<Map<String, dynamic>> buttonData = [
       {'label': 'Gestor de Equipo', 'route': const MenuScreenFutsalTeam()},
       {'label': 'Campo Completo', 'route': const FootballFieldScreen()},
-      {'label': 'Media Pista', 'route': const MidFootballFieldScreen()},
+      {'label': 'Partidos y Estadisticas', 'route': const MatchesScreen()},
       {'label': 'Volver', 'route': const HomeScreen()},
     ];
 
