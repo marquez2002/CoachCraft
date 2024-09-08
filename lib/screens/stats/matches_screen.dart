@@ -17,6 +17,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
   List<Map<String, dynamic>> _matches = [];
   List<Map<String, dynamic>> _filteredMatches = [];
   String _season = '2024';
+  // ignore: unused_field
   String _matchType = 'Todos'; // Agregar tipo de partido
 
   @override

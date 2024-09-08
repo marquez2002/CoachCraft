@@ -1,4 +1,5 @@
 import 'package:CoachCraft/services/match_service.dart';
+import 'package:CoachCraft/services/player_service.dart'; // Asegúrate de que esta clase exista
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -24,13 +25,20 @@ class _MatchFormState extends State<MatchForm> {
       return; // Validación básica
     }
 
-    await MatchService().createMatch({
+    // Crea el partido y guarda el ID
+    String matchId = await MatchService().createMatch({
       'rivalTeam': _rivalTeamController.text,
       'matchDate': _selectedDate!.toIso8601String(),
       'result': _resultController.text,
       'location': _location,
       'matchType': _matchType,
     });
+
+    // Obtener los jugadores actuales de la plantilla
+    List<Map<String, dynamic>> players = await PlayerService().getCurrentPlayers(); // Asegúrate de implementar este método
+
+    // Guardar los jugadores en la colección raíz del partido
+    await MatchService().savePlayersForMatch(matchId, players);
 
     _clearForm();
     widget.onMatchCreated();

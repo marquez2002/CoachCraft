@@ -26,6 +26,19 @@ class MatchList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtiene el ancho de la pantalla
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    // Calcula cuántas tarjetas se pueden mostrar en una fila
+    int crossAxisCount;
+    if (screenWidth < 600) {
+      crossAxisCount = 2; // Móviles
+    } else if (screenWidth < 900) {
+      crossAxisCount = 3; // Tabletas pequeñas
+    } else {
+      crossAxisCount = 5; // Pantallas más grandes
+    }
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,8 +47,8 @@ class MatchList extends StatelessWidget {
           const SizedBox(height: 8.0),
           Expanded(
             child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount, // Usar el número calculado de tarjetas por fila
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
                 childAspectRatio: 1.2,

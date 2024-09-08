@@ -27,38 +27,48 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Jugador No Encontrado.'));
           } else {
-            return Column(
-              children: [
-                // Ajuste aquí para que el contenido esté en la parte superior
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0), // Separar del AppBar
-                  child: Align(
-                    alignment: Alignment.topCenter, // Alinear en la parte superior y centro
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.9, // Ajusta el ancho de la tabla
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                // Se calcula el ancho basado en el tamaño del dispositivo
+                double tableWidth = constraints.maxWidth * 0.9; // 90% del ancho disponible
+
+                return Column(
+                  children: [
+                    // Ajuste aquí para que el contenido esté en la parte superior
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0), // Separar del AppBar
+                      child: Align(
+                        alignment: Alignment.topCenter, // Alinear en la parte superior y centro
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: tableWidth, // Ajustar el ancho de la tabla
+                            ),
+                            child: PlayerDataTable(players: snapshot.data!),
+                          ),
                         ),
-                        child: PlayerDataTable(players: snapshot.data!),
                       ),
                     ),
-                  ),
-                ),
-                const Spacer(), // Esto empuja el botón hacia la parte inferior
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const FootballConvPlayer()),
-                      );
-                    },
-                    child: const Text('Convocatoria'),
-                  ),
-                ),
-              ],
+                    // Botón en la parte inferior
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SizedBox(
+                        width: double.infinity, // Botón ocupa todo el ancho
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const FootballConvPlayer()),
+                            );
+                          },
+                          child: const Text('Convocatoria'),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           }
         },
