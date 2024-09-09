@@ -1,5 +1,7 @@
+import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:flutter/material.dart';
 import '../screens/team_management/team_modify_player_screen.dart';
+import '../../services/player_service.dart';
 
 // Campo de formulario reutilizable con validaciones personalizadas
 Widget buildPlayerFormField(
@@ -72,6 +74,7 @@ class PlayerDataTable extends StatelessWidget {
           DataColumn(label: Text('Altura')),
           DataColumn(label: Text('Peso')),
           DataColumn(label: Text('Modificar')),
+          DataColumn(label: Text('Eliminar')),
         ],
         rows: players.map((player) {
           final dorsal = player['dorsal']; // Asegurarse de que el dorsal está presente
@@ -98,6 +101,58 @@ class PlayerDataTable extends StatelessWidget {
                         ),
                       );
                     } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Dorsal del jugador no disponible'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+            DataCell(
+              Center(
+                child: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () async {
+                    if (dorsal != null) {
+                      bool confirmDelete = await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirmar eliminación'),
+                            content: const Text('¿Estás seguro de que deseas eliminar este jugador?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(false); // No eliminar
+                                },
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(true); // Confirmar eliminación
+                                },
+                                child: const Text('Eliminar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (confirmDelete) {
+                        // Llamar a la función para eliminar el jugador
+                        await deletePlayerByDorsal(dorsal);
+
+                        // Redirigir a MenuFutsalScreen tras eliminar el jugador
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => MenuScreenFutsalTeam()), // Navegar a MenuFutsalScreen
+                        );
+                      }
+                    } else {
+                      // Mostrar SnackBar si no hay dorsal disponible
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Dorsal del jugador no disponible'),

@@ -62,10 +62,17 @@ class MatchList extends StatelessWidget {
 
                 return GestureDetector(
                   onTap: () {
+                    // Navegar a StatsScreen pasando los datos del partido
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => StatsScreen(),
+                        builder: (context) => StatsScreen(
+                          matchDate: matchData['matchDate'], // Pasar la fecha del partido
+                          rivalTeam: matchData['rivalTeam'], // Pasar el equipo rival
+                          result: matchData['result'], // Pasar el resultado
+                          matchType: matchData['matchType'], // Pasar el tipo de partido
+                          location: matchData['location']
+                        ),
                       ),
                     );
                   },

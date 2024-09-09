@@ -50,11 +50,11 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
                         ),
                       ),
                     ),
-                    // Botón en la parte inferior
+                    const Spacer(), // Esto empuja el botón hacia la parte inferior
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SizedBox(
-                        width: double.infinity, // Botón ocupa todo el ancho
+                        width: 200, // Ajuste de ancho del botón
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(

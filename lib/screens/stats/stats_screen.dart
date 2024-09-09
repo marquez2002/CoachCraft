@@ -1,239 +1,246 @@
-import 'package:CoachCraft/models/player_stats.dart'; // Asegúrate de que el nombre del archivo sea correcto
+import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
+import 'package:CoachCraft/services/match_service.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StatsScreen extends StatefulWidget {
-  const StatsScreen({Key? key}) : super(key: key);
+  final String matchDate;
+  final String rivalTeam;
+  final String result;
+  final String matchType;
+  final String location;
+
+  const StatsScreen({
+    Key? key,
+    required this.matchDate,
+    required this.rivalTeam,
+    required this.result,
+    required this.matchType,
+    required this.location,
+  }) : super(key: key);
 
   @override
   _StatsScreenState createState() => _StatsScreenState();
 }
 
 class _StatsScreenState extends State<StatsScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final List<PlayerStats> _playerStats = [];
+  late TextEditingController _dateController;
+  late TextEditingController _rivalController;
+  late TextEditingController _resultController;
+  String _matchType = '';
+  String _location = '';
+  bool _isExpanded = false;
 
-  String? _rivalTeam;
-  DateTime? _matchDate;
+  final List<String> matchTypes = ['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs'];
+  final List<String> locations = ['Casa', 'Fuera'];
 
   @override
   void initState() {
     super.initState();
-    _fetchPlayers();
-  }
-
-  Future<void> _fetchPlayers() async {
-    QuerySnapshot snapshot = await _firestore.collection('team').get();
-    setState(() {
-      // Mapa de datos a PlayerStats
-      _playerStats.addAll(snapshot.docs.map((doc) => PlayerStats.fromJson(doc.data() as Map<String, dynamic>)));
-
-      // Ordenar jugadores por dorsal
-      _playerStats.sort((a, b) => a.dorsal.compareTo(b.dorsal));
-    });
-  }
-
-  void _incrementStat(PlayerStats playerStat, String stat) {
-    setState(() {
-      switch (stat) {
-        case 'goals':
-          playerStat.goals++;
-          break;
-        case 'assists':
-          playerStat.assists++;
-          break;
-        case 'yellowCards':
-          playerStat.yellowCards++;
-          break;
-        case 'redCards':
-          playerStat.redCards++;
-          break;
-        case 'shots':
-          playerStat.shots++;
-          break;
-        case 'shotsOnGoal':
-          playerStat.shotsOnGoal++;
-          break;
-        case 'tackle':
-          playerStat.tackle++;
-          break;
-        case 'foul':
-          playerStat.foul++;
-          break;
-        case 'failedPasses':
-          playerStat.failedPasses++;
-          break;
-        case 'failedDribbles':
-          playerStat.failedDribbles++;
-          break;
-      }
-    });
-  }
-
-  void _decrementStat(PlayerStats playerStat, String stat) {
-    setState(() {
-      switch (stat) {
-        case 'goals':
-          if (playerStat.goals > 0) playerStat.goals--;
-          break;
-        case 'assists':
-          if (playerStat.assists > 0) playerStat.assists--;
-          break;
-        case 'yellowCards':
-          if (playerStat.yellowCards > 0) playerStat.yellowCards--;
-          break;
-        case 'redCards':
-          if (playerStat.redCards > 0) playerStat.redCards--;
-          break;
-        case 'shots':
-          if (playerStat.shots > 0) playerStat.shots--;
-          break;
-        case 'shotsOnGoal':
-          if (playerStat.shotsOnGoal > 0) playerStat.shotsOnGoal--;
-          break;
-        case 'tackle':
-          if (playerStat.tackle > 0) playerStat.tackle--;
-          break;
-        case 'foul':
-          if (playerStat.foul > 0) playerStat.foul--;
-          break;
-        case 'failedPasses':
-          if (playerStat.failedPasses > 0) playerStat.failedPasses--;
-          break;
-        case 'failedDribbles':
-          if (playerStat.failedDribbles > 0) playerStat.failedDribbles--;
-          break;
-      }
-    });
+    _dateController = TextEditingController(text: _formatDate(widget.matchDate)); // Formato correcto
+    _rivalController = TextEditingController(text: widget.rivalTeam);
+    _resultController = TextEditingController(text: widget.result);
+    _matchType = widget.matchType; 
+    _location = widget.location; 
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Match Stats'),
+  void dispose() {
+    _dateController.dispose();
+    _rivalController.dispose();
+    _resultController.dispose();
+    super.dispose();
+  }
+
+  String _formatDate(String date) {
+    DateTime parsedDate = DateTime.parse(date);
+    return '${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}';
+  }
+
+  Future<void> _deleteMatch() async {
+    // Confirmación antes de eliminar
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar Eliminación'),
+        content: const Text('¿Estás seguro de que deseas eliminar este partido?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Eliminar'),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: const InputDecoration(labelText: 'Rival Team'),
-              onChanged: (value) {
-                _rivalTeam = value;
-              },
+    );
+
+    if (confirm == true) {
+      try {
+        await MatchService().deleteMatch(widget.rivalTeam, widget.matchDate);
+        Navigator.pop(context); // Regresar a la pantalla anterior
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Partido eliminado exitosamente.')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al eliminar el partido: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateMatch() async {
+    final updatedData = {
+      'rivalTeam': widget.rivalTeam,
+      'matchDate': widget.matchDate,
+      'result': _resultController.text,
+      'matchType': _matchType,
+      'location': _location,
+    };
+
+    try {
+      await MatchService().updateMatchByDetails(updatedData);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Partido actualizado exitosamente.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al actualizar el partido: $e')),
+      );
+    }
+  }
+
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Estadísticas del Partido: ${_rivalController.text}'),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Modificar Estadísticas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
+              ],
             ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Match Date'),
-              onTap: () async {
-                DateTime? date = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (date != null) {
-                  setState(() {
-                    _matchDate = date;
-                  });
-                }
-              },
-              readOnly: true,
-              controller: TextEditingController(text: _matchDate != null ? _matchDate!.toLocal().toString().split(' ')[0] : ''),
-            ),
-            const SizedBox(height: 32.0),
-            Expanded(
-              child: SingleChildScrollView( // Permite el desplazamiento
-                child: GridView.builder(
-                  shrinkWrap: true, // Evita que la cuadrícula se expanda
-                  physics: const NeverScrollableScrollPhysics(), // Deshabilita el desplazamiento de la cuadrícula
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Cambia el número de columnas
-                    childAspectRatio: 1.5, // Ajustado para que se vean bien las tarjetas
-                    crossAxisSpacing: 8.0, // Espacio horizontal entre tarjetas
-                    mainAxisSpacing: 8.0, // Espacio vertical entre tarjetas
+          ),
+          const SizedBox(height: 8.0),
+          if (_isExpanded) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _rivalController,
+                    decoration: const InputDecoration(
+                      labelText: 'Rival',
+                      border: OutlineInputBorder(),
+                    ),
+                    enabled: false,
                   ),
-                  itemCount: _playerStats.length,
-                  itemBuilder: (context, index) {
-                    final playerStat = _playerStats[index];
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('${playerStat.nombre} #${playerStat.dorsal}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8.0), // Espacio entre el nombre y las estadísticas
-                            ..._buildStatRows(playerStat),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
                 ),
+                const SizedBox(width: 8.0), // Espacio entre Rival y Fecha
+                Expanded(
+                  child: TextField(
+                    controller: _dateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Fecha',
+                      border: OutlineInputBorder(),
+                    ),
+                    enabled: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            TextField(
+              controller: _resultController,
+              decoration: const InputDecoration(
+                labelText: 'Resultado',
+                border: OutlineInputBorder(),
               ),
             ),
+            const SizedBox(height: 8.0),
+            DropdownButtonFormField<String>(
+              value: _matchType,
+              decoration: const InputDecoration(
+                labelText: 'Tipo de Partido',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _matchType = newValue!;
+                });
+              },
+              items: matchTypes.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 8.0),
+            DropdownButtonFormField<String>(
+              value: _location,
+              decoration: const InputDecoration(
+                labelText: 'Lugar del Partido',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _location = newValue!;
+                });
+              },
+              items: locations.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16.0),
+            // Modificación en el Row de los botones
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Centrado
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await _updateMatch(); // Llama a la función de actualización
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), // Navegar a MenuScreenFutsal
+                    );
+                  },
+                  child: const Text('Guardar'),
+                ),
+                const SizedBox(width: 16.0), // Espacio entre los botones
+                ElevatedButton(
+                  onPressed: () async {
+                    await _deleteMatch(); // Llama a la función de eliminación
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), // Navegar a MenuScreenFutsal
+                    );
+                  },
+                  child: const Text('Borrar Partido'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16.0),
           ],
-        ),
+        ],
       ),
-    );
-  }
-
-  List<Widget> _buildStatRows(PlayerStats playerStat) {
-    List<String> statLabels = [
-      'Goals',
-      'Assists',
-      'Yellow Cards',
-      'Red Cards',
-      'Shots',
-      'Shots on Goal',
-      'Tackles',
-      'Fouls',
-      'Failed Passes',
-      'Failed Dribbles'
-    ];
-
-    List<String> statKeys = [
-      'goals',
-      'assists',
-      'yellowCards',
-      'redCards',
-      'shots',
-      'shotsOnGoal',
-      'tackle',
-      'foul',
-      'failedPasses',
-      'failedDribbles'
-    ];
-
-    List<Widget> statWidgets = [];
-
-    for (int i = 0; i < statLabels.length; i++) {
-      statWidgets.add(_buildStatRow(statLabels[i], playerStat.toJson()[statKeys[i]], playerStat, statKeys[i]));
-      statWidgets.add(const SizedBox(height: 2.0)); // Espacio entre las filas de estadísticas
-    }
-
-    return statWidgets;
-  }
-
-  Widget _buildStatRow(String label, int value, PlayerStats playerStat, String stat) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(child: Text('$label: $value')),
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => _incrementStat(playerStat, stat),
-            ),
-            IconButton(
-              icon: const Icon(Icons.remove),
-              onPressed: () => _decrementStat(playerStat, stat),
-            ),
-          ],
-        ),
-      ],
-    );
+    ),
+  );
   }
 }
