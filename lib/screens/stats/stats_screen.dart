@@ -1,5 +1,6 @@
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/services/match_service.dart';
+import 'package:CoachCraft/widgets/player_stat_card.dart';
 import 'package:flutter/material.dart';
 
 class StatsScreen extends StatefulWidget {
@@ -8,6 +9,7 @@ class StatsScreen extends StatefulWidget {
   final String result;
   final String matchType;
   final String location;
+  final List<dynamic> playerStats; // Lista de estadísticas de los jugadores
 
   const StatsScreen({
     Key? key,
@@ -16,6 +18,7 @@ class StatsScreen extends StatefulWidget {
     required this.result,
     required this.matchType,
     required this.location,
+    required this.playerStats, // Inicializa el parámetro
   }) : super(key: key);
 
   @override
@@ -28,7 +31,6 @@ class _StatsScreenState extends State<StatsScreen> {
   late TextEditingController _resultController;
   String _matchType = '';
   String _location = '';
-  bool _isExpanded = false;
 
   final List<String> matchTypes = ['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs'];
   final List<String> locations = ['Casa', 'Fuera'];
@@ -36,11 +38,14 @@ class _StatsScreenState extends State<StatsScreen> {
   @override
   void initState() {
     super.initState();
-    _dateController = TextEditingController(text: _formatDate(widget.matchDate)); // Formato correcto
+    _dateController = TextEditingController(text: _formatDate(widget.matchDate));
     _rivalController = TextEditingController(text: widget.rivalTeam);
     _resultController = TextEditingController(text: widget.result);
     _matchType = widget.matchType; 
     _location = widget.location; 
+
+    // Verificar los datos de los jugadores
+    print("Player Stats: ${widget.playerStats}"); // Verificar datos
   }
 
   @override
@@ -113,32 +118,16 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Estadísticas del Partido: ${_rivalController.text}'),
-    ),
-    body: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Modificar Estadísticas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          if (_isExpanded) ...[
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Estadísticas del Partido: ${_rivalController.text}'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Row(
               children: [
                 Expanded(
@@ -151,7 +140,7 @@ Widget build(BuildContext context) {
                     enabled: false,
                   ),
                 ),
-                const SizedBox(width: 8.0), // Espacio entre Rival y Fecha
+                const SizedBox(width: 8.0),
                 Expanded(
                   child: TextField(
                     controller: _dateController,
@@ -211,25 +200,24 @@ Widget build(BuildContext context) {
               }).toList(),
             ),
             const SizedBox(height: 16.0),
-            // Modificación en el Row de los botones
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Centrado
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    await _updateMatch(); // Llama a la función de actualización
+                    await _updateMatch(); 
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), // Navegar a MenuScreenFutsal
+                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), 
                     );
                   },
                   child: const Text('Guardar'),
                 ),
-                const SizedBox(width: 16.0), // Espacio entre los botones
+                const SizedBox(width: 16.0),
                 ElevatedButton(
                   onPressed: () async {
-                    await _deleteMatch(); // Llama a la función de eliminación
+                    await _deleteMatch(); 
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), // Navegar a MenuScreenFutsal
+                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), 
                     );
                   },
                   child: const Text('Borrar Partido'),
@@ -237,10 +225,24 @@ Widget build(BuildContext context) {
               ],
             ),
             const SizedBox(height: 16.0),
+            // Lista de estadísticas de jugadores
+            const Text('Estadísticas de Jugadores:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8.0),
+            // Controlar la altura del ListView con SizedBox
+            SizedBox(
+              height: 200.0, // Altura fija para evitar problemas de layout
+              child: widget.playerStats.isNotEmpty 
+                ? ListView.builder(
+                    itemCount: widget.playerStats.length,
+                    itemBuilder: (context, index) {
+                      return PlayerStatCard(playerStat: widget.playerStats[index]); // Mostrar cada tarjeta
+                    },
+                  )
+                : Center(child: Text('No hay estadísticas disponibles')), // Mensaje si no hay datos
+            ),
           ],
-        ],
+        ),
       ),
-    ),
-  );
+    );
   }
 }

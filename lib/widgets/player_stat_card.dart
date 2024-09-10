@@ -28,6 +28,8 @@ class PlayerStatCard extends StatelessWidget {
                 ],
               ],
             ),
+            const SizedBox(height: 8.0),
+            ..._buildStatRows(playerStat), // Call the method to build the stats rows
           ],
         ),
       ),

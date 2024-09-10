@@ -71,7 +71,7 @@ class MatchList extends StatelessWidget {
                           rivalTeam: matchData['rivalTeam'], // Pasar el equipo rival
                           result: matchData['result'], // Pasar el resultado
                           matchType: matchData['matchType'], // Pasar el tipo de partido
-                          location: matchData['location']
+                          location: matchData['location'], playerStats: [],
                         ),
                       ),
                     );

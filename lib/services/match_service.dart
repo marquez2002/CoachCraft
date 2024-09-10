@@ -122,18 +122,47 @@ class MatchService {
   }
 
 
-
-  // Método para eliminar un partido basado en el nombre del rival y la fecha
-  Future<void> deleteMatch(String rivalTeam, String matchDate) async {    
-    final matches = await _firestore
+Future<void> deleteMatch(String rivalTeam, String matchDate) async {
+  // Buscar los partidos que coinciden con el equipo rival y la fecha del partido
+  final matches = await _firestore
       .collection('matches')
       .where('rivalTeam', isEqualTo: rivalTeam)
       .where('matchDate', isEqualTo: matchDate)
       .get();
 
-    for (var match in matches.docs) {
-      await match.reference.delete();
-    }
+  // Recorrer todos los partidos encontrados
+  for (var match in matches.docs) {
+    // Obtener la referencia del partido
+    var matchRef = match.reference;
+
+    // Eliminar la subcolección de jugadores y sus estadísticas
+    await _deletePlayersWithStatistics(matchRef);
+
+    // Eliminar el documento del partido
+    await matchRef.delete();
   }
 }
+
+// Método para eliminar la subcolección de jugadores y sus estadísticas
+Future<void> _deletePlayersWithStatistics(DocumentReference matchRef) async {
+  var playersRef = matchRef.collection('players');
+  var playersDocs = await playersRef.get();
+
+  // Recorrer cada documento de la subcolección de jugadores
+  for (var playerDoc in playersDocs.docs) {
+    // Eliminar la subcolección de estadísticas del jugador
+    var statisticsRef = playerDoc.reference.collection('stadistics');
+    var statisticsDocs = await statisticsRef.get();
+
+    for (var statDoc in statisticsDocs.docs) {
+      await statDoc.reference.delete(); // Eliminar cada documento de estadísticas
+    }
+
+    await playerDoc.reference.delete(); // Eliminar el documento del jugador
+  }
+}
+
+
+}
+
 
