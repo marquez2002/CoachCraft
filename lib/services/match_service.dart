@@ -20,16 +20,11 @@ class MatchService {
             .get();
 
         for (var playerDoc in playersSnapshot.docs) {
-          var playerData = playerDoc.data();
           final statsSnapshot = await playerDoc.reference.collection('stadistics').get();
           for (var statDoc in statsSnapshot.docs) {
             var statData = statDoc.data();
-            if (playerData['position'] == 'Portero') {
-              loadedPlayerStats.add(GoalkeeperStats.fromJson(statData));
-            } else {
               loadedPlayerStats.add(PlayerStats.fromJson(statData));
-            }
-          }
+          }          
         }
       } else {
         print('No se encontró ningún partido con ese rival y fecha.');
@@ -46,6 +41,7 @@ class MatchService {
     return docRef.id; // Retorna el ID del nuevo partido creado
   }
 
+  
   Future<void> savePlayersForMatch(String matchId, List<Map<String, dynamic>> players) async {
     try {
       for (var player in players) {
@@ -65,31 +61,25 @@ class MatchService {
             .collection('players')
             .add(playerData);
 
-        // Crear estadísticas iniciales
-        Map<String, dynamic> stadistics;
-        if (playerData['position'] == 'portero') {
-          var goalkeeperStats = GoalkeeperStats(
-            nombre: playerData['name'],
-            dorsal: playerData['dorsal'],
-            posicion: playerData['posicion'],
-          );
-          stadistics = goalkeeperStats.toJson();
-        } else {
-          var playerStats = PlayerStats(
-            nombre: playerData['name'],
-            dorsal: playerData['dorsal'],
-            posicion: playerData['posicion'],
-          );
-          stadistics = playerStats.toJson();
-        }
-        
+        // Crear estadísticas iniciales usando solo PlayerStats
+        var playerStats = PlayerStats(
+          nombre: playerData['name'],
+          dorsal: playerData['dorsal'],
+          posicion: playerData['posicion'],
+        );
+
+        // Convertir a JSON
+        Map<String, dynamic> stadistics = playerStats.toJson();
+              
+        // Guardar las estadísticas en la subcolección 'stadistics'
         await playerRef.collection('stadistics').add(stadistics);
       }
     } catch (e) {
-      print(e); // Imprimir el error para más información
+      print(e); 
       throw Exception('Error al guardar jugadores para el partido: $e');
     }
   }
+
 
   Future<List<Map<String, dynamic>>> fetchMatches() async {
     QuerySnapshot snapshot = await _firestore.collection('matches').get();

@@ -1,7 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/services/match_service.dart';
 import 'package:CoachCraft/widgets/player_stat_card.dart';
-import 'package:flutter/material.dart';
 
 class StatsScreen extends StatefulWidget {
   final String matchDate;
@@ -9,7 +9,6 @@ class StatsScreen extends StatefulWidget {
   final String result;
   final String matchType;
   final String location;
-  final List<dynamic> playerStats; // Lista de estadísticas de los jugadores
 
   const StatsScreen({
     Key? key,
@@ -17,8 +16,7 @@ class StatsScreen extends StatefulWidget {
     required this.rivalTeam,
     required this.result,
     required this.matchType,
-    required this.location,
-    required this.playerStats, // Inicializa el parámetro
+    required this.location, required List playerStats,
   }) : super(key: key);
 
   @override
@@ -31,6 +29,8 @@ class _StatsScreenState extends State<StatsScreen> {
   late TextEditingController _resultController;
   String _matchType = '';
   String _location = '';
+  bool _isExpanded = false;
+  List<dynamic> playerStats = []; // Lista para almacenar las estadísticas de jugadores
 
   final List<String> matchTypes = ['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs'];
   final List<String> locations = ['Casa', 'Fuera'];
@@ -41,11 +41,16 @@ class _StatsScreenState extends State<StatsScreen> {
     _dateController = TextEditingController(text: _formatDate(widget.matchDate));
     _rivalController = TextEditingController(text: widget.rivalTeam);
     _resultController = TextEditingController(text: widget.result);
-    _matchType = widget.matchType; 
-    _location = widget.location; 
+    _matchType = widget.matchType;
+    _location = widget.location;
+    _fetchPlayerStats(); // Llama a la función para cargar estadísticas de jugadores
+  }
 
-    // Verificar los datos de los jugadores
-    print("Player Stats: ${widget.playerStats}"); // Verificar datos
+  Future<void> _fetchPlayerStats() async {
+    final fetchedStats = await MatchService().fetchPlayerStats(widget.rivalTeam, widget.matchDate);
+    setState(() {
+      playerStats = fetchedStats; // Actualiza la lista de estadísticas
+    });
   }
 
   @override
@@ -117,7 +122,7 @@ class _StatsScreenState extends State<StatsScreen> {
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -128,118 +133,156 @@ class _StatsScreenState extends State<StatsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _rivalController,
-                    decoration: const InputDecoration(
-                      labelText: 'Rival',
-                      border: OutlineInputBorder(),
-                    ),
-                    enabled: false,
-                  ),
-                ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: TextField(
-                    controller: _dateController,
-                    decoration: const InputDecoration(
-                      labelText: 'Fecha',
-                      border: OutlineInputBorder(),
-                    ),
-                    enabled: false,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              controller: _resultController,
-              decoration: const InputDecoration(
-                labelText: 'Resultado',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            DropdownButtonFormField<String>(
-              value: _matchType,
-              decoration: const InputDecoration(
-                labelText: 'Tipo de Partido',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (String? newValue) {
+            GestureDetector(
+              onTap: () {
                 setState(() {
-                  _matchType = newValue!;
+                  _isExpanded = !_isExpanded;
                 });
               },
-              items: matchTypes.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8.0),
-            DropdownButtonFormField<String>(
-              value: _location,
-              decoration: const InputDecoration(
-                labelText: 'Lugar del Partido',
-                border: OutlineInputBorder(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Modificar Estadísticas',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
+                ],
               ),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _location = newValue!;
-                });
-              },
-              items: locations.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
             ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    await _updateMatch(); 
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), 
-                    );
-                  },
-                  child: const Text('Guardar'),
-                ),
-                const SizedBox(width: 16.0),
-                ElevatedButton(
-                  onPressed: () async {
-                    await _deleteMatch(); 
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => MenuScreenFutsal()), 
-                    );
-                  },
-                  child: const Text('Borrar Partido'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            // Lista de estadísticas de jugadores
-            const Text('Estadísticas de Jugadores:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8.0),
-            // Controlar la altura del ListView con SizedBox
-            SizedBox(
-              height: 200.0, // Altura fija para evitar problemas de layout
-              child: widget.playerStats.isNotEmpty 
-                ? ListView.builder(
-                    itemCount: widget.playerStats.length,
-                    itemBuilder: (context, index) {
-                      return PlayerStatCard(playerStat: widget.playerStats[index]); // Mostrar cada tarjeta
+            if (_isExpanded) ...[
+              // Campos de edición
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _rivalController,
+                      decoration: const InputDecoration(
+                        labelText: 'Rival',
+                        border: OutlineInputBorder(),
+                      ),
+                      enabled: false,
+                    ),
+                  ),
+                  const SizedBox(width: 8.0),
+                  Expanded(
+                    child: TextField(
+                      controller: _dateController,
+                      decoration: const InputDecoration(
+                        labelText: 'Fecha',
+                        border: OutlineInputBorder(),
+                      ),
+                      enabled: false,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              TextField(
+                controller: _resultController,
+                decoration: const InputDecoration(
+                  labelText: 'Resultado',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              DropdownButtonFormField<String>(
+                value: _matchType,
+                decoration: const InputDecoration(
+                  labelText: 'Tipo de Partido',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _matchType = newValue!;
+                  });
+                },
+                items: matchTypes.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 8.0),
+              DropdownButtonFormField<String>(
+                value: _location,
+                decoration: const InputDecoration(
+                  labelText: 'Lugar del Partido',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _location = newValue!;
+                  });
+                },
+                items: locations.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _updateMatch();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                      );
                     },
-                  )
-                : Center(child: Text('No hay estadísticas disponibles')), // Mensaje si no hay datos
+                    child: const Text('Guardar'),
+                  ),
+                  const SizedBox(width: 16.0),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _deleteMatch();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                      );
+                    },
+                    child: const Text('Borrar Partido'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+            ],
+            const SizedBox(height: 8.0),
+             
+            Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Calcula el ancho total disponible
+                double availableWidth = constraints.maxWidth;
+
+                // Determina cuántas tarjetas caben en una fila, basadas en un ancho deseado
+                int count = (availableWidth / 800).floor(); // Ajusta 650 según el ancho deseado de la tarjeta
+
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: count > 0 ? count : 1,
+                    mainAxisSpacing: 4.0,
+                    crossAxisSpacing: 4.0,
+                  ),
+                  itemCount: playerStats.length,
+                  itemBuilder: (context, index) {
+                    return SizedBox(
+                      height: 1400, // Altura fija de la tarjeta (ajusta según tus necesidades)
+                      width: 800, // Ancho fijo de la tarjeta
+                      child: PlayerStatCard(playerStat: playerStats[index]),
+                    );
+                  },
+                );
+              },
             ),
+          ),
+
+
+
           ],
         ),
       ),

@@ -97,6 +97,7 @@ class MatchList extends StatelessWidget {
                               const SizedBox(width: 8.0),
                               Text(
                                 'Rival: ${matchData['rivalTeam']}',
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                               ),
                             ],
