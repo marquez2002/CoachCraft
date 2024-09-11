@@ -14,7 +14,7 @@ class MenuWidgetFutsal extends StatelessWidget {
     // Lista de datos para los botones con las rutas determinada que deben seguir
     List<Map<String, dynamic>> buttonData = [
       {'label': 'Gestor de Equipo', 'route': const MenuScreenFutsalTeam()},
-      {'label': 'Campo Completo', 'route': const FootballFieldScreen()},
+      {'label': 'Pizarra', 'route': const FootballFieldScreen()},
       {'label': 'Partidos y Estadisticas', 'route': const MatchesScreen()},
       {'label': 'Volver', 'route': const HomeScreen()},
     ];
