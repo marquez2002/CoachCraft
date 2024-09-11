@@ -3,7 +3,7 @@ import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:flutter/material.dart';
 import '../../models/player.dart';
 import '../../services/firebase_service.dart';
-import '../../widgets/player_widget.dart';
+import '../../widgets/player/player_widget.dart';
 
 class FootballAddPlayer extends StatefulWidget {
   const FootballAddPlayer({super.key});

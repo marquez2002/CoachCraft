@@ -1,6 +1,6 @@
 import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
-import 'package:CoachCraft/widgets/field_painter_widget.dart';
-import 'package:CoachCraft/widgets/football_piece_widget.dart';
+import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
+import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
 
 class FootballFieldScreen extends StatefulWidget {

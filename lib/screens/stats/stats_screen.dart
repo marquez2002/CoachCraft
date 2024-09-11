@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/services/match_service.dart';
-import 'package:CoachCraft/widgets/player_stat_card.dart';
+import 'package:CoachCraft/widgets/match/player_stat_card.dart';
 
 class StatsScreen extends StatefulWidget {
   final String matchDate;

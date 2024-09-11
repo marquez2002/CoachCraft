@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/firebase_service.dart';
 import 'team_conv_player_screen.dart';
-import '../../widgets/player_widget.dart';
+import '../../widgets/player/player_widget.dart';
 
 class FootballListPlayer extends StatefulWidget {
   const FootballListPlayer({super.key});
