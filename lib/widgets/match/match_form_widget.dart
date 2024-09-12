@@ -23,7 +23,7 @@ class _MatchFormState extends State<MatchForm> {
   Future<void> _createMatch() async {
     if (_rivalTeamController.text.isEmpty || _selectedDate == null || _resultController.text.isEmpty) {
       return; // Validación básica
-    }
+    } 
 
     // Crea el partido y guarda el ID
     String matchId = await MatchService().createMatch({

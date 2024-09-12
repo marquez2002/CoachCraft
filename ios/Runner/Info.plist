@@ -53,5 +53,20 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Necesitamos acceso a la biblioteca de fotos para seleccionar una imagen del escudo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Save video in gallery</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Save audio in video</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Se necesita acceso al micrófono para grabar la pantalla.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Se necesita acceso a la cámara.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+	    <string>audio</string>
+	</array>
+
+
+
 </dict>
 </plist>

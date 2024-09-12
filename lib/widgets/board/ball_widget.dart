@@ -47,8 +47,8 @@ class _BallState extends State<Ball> {
         },
         child: Image.asset(
           widget.image,
-          width: 70, // Tamaño del balón
-          height: 70,
+          width: 50, // Tamaño del balón
+          height: 50,
         ),
       ),
     );

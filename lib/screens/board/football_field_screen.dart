@@ -1,8 +1,11 @@
 import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
+import 'package:CoachCraft/screens/board/recording_plays_screen.dart';
 import 'package:CoachCraft/widgets/board/ball_widget.dart';
 import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screen_recording/flutter_screen_recording.dart';
+import 'package:intl/intl.dart';
 
 class FootballFieldScreen extends StatefulWidget {
   const FootballFieldScreen({Key? key}) : super(key: key);
@@ -17,6 +20,8 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   GlobalKey _imageKey = GlobalKey();
   Size? _imageSize;
   Color drawColor = Colors.red; // Color por defecto
+  bool _isRecording = false;
+  String? videoPath; // Ruta del video grabado
 
   // Inicializa posiciones proporcionales al tamaño de la imagen (0.0 - 1.0)
   final List<Map<String, dynamic>> _initialPositions = [
@@ -57,11 +62,52 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     });
   }
 
-  void _navigateToOtherScreen() {
+  void _navigateToScreen(int screenNumber) {
+  if (screenNumber == 1) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const MidFootballFieldScreen()),
     );
+  } else if (screenNumber == 2) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RecordingPlayScreen()),
+    );
+  } else {
+    // Manejo de error si el número no es válido (opcional)
+    print('Número de pantalla no válido: $screenNumber');
+  }
+}
+
+
+  Future<void> _startRecording() async {
+    // Obtiene la fecha y hora actual para el nombre del archivo
+    final now = DateTime.now();
+    final dateFormat = DateFormat('yyyyMMdd_HHmmss');
+    String formattedDate = dateFormat.format(now);
+
+    // Establece la ruta del video con la fecha y hora
+    videoPath = '/football_plays_$formattedDate.mp4';
+
+    // Inicia la grabación
+    await FlutterScreenRecording.startRecordScreen(videoPath!);
+
+    setState(() {
+      _isRecording = true;
+    });
+  }
+
+  Future<void> _stopRecording() async {
+    // Detén la grabación
+    await FlutterScreenRecording.stopRecordScreen;
+
+    setState(() {
+      _isRecording = false;
+    });
+
+    // Aquí podrías guardar el video o hacer algo más con él.
+    // Por ejemplo, podrías mostrar un mensaje al usuario.
+    print('Video grabado en: $videoPath');
   }
 
   @override
@@ -73,9 +119,19 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: _navigateToOtherScreen,
+            icon: Icon(_isRecording ? Icons.stop : Icons.videocam),
+            onPressed: _isRecording ? _stopRecording : _startRecording,
+            tooltip: _isRecording ? 'Detener Grabación' : 'Iniciar Grabación',
+          ),
+          IconButton(
+            onPressed: () => _navigateToScreen(1), // Navega a MidFootballFieldScreen
             icon: const Icon(Icons.airline_stops_outlined),
             tooltip: 'Ir a pizarra de media pista',
+          ),
+          IconButton(
+            onPressed: () => _navigateToScreen(2), // Navega a RecordingPlayScreen
+            icon: const Icon(Icons.list),
+            tooltip: 'Ir a grabaciones',
           ),
           IconButton(
             onPressed: _toggleDrawing,
@@ -180,3 +236,5 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     );
   }
 }
+
+  
