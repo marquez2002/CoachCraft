@@ -49,6 +49,7 @@ dependencies:
   flutter_screen_recording: ^2.0.16
   path_provider: ^2.0.9
   flutter_ffmpeg: ^0.4.2
+  file_picker: ^8.1.2
 
 
 dev_dependencies:
