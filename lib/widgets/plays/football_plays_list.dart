@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class VideoList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   String getBackgroundImage(String type) {
     switch (type) {
@@ -107,7 +105,7 @@ class VideoList extends StatelessWidget {
                             ),
                             const SizedBox(height: 4.0),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.play_arrow),

@@ -27,34 +27,35 @@ class _UploadFormState extends State<UploadForm> {
     }
   }
 
-  // Función para subir el video
   Future<String?> _uploadVideo() async {
-    if (_videoBytes != null) {
-      String fileName = '${DateTime.now().millisecondsSinceEpoch}.mp4';
-      Reference storageRef = FirebaseStorage.instance.ref().child('football_plays/$fileName');
+  if (_videoBytes != null) {
+    // El nombre del archivo es simplemente un timestamp con la extensión ".mp4"
+    String fileName = '${DateTime.now().millisecondsSinceEpoch}.mp4';
+    Reference storageRef = FirebaseStorage.instance.ref().child('football_plays/$fileName');
 
-      try {
-        UploadTask uploadTask = storageRef.putData(_videoBytes!);
-        TaskSnapshot snapshot = await uploadTask;
+    try {
+      UploadTask uploadTask = storageRef.putData(_videoBytes!);
+      TaskSnapshot snapshot = await uploadTask;
 
-        if (snapshot.state == TaskState.success) {
-          String downloadUrl = await snapshot.ref.getDownloadURL();
-          return downloadUrl;
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error al subir el video')),
-          );
-          return null;
-        }
-      } catch (e) {
+      if (snapshot.state == TaskState.success) {
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+        return downloadUrl;
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir el video: $e')),
+          const SnackBar(content: Text('Error al subir el video')),
         );
         return null;
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al subir el video: $e')),
+      );
+      return null;
     }
-    return null; // Si no hay video, retornar null
   }
+  return null; // Si no hay video, retornar null
+}
+
 
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {

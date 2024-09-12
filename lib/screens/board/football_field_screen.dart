@@ -130,7 +130,7 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
           ),
           IconButton(
             onPressed: () => _navigateToScreen(2), // Navega a RecordingPlayScreen
-            icon: const Icon(Icons.list),
+            icon: const Icon(Icons.folder),
             tooltip: 'Ir a grabaciones',
           ),
           IconButton(
