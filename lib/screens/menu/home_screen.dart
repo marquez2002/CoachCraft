@@ -1,25 +1,40 @@
-import 'package:CoachCraft/widgets/menu/main_widget.dart';
+/*
+ * Archivo: home_screen.dart
+ * Descripción: Este archivo contiene la definición de la clase HomeScreen, 
+ *              que representa la pantalla principal de la aplicación CoachCraft.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ * 
+ * Dependencias: 
+ * - main_widget.dart: Proporciona el widget principal que se utiliza en el cuerpo.
+ * 
+ * Notas adicionales:
+ * - Este archivo usa Material 3 para el diseño de la interfaz.
+ */
+import 'package:CoachCraft/widgets/menu/home_widget.dart';
 import 'package:flutter/material.dart';
 
+/// Clase principal que representa la pantalla de inicio de la aplicación.
 class HomeScreen extends StatelessWidget {
+  /// Constructor de la clase HomeScreen.
   const HomeScreen({super.key});
 
+  /// Método que construye el widget principal de la pantalla.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // Enunciamos el título de la screen
+      // Título de la aplicación que aparecerá en el administrador de tareas.
       title: 'CoachCraft',
 
+      // Definición del tema de la aplicación.
       theme: ThemeData(
-        // Esquema de colores basado en un color principal
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),       
-        // Usar Material3 para el diseño de la aplicación
-        useMaterial3: true,  
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+        useMaterial3: true,
       ),
 
+      // Definimos la pantalla principal de la aplicación.
       home: const Scaffold(
-        // El cuerpo de HomeScreen se encontrará en MainWidget
-        body: MainWidget(),
+        body: HomeWidget(),
       ),
     );
   }
