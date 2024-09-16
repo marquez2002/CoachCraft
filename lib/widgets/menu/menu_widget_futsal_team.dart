@@ -16,7 +16,7 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
       {'label': 'Añadir Jugador', 'route': FootballAddPlayer()},
       {'label': 'Datos Equipo', 'route': TeamDataScreen()},
       {'label': 'Listar Jugadores', 'route': FootballListPlayer()},
-      {'label': 'Volver', 'route': const MenuScreenFutsal()},
+      {'label': 'Volver', 'route': const MenuScreenFutsal(teamId: '',)},
     ];
 
     return Scaffold(

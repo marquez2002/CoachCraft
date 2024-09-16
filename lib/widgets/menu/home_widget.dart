@@ -10,9 +10,8 @@
  *   a la que se navega desde MainWidget.
  * - team_screen.dart: Pantalla a la que se navega si el usuario ya está autenticado.
  */
-
-import 'package:CoachCraft/screens/menu/login_screen.dart';
-import 'package:CoachCraft/screens/menu/teams_screen.dart'; // Asegúrate de importar el TeamScreen
+import 'package:CoachCraft/screens/sesion/login_screen.dart';
+import 'package:CoachCraft/screens/teams/teams_screen.dart'; // Asegúrate de importar el TeamScreen
 import 'package:firebase_auth/firebase_auth.dart'; // Importa Firebase Auth
 import 'package:flutter/material.dart';
 

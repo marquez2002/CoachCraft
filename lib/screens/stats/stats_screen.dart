@@ -232,7 +232,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     onPressed: () async {
                       await _updateMatch();
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                        MaterialPageRoute(builder: (context) => MenuScreenFutsal(teamId: '',)),
                       );
                     },
                     child: const Text('Guardar'),
@@ -242,7 +242,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     onPressed: () async {
                       await _deleteMatch();
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                        MaterialPageRoute(builder: (context) => MenuScreenFutsal(teamId: '',)),
                       );
                     },
                     child: const Text('Borrar Partido'),
