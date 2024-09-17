@@ -2,7 +2,7 @@ import 'package:CoachCraft/widgets/menu/menu_widget_futsal.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreenFutsal extends StatelessWidget {
-  const MenuScreenFutsal({super.key, required String teamId});
+  const MenuScreenFutsal({super.key});
 
   @override
   Widget build(BuildContext context) {

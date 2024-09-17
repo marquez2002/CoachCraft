@@ -235,7 +235,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MenuScreenFutsal(teamId: team.id), 
+                          builder: (context) => MenuScreenFutsal(), 
                         ),
                       );
                     },

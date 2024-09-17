@@ -18,6 +18,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
   final TextEditingController _addressController = TextEditingController();
   String? _shieldImageUrl; // URL de la imagen del escudo
   Uint8List? _shieldImageBytes; // Imagen del escudo como bytes
+  String? teamId; // Almacena el ID del documento del equipo
 
   @override
   void initState() {
@@ -33,29 +34,77 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
     super.dispose();
   }
 
-  Future<void> _loadTeamData() async {
-    try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('dataTeam').limit(1).get();
-      if (snapshot.docs.isNotEmpty) {
-        Map<String, dynamic> data = snapshot.docs.first.data() as Map<String, dynamic>;
+Future<void> _loadTeamData() async {
+  try {
+    // Obtener el primer equipo desde la colección 'teams'
+    QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('teams').limit(1).get();
+
+    if (teamSnapshot.docs.isNotEmpty) {
+      DocumentSnapshot teamDoc = teamSnapshot.docs.first;
+      teamId = teamDoc.id; // Almacenar el ID del documento del equipo
+      Map<String, dynamic> teamData = teamDoc.data() as Map<String, dynamic>;
+
+      // Asegúrate de que el campo 'nombre' esté presente
+      String teamName = teamData['name'] ?? '';
+      if (teamName.isNotEmpty) {
         setState(() {
-          _nameController.text = data['nombre'] ?? '';
-          _pavilionController.text = data['pabellon'] ?? '';
-          _addressController.text = data['direccion'] ?? '';
-          _shieldImageUrl = data['escudo'];
+          _nameController.text = teamName; // Usar el nombre del equipo
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No hay datos todavía')),
+          const SnackBar(content: Text('El nombre del equipo está vacío en la base de datos')),
         );
+        return;
       }
-    } catch (e) {
-      print(e); // Imprimir el error para depuración
+
+      // Verificar si el documento de datos del equipo existe en la subcolección 'teamData'
+      DocumentReference teamDataDocRef = FirebaseFirestore.instance
+          .collection('teams')
+          .doc(teamId)
+          .collection('teamData')
+          .doc('data');
+
+      DocumentSnapshot teamDataDoc = await teamDataDocRef.get();
+
+      if (!teamDataDoc.exists) {
+        // Si el documento no existe, crearlo con los campos iniciales
+        await teamDataDocRef.set({
+          'nombre': teamName,
+          'pabellon': null,
+          'direccion': null,
+          'escudo': null,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Documento de datos creado para el equipo')),
+        );
+      } else {
+        // Si el documento existe, cargar los datos
+        Map<String, dynamic>? data = teamDataDoc.data() as Map<String, dynamic>?;
+        if (data != null) {
+          _pavilionController.text = data['pabellon'] ?? '';
+          _addressController.text = data['direccion'] ?? '';
+          _shieldImageUrl = data['escudo']; // Asegúrate de que esto se asigne correctamente
+          setState(() {}); // Actualiza el estado para reflejar los cambios
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se encontraron datos del equipo')),
+          );
+        }
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar los datos: $e')),
+        const SnackBar(content: Text('No hay datos en la colección de equipos')),
       );
+      return;
     }
+  } catch (e) {
+    print(e); // Imprimir el error para depuración
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error al cargar los datos: $e')),
+    );
   }
+}
+
 
   Future<void> _pickShieldImage() async {
     final picker = ImagePicker();
@@ -105,31 +154,47 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
     return null; // Si no hay imagen, retornar null
   }
 
-  Future<void> _saveTeamData() async {
-    if (_formKey.currentState!.validate()) {
-      String? shieldUrl = await _uploadShieldImage(); // Subir la imagen y obtener la URL
+Future<void> _saveTeamData() async {
+  if (_formKey.currentState!.validate()) {
+    String? shieldUrl = await _uploadShieldImage(); // Subir la imagen y obtener la URL
 
-      Map<String, dynamic> teamData = {
-        'nombre': _nameController.text,
-        'pabellon': _pavilionController.text.isEmpty ? null : _pavilionController.text,
-        'direccion': _addressController.text.isEmpty ? null : _addressController.text,
-        'escudo': shieldUrl ?? _shieldImageUrl, // Usar la URL existente si no se subió una nueva
-      };
+    // Crea un mapa con los datos del equipo
+    Map<String, dynamic> teamData = {
+      'nombre': _nameController.text,
+      'pabellon': _pavilionController.text.isEmpty ? null : _pavilionController.text,
+      'direccion': _addressController.text.isEmpty ? null : _addressController.text,
+      'escudo': shieldUrl ?? _shieldImageUrl, // Usar la URL existente si no se subió una nueva
+    };
 
-      try {
-        await FirebaseFirestore.instance.collection('dataTeam').doc('teamId').set(teamData); // Reemplaza 'teamId' con el ID correspondiente
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Datos del equipo guardados correctamente')),
-        );
-        _loadTeamData(); // Volver a cargar los datos después de guardar
-      } catch (e) {
-        print(e); // Imprimir el error para depuración
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar los datos: $e')),
-        );
+    try {
+      // Guardar datos en el documento del equipo en la subcolección 'teamData'
+      await FirebaseFirestore.instance
+          .collection('teams')
+          .doc(teamId) // Usar el ID del documento
+          .collection('teamData')
+          .doc('data') // Usar un documento específico para los datos del equipo
+          .set(teamData, SetOptions(merge: true));
+
+      // Si se modificó el nombre, actualizar el nombre en el documento principal del equipo
+      if (teamData['nombre'] != null) {
+        await FirebaseFirestore.instance
+            .collection('teams')
+            .doc(teamId) // Usar el ID del documento
+            .update({'name': teamData['nombre']}); // Actualizar el nombre del equipo
       }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Datos del equipo guardados correctamente')),
+      );
+      _loadTeamData(); // Volver a cargar los datos después de guardar
+    } catch (e) {
+      print(e); // Imprimir el error para depuración
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar los datos: $e')),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +233,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
                 ),
                 TextFormField(
                   controller: _pavilionController,
-                  decoration: const InputDecoration(labelText: 'Pabellón'),                  
+                  decoration: const InputDecoration(labelText: 'Pabellón'),
                 ),
                 TextFormField(
                   controller: _addressController,
