@@ -4,8 +4,6 @@ import 'package:CoachCraft/screens/team_management/team_list_player_screen.dart'
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:flutter/material.dart';
 
-
-
 class MenuWidgetFutsalTeam extends StatelessWidget {
   const MenuWidgetFutsalTeam({super.key});
 
@@ -22,14 +20,13 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Se añade la imagen preselecionada de fondo de pantalla
+          // Se añade la imagen preseleccionada de fondo de pantalla
           Image.asset(
             'assets/image/football_menu.png',
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
           ),
-
 
           // Contenido de la pantalla principal
           Center(
@@ -38,22 +35,26 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
               children: buttonData.map((data) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Acción al presionar el botón con navegacion a la pantalla correspondiente
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => data['route']),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black, backgroundColor: Colors.white,
-                      minimumSize: const Size(300, 50), // Tamaño del botón
-                    ),
-                    child: Text(
-                      data['label'],
-                      style: const TextStyle(
-                        fontSize: 22,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.4, // El botón ocupará el 40% del ancho disponible
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Acción al presionar el botón con navegación a la pantalla correspondiente
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => data['route']),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15.0), // Ajusta la altura del botón
+                      ),
+                      child: Text(
+                        data['label'],
+                        style: const TextStyle(
+                          fontSize: 22,
+                        ),
                       ),
                     ),
                   ),

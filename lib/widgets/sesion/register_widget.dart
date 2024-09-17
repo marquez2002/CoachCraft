@@ -1,3 +1,10 @@
+/*
+ * Archivo: register_widget.dart
+ * Descripción: Este archivo contiene la definición del widget para realizar el registro 
+ *              en el sistema, para acceder al mismo.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/services/login/login_service.dart';
 import 'package:CoachCraft/screens/menu/menu_screen.dart';
 import 'package:CoachCraft/widgets/sesion/login_widget.dart';
@@ -37,8 +44,8 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             height: double.infinity,
           ),
           // Usar SingleChildScrollView para evitar overflow
-          SingleChildScrollView(
-            child: Center(
+          Center( // Centrar el contenido en la pantalla
+            child: SingleChildScrollView(
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 60),
                 width: 350,

@@ -1,3 +1,9 @@
+/*
+ * Archivo: menu_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente al menu genérico de la aplicación.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import '../../widgets/menu/menu_widget_futsal.dart';
 

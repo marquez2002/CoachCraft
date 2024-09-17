@@ -1,3 +1,9 @@
+/*
+ * Archivo: menu_screen_futsal_team.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente al menu de un equipo concreto.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/widgets/menu/menu_widget_futsal_team.dart';
 import 'package:flutter/material.dart';
 

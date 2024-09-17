@@ -1,10 +1,18 @@
-import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
-import 'package:CoachCraft/services/firebase_service.dart';
-import 'package:flutter/material.dart';
+/*
+ * Archivo: team_modify_player_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente para modificar un jugador
+ *              en Firebase.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 
+import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart'; 
+import 'package:CoachCraft/services/player/player_service.dart'; 
+import 'package:flutter/material.dart'; 
 
+/// Widget principal que permite modificar la información de un jugador de fútbol.
 class FootballModifyPlayer extends StatefulWidget {
-  final int dorsal; // Dorsal del jugador que se va a modificar
+  final int dorsal; 
 
   const FootballModifyPlayer({super.key, required this.dorsal});
 
@@ -12,10 +20,11 @@ class FootballModifyPlayer extends StatefulWidget {
   _FootballModifyPlayerState createState() => _FootballModifyPlayerState();
 }
 
+/// Estado del widget FootballModifyPlayer que maneja la lógica de la interfaz.
 class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(); 
 
-  // Controladores de datos del jugador
+  // Controladores de texto para los campos de datos del jugador
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dorsalController = TextEditingController();
   final TextEditingController _positionController = TextEditingController();
@@ -26,11 +35,12 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
   @override
   void initState() {
     super.initState();
-    _loadPlayerData(); // Cargar los datos del jugador al inicio
+    _loadPlayerData(); 
   }
 
   @override
   void dispose() {
+    // Liberar los controladores de texto al eliminar el widget
     _nameController.dispose();
     _dorsalController.dispose();
     _positionController.dispose();
@@ -40,10 +50,11 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
     super.dispose();
   }
 
-  // Función para cargar los datos del jugador desde Firestore en base al dorsal
+  /// Función para cargar los datos del jugador desde Firestore utilizando el dorsal
   Future<void> _loadPlayerData() async {
-    var data = await PlayerServices.loadPlayerData(widget.dorsal);
+    var data = await PlayerServices.loadPlayerData(widget.dorsal); 
     if (data != null) {
+      // Si se encuentran datos, se cargan en los controladores de texto
       setState(() {
         _nameController.text = data['nombre'] ?? '';
         _dorsalController.text = data['dorsal']?.toString() ?? '';
@@ -53,24 +64,27 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
         _weightController.text = data['peso']?.toString() ?? '';
       });
     } else {
+      // Si no se encuentra el jugador, se muestra un mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Jugador no encontrado')),
       );
     }
   }
 
-  // Función para modificar el jugador
+  /// Función para modificar la información del jugador
   Future<void> _modifyPlayer() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) { 
       int newDorsal = int.tryParse(_dorsalController.text) ?? 0;
 
+      // Verifica si el dorsal ya está en uso
       if (await PlayerValidations.isDorsalInUse(newDorsal, widget.dorsal)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Este dorsal ya está en uso')),
         );
-        return;
+        return; 
       }
 
+      // Crear un mapa con los datos actualizados del jugador
       Map<String, dynamic> playerData = {
         'nombre': _nameController.text,
         'dorsal': newDorsal,
@@ -81,12 +95,14 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
       };
 
       try {
+        // Llama al servicio para modificar el jugador en Firestore
         await PlayerServices.modifyPlayer(widget.dorsal, playerData);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Jugador modificado correctamente')),
         );
-        Navigator.pop(context); // Regresar a la pantalla anterior
+        Navigator.pop(context); 
       } catch (e) {
+        // Muestra un mensaje de error si la modificación falla
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al modificar jugador: $e')),
         );
@@ -98,58 +114,59 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modificar Jugador'),
+        title: const Text('Modificar Jugador'), 
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0), 
         child: Form(
-          key: _formKey,
+          key: _formKey, 
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center, 
               children: [
+                // Campos del formulario para ingresar o modificar datos del jugador
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
+                  decoration: const InputDecoration(labelText: 'Nombre'), 
                   validator: (value) => PlayerValidations.validateName(value),
                 ),
                 TextFormField(
                   controller: _dorsalController,
-                  decoration: const InputDecoration(labelText: 'Dorsal'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) => PlayerValidations.validateDorsal(value),
+                  decoration: const InputDecoration(labelText: 'Dorsal'), 
+                  keyboardType: TextInputType.number, 
+                  validator: (value) => PlayerValidations.validateDorsal(value), 
                 ),
                 TextFormField(
                   controller: _positionController,
-                  decoration: const InputDecoration(labelText: 'Posición'),
+                  decoration: const InputDecoration(labelText: 'Posición'), 
                   validator: (value) => PlayerValidations.validatePosition(value),
                 ),
                 TextFormField(
                   controller: _ageController,
-                  decoration: const InputDecoration(labelText: 'Edad'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) => PlayerValidations.validateAge(value),
+                  decoration: const InputDecoration(labelText: 'Edad'), 
+                  keyboardType: TextInputType.number, 
+                  validator: (value) => PlayerValidations.validateAge(value), 
                 ),
                 TextFormField(
                   controller: _heightController,
-                  decoration: const InputDecoration(labelText: 'Altura (cm)'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) => PlayerValidations.validateHeight(value),
+                  decoration: const InputDecoration(labelText: 'Altura (cm)'), 
+                  keyboardType: TextInputType.number, 
+                  validator: (value) => PlayerValidations.validateHeight(value), 
                 ),
                 TextFormField(
                   controller: _weightController,
-                  decoration: const InputDecoration(labelText: 'Peso (kg)'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) => PlayerValidations.validateWeight(value),
+                  decoration: const InputDecoration(labelText: 'Peso (kg)'), 
+                  keyboardType: TextInputType.number, 
+                  validator: (value) => PlayerValidations.validateWeight(value), 
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 20), 
                 ElevatedButton(
-                  onPressed: () async {                    
-                    await _modifyPlayer();
+                  onPressed: () async {
+                    await _modifyPlayer(); 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MenuScreenFutsalTeam(), // La pantalla a la que quieres navegar
+                        builder: (context) => MenuScreenFutsalTeam(), 
                       ),
                     );
                   },

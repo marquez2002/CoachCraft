@@ -79,7 +79,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         'enabledFor': ['Entrenador']
       },
       {
-        'label': 'Partidos y Estadisticas',
+        'label': 'Partidos',
         'route': const MatchesScreen(),
         'enabledFor': ['Entrenador', 'Jugador']
       },
@@ -101,60 +101,62 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
             height: double.infinity,
           ),
 
+          /*
+          mainAxisAlignment: MainAxisAlignment.center,
+              children: buttonData.map((data) {
+               */
           // Contenido de la pantalla principal
            Center(
             child: _userRole == 'loading'
-                ? const CircularProgressIndicator() // Mientras carga el rol
-                : SingleChildScrollView( // Permite desplazamiento si hay muchos botones
+                ? const CircularProgressIndicator() 
+                : SingleChildScrollView( 
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: buttonData.map((data) {
-                        // Determina si el botón debe estar habilitado según el rol del usuario
                         bool isEnabled = data['enabledFor'].contains(_userRole);
 
-                return Padding(
+                        return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: ElevatedButton(
-                            onPressed: isEnabled
-                                ? () {
-                                    // Acción al presionar el botón con navegación a la pantalla correspondiente
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => data['route']),
-                                    );
-                                  }
-                                : null, // Si el botón está deshabilitado, no hace nada
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.black, // Color del texto
-                              backgroundColor: Colors.white, // Color de fondo siempre blanco
-                              side: BorderSide(
-                                color: Colors.white, // Color del borde
-                                width: 1,
+                          child: FractionallySizedBox(
+                            widthFactor: 0.4, // El botón ocupará el 100% del ancho disponible
+                            child: ElevatedButton(
+                              onPressed: isEnabled
+                                  ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => data['route']),
+                                      );
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.black,
+                                backgroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 15.0), // Ajusta el padding para controlar la altura del botón
                               ),
-                              minimumSize: const Size(300, 50), // Tamaño del botón
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  data['label'],
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    color:Colors.black, // Color del texto
-                                  ),
-                                ),
-                                if (!isEnabled) // Muestra el candado solo si el botón está deshabilitado
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 8.0), // Espacio entre el texto y el icono
-                                    child: Icon(
-                                      Icons.lock,
-                                      color: Colors.grey, // Color del icono
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    data['label'],
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      color: Colors.black,
                                     ),
                                   ),
-                              ],
+                                  if (!isEnabled) // Muestra el candado solo si el botón está deshabilitado
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 8.0), // Espacio entre el texto y el icono
+                                      child: Icon(
+                                        Icons.lock,
+                                        color: Colors.grey, // Color del icono
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
                         );
+
                       }).toList(),
                     ),
                   ),

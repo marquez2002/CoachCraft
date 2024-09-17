@@ -1,7 +1,7 @@
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
+import 'package:CoachCraft/services/player/player_service.dart';
 import 'package:flutter/material.dart';
 import '../../screens/team_management/team_modify_player_screen.dart';
-import '../../services/player_service.dart';
 
 // Campo de formulario reutilizable con validaciones personalizadas
 Widget buildPlayerFormField(

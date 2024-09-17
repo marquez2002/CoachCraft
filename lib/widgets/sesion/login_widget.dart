@@ -47,9 +47,8 @@ class _LoginWidgetState extends State<LoginWidget> {
             width: double.infinity,
             height: double.infinity,
           ),
-          SingleChildScrollView(
-            child: Center(
-              // Contenedor principal para el formulario de inicio de sesión
+          Center( // Centrar el contenido en la pantalla
+            child: SingleChildScrollView(
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 60), 
                 width: 350,
