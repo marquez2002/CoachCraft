@@ -1,5 +1,5 @@
-import 'package:CoachCraft/services/match_service.dart';
-import 'package:CoachCraft/services/player/player_service.dart'; // Asegúrate de que esta clase exista
+import 'package:CoachCraft/services/match/match_service.dart';
+import 'package:CoachCraft/services/player/player_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,15 +18,33 @@ class _MatchFormState extends State<MatchForm> {
   DateTime? _selectedDate;
   String _location = 'Casa';
   String _matchType = 'Amistoso';
-  bool _isExpanded = false; // Estado para controlar la expansión
-
+  bool _isExpanded = false; 
+  
   Future<void> _createMatch() async {
-    if (_rivalTeamController.text.isEmpty || _selectedDate == null || _resultController.text.isEmpty) {
-      return; // Validación básica
-    } 
+    // Validación básica: Asegurarse de que todos los campos están completos
+    if (_rivalTeamController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, ingrese el equipo rival.')),
+      );
+      return;
+    }
+
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, seleccione la fecha del partido.')),
+      );
+      return;
+    }
+
+    if (_resultController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, ingrese el resultado del partido.')),
+      );
+      return;
+    }
 
     // Crea el partido y guarda el ID
-    String matchId = await MatchService().createMatch({
+    String matchId = await MatchService().createMatch(context, {
       'rivalTeam': _rivalTeamController.text,
       'matchDate': _selectedDate!.toIso8601String(),
       'result': _resultController.text,
@@ -35,21 +53,24 @@ class _MatchFormState extends State<MatchForm> {
     });
 
     // Obtener los jugadores actuales de la plantilla
-    List<Map<String, dynamic>> players = await getCurrentPlayers(); // Asegúrate de implementar este método
+    List<Map<String, dynamic>> players = await getCurrentPlayers(context);
 
     // Guardar los jugadores en la colección raíz del partido
-    await MatchService().savePlayersForMatch(matchId, players);
+    await MatchService().savePlayersForMatch(context, matchId, players);
 
-    _clearForm();
-    widget.onMatchCreated();
+    _clearForm(); // Limpiar el formulario después de crear el partido
+    widget.onMatchCreated(); // Notificar que se ha creado el partido
   }
 
+  // Limpiar el formulario
   void _clearForm() {
     _rivalTeamController.clear();
     _resultController.clear();
-    _selectedDate = null;
-    _location = 'Casa';
-    _matchType = 'Amistoso'; // Reiniciar a "Amistoso" al limpiar el formulario
+    setState(() {
+      _selectedDate = null;
+      _location = 'Casa';
+      _matchType = 'Amistoso';
+    });
   }
 
   @override
@@ -88,12 +109,13 @@ class _MatchFormState extends State<MatchForm> {
           TextField(
             controller: _resultController,
             decoration: const InputDecoration(
-              labelText: 'Resultado (2-1)',
+              labelText: 'Resultado (ej: 2-1)',
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 8.0),
 
+          // Campo para seleccionar la fecha del partido
           TextField(
             decoration: const InputDecoration(
               labelText: 'Fecha del Partido',
@@ -119,6 +141,7 @@ class _MatchFormState extends State<MatchForm> {
           ),
           const SizedBox(height: 8.0),
 
+          // Dropdown para la ubicación
           DropdownButtonFormField<String>(
             value: _location,
             decoration: const InputDecoration(
@@ -139,6 +162,7 @@ class _MatchFormState extends State<MatchForm> {
           ),
           const SizedBox(height: 8.0),
 
+          // Dropdown para el tipo de partido
           DropdownButtonFormField<String>(
             value: _matchType,
             decoration: const InputDecoration(
@@ -161,6 +185,7 @@ class _MatchFormState extends State<MatchForm> {
 
           const SizedBox(height: 16.0),
 
+          // Botón para crear el partido
           Center(
             child: ElevatedButton(
               onPressed: _createMatch,

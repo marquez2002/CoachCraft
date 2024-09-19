@@ -143,7 +143,7 @@ class PlayerDataTable extends StatelessWidget {
 
                       if (confirmDelete) {
                         // Llamar a la función para eliminar el jugador
-                        await deletePlayerByDorsal(dorsal);
+                        await deletePlayerByDorsal(context, dorsal);
 
                         // Redirigir a MenuFutsalScreen tras eliminar el jugador
                         Navigator.pushReplacement(

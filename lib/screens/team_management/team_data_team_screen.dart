@@ -1,7 +1,9 @@
+import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'dart:typed_data';
 
 class TeamDataScreen extends StatefulWidget {
@@ -36,15 +38,22 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
 
   Future<void> _loadTeamData() async {
     try {
-      // Obtener el primer equipo desde la colección 'teams'
-      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('teams').limit(1).get();
+      // Suponiendo que tienes el nombre del equipo disponible
+      String teamNameToSearch = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
+
+      // Obtener el equipo desde la colección 'teams' que coincida con el nombre
+      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
+          .collection('teams')
+          .where('name', isEqualTo: teamNameToSearch) // Filtrar por el nombre del equipo
+          .limit(1)
+          .get();
 
       if (teamSnapshot.docs.isNotEmpty) {
         DocumentSnapshot teamDoc = teamSnapshot.docs.first;
         teamId = teamDoc.id; // Almacenar el ID del documento del equipo
         Map<String, dynamic> teamData = teamDoc.data() as Map<String, dynamic>;
 
-        // Asegúrate de que el campo 'nombre' esté presente
+        // Usar el nombre del equipo
         String teamName = teamData['name'] ?? '';
         if (teamName.isNotEmpty) {
           setState(() {
@@ -104,6 +113,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
       );
     }
   }
+
 
   Future<void> _pickShieldImage() async {
     final picker = ImagePicker();

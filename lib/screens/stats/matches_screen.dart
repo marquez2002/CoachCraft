@@ -1,4 +1,4 @@
-import 'package:CoachCraft/services/match_service.dart';
+import 'package:CoachCraft/services/match/match_service.dart';
 import 'package:CoachCraft/widgets/match/filter_section.dart';
 import 'package:CoachCraft/widgets/match/match_form_widget.dart';
 import 'package:CoachCraft/widgets/match/match_list.dart';
@@ -27,7 +27,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
   }
 
   Future<void> _fetchMatches() async {
-    _matches = await _matchService.fetchMatches();
+    _matches = await _matchService.fetchMatches(context);
     setState(() {
       // Ordenar los partidos por fecha (más recientes primero)
       _matches.sort((a, b) {

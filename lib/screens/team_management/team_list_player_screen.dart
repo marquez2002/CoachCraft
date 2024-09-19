@@ -27,7 +27,7 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
         title: const Text('Jugadores'), 
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: getPlayers(),
+        future: getPlayers(context),
         builder: (context, snapshot) {
           // Manejo de diferentes estados de la conexión
           if (snapshot.connectionState == ConnectionState.waiting) {

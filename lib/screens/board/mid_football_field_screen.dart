@@ -1,5 +1,6 @@
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/board/recording_plays_screen.dart';
+import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/widgets/board/ball_widget.dart';
 import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
@@ -115,9 +116,21 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(' '),
-        backgroundColor: const Color.fromARGB(255, 54, 45, 46),
-        foregroundColor: Colors.white,
+        title: const Text(' '), 
+        backgroundColor: const Color.fromARGB(255, 54, 45, 46), 
+        foregroundColor: Colors.white, 
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), 
+          onPressed: () {
+            // Redirigir a la pantalla de menú Futsal cuando se presiona el botón de atrás
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MenuScreenFutsal(), 
+              ),
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(_isRecording ? Icons.stop : Icons.videocam),

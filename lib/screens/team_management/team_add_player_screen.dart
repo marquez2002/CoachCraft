@@ -5,11 +5,11 @@
  * 
  * Autor: Gonzalo Márquez de Torres
  */
+import 'package:CoachCraft/models/player.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart'; 
-import 'package:CoachCraft/services/player/player_service.dart'; 
+import 'package:CoachCraft/services/player/player_service.dart';
+import 'package:CoachCraft/widgets/player/player_widget.dart'; 
 import 'package:flutter/material.dart'; 
-import '../../models/player.dart'; 
-import '../../widgets/player/player_widget.dart'; 
 
 // Clase principal para añadir un jugador
 class FootballAddPlayer extends StatefulWidget {
@@ -60,7 +60,7 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
       );
 
       // Verificar si el dorsal es único
-      bool isUnique = await isDorsalUnique(player.dorsal);
+      bool isUnique = await isDorsalUnique(context, player.dorsal);
       if (!isUnique) {
         // Mostrar un mensaje si el dorsal ya está en uso
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +71,7 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
 
       try {
         // Añadir el jugador a la base de datos
-        await addPlayer(player.toJson());
+        await addPlayer(context, player.toJson());
         // Mostrar un mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Jugador añadido correctamente')),

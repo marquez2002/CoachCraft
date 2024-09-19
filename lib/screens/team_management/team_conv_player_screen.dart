@@ -77,7 +77,7 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
         title: Text('Convocatoria'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: getPlayers(),
+        future: getPlayers(context),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

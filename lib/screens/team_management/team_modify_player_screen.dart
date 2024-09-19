@@ -52,7 +52,7 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
 
   /// Función para cargar los datos del jugador desde Firestore utilizando el dorsal
   Future<void> _loadPlayerData() async {
-    var data = await PlayerServices.loadPlayerData(widget.dorsal); 
+    var data = await PlayerServices.loadPlayerData(context, widget.dorsal); 
     if (data != null) {
       // Si se encuentran datos, se cargan en los controladores de texto
       setState(() {
@@ -77,7 +77,7 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
       int newDorsal = int.tryParse(_dorsalController.text) ?? 0;
 
       // Verifica si el dorsal ya está en uso
-      if (await PlayerValidations.isDorsalInUse(newDorsal, widget.dorsal)) {
+      if (await PlayerValidations.isDorsalInUse(context, newDorsal, widget.dorsal)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Este dorsal ya está en uso')),
         );
@@ -96,7 +96,7 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
 
       try {
         // Llama al servicio para modificar el jugador en Firestore
-        await PlayerServices.modifyPlayer(widget.dorsal, playerData);
+        await PlayerServices.modifyPlayer(context, widget.dorsal, playerData);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Jugador modificado correctamente')),
         );

@@ -34,9 +34,9 @@ class MatchList extends StatelessWidget {
     if (screenWidth < 600) {
       crossAxisCount = 2; // Móviles
     } else if (screenWidth < 900) {
-      crossAxisCount = 3; // Tabletas pequeñas
+      crossAxisCount = 3; 
     } else {
-      crossAxisCount = 5; // Pantallas más grandes
+      crossAxisCount = 4; 
     }
 
     return Expanded(
@@ -48,7 +48,7 @@ class MatchList extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount, // Usar el número calculado de tarjetas por fila
+                crossAxisCount: crossAxisCount, 
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
                 childAspectRatio: 1.2,
@@ -67,10 +67,10 @@ class MatchList extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => StatsScreen(
-                          matchDate: matchData['matchDate'], // Pasar la fecha del partido
-                          rivalTeam: matchData['rivalTeam'], // Pasar el equipo rival
-                          result: matchData['result'], // Pasar el resultado
-                          matchType: matchData['matchType'], // Pasar el tipo de partido
+                          matchDate: matchData['matchDate'], 
+                          rivalTeam: matchData['rivalTeam'], 
+                          result: matchData['result'],
+                          matchType: matchData['matchType'],
                           location: matchData['location'], playerStats: [],
                         ),
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
-import 'package:CoachCraft/services/match_service.dart';
+import 'package:CoachCraft/services/match/match_service.dart';
 import 'package:CoachCraft/widgets/match/player_stat_card.dart';
 
 class StatsScreen extends StatefulWidget {
@@ -47,7 +47,7 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Future<void> _fetchPlayerStats() async {
-    final fetchedStats = await MatchService().fetchPlayerStats(widget.rivalTeam, widget.matchDate);
+    final fetchedStats = await MatchService().fetchPlayerStats(context, widget.rivalTeam, widget.matchDate);
     setState(() {
       playerStats = fetchedStats; // Actualiza la lista de estadísticas
     });
@@ -88,7 +88,7 @@ class _StatsScreenState extends State<StatsScreen> {
 
     if (confirm == true) {
       try {
-        await MatchService().deleteMatch(widget.rivalTeam, widget.matchDate);
+        await MatchService().deleteMatch(context, widget.rivalTeam, widget.matchDate);
         Navigator.pop(context); // Regresar a la pantalla anterior
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Partido eliminado exitosamente.')),
@@ -111,7 +111,7 @@ class _StatsScreenState extends State<StatsScreen> {
     };
 
     try {
-      await MatchService().updateMatchByDetails(updatedData);
+      await MatchService().updateMatchByDetails(context, updatedData);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Partido actualizado exitosamente.')),
       );

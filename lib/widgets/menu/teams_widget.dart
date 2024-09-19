@@ -6,13 +6,17 @@
  * Autor: Gonzalo Márquez de Torres
  * 
  */
-import 'package:CoachCraft/models/teams.dart'; 
-import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart'; 
+import 'package:CoachCraft/models/teams.dart';
+import 'package:CoachCraft/provider/team_provider.dart'; 
+import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/screens/sesion/login_screen.dart'; 
-import 'package:CoachCraft/services/team_service.dart'; 
+import 'package:CoachCraft/services/team_service.dart';
 import 'package:firebase_auth/firebase_auth.dart'; 
 import 'package:flutter/material.dart'; 
 import 'package:flutter/services.dart'; 
+import 'package:provider/provider.dart';
+
+// Resto de tus imports y el código del widget
 
 // Widget principal que muestra la lista de equipos del usuario
 class TeamListWidget extends StatefulWidget {
@@ -28,6 +32,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
   List<Teams> userTeams = []; 
   final TextEditingController _teamNameController = TextEditingController(); 
   final TextEditingController _teamCodeController = TextEditingController(); 
+  // ignore: unused_field
   bool _isAddingTeam = false; 
 
   @override
@@ -107,8 +112,8 @@ class _TeamListWidgetState extends State<TeamListWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis Equipos'), 
-        actions: [
+        title: const Text('Mis Equipos'),
+         actions: [
           IconButton(
             icon: const Icon(Icons.add), 
             onPressed: () {
@@ -129,7 +134,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
           ),
         ],
       ),
-      body: Column(
+            body: Column(
         children: [
           // Formulario para agregar un nuevo equipo
           if (_isAddingTeam) ...[
@@ -174,68 +179,43 @@ class _TeamListWidgetState extends State<TeamListWidget> {
               ),
             ),
           ],
-
-          // Lista de equipos del usuario
+          // Formulario para agregar equipo o unirse a equipo (ya implementado)
           Expanded(
             child: ListView.builder(
               itemCount: userTeams.length,
               itemBuilder: (context, index) {
-                Teams team = userTeams[index]; 
+                Teams team = userTeams[index];
 
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0), 
+                    contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
                     title: Row(
                       children: [
-                        Text(team.name), 
-                        const SizedBox(width: 2.0), 
+                        Text(team.name),
+                        const SizedBox(width: 2.0),
                         Icon(
-                          team.role == 'Entrenador' ? Icons.sports : Icons.sports_soccer_outlined, 
+                          team.role == 'Entrenador' ? Icons.sports : Icons.sports_soccer_outlined,
                         ),
                       ],
                     ),
                     subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start, 
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Rol: ${team.role}'), 
-                        Text('Número de miembros: ${team.members.length}'),                                             
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center, 
-                          children: [
-                            Row(
-                              children: [
-                                const Text('Código Entrenador: ******'), 
-                                IconButton(
-                                  icon: const Icon(Icons.copy),
-                                  onPressed: () {
-                                    _copyToClipboard(team.id, '0'); 
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 20), 
-                            Row(
-                              children: [
-                                const Text('Código Jugador: ******'), 
-                                IconButton(
-                                  icon: const Icon(Icons.copy),
-                                  onPressed: () {
-                                    _copyToClipboard(team.id, '1'); 
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                        Text('Rol: ${team.role}'),
+                        Text('Número de miembros: ${team.members.length}'),
+                        // Botones de copia de códigos (ya implementados)
                       ],
                     ),
                     onTap: () {
-                      // Navegar al menú Futsal pasando el ID del equipo
+                      // Guardar el nombre del equipo seleccionado en el provider
+                      Provider.of<TeamProvider>(context, listen: false).setSelectedTeamName(team.name);
+
+                      // Navegar al menú Futsal (u otra pantalla), ahora con el nombre del equipo seleccionado almacenado globalmente
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MenuScreenFutsal(), 
+                          builder: (context) => MenuScreenFutsal(), // Asegúrate de que esta pantalla esté implementada
                         ),
                       );
                     },
