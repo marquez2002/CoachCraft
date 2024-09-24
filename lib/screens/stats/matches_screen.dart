@@ -18,7 +18,11 @@ class _MatchesScreenState extends State<MatchesScreen> {
   List<Map<String, dynamic>> _filteredMatches = [];
   String _season = '2024';
   // ignore: unused_field
-  String _matchType = 'Todos'; // Agregar tipo de partido
+  String _matchType = 'Todos';
+
+  // Controladores de expansión
+  bool _isCreatingMatchExpanded = false;
+  bool _isSearchingMatchExpanded = false;
 
   @override
   void initState() {
@@ -29,28 +33,23 @@ class _MatchesScreenState extends State<MatchesScreen> {
   Future<void> _fetchMatches() async {
     _matches = await _matchService.fetchMatches(context);
     setState(() {
-      // Ordenar los partidos por fecha (más recientes primero)
       _matches.sort((a, b) {
-        DateTime dateA = DateTime.parse(a['data']['matchDate']);
-        DateTime dateB = DateTime.parse(b['data']['matchDate']);
+        DateTime dateA = DateTime.parse(a['matchDate']);
+        DateTime dateB = DateTime.parse(b['matchDate']);
         return dateB.compareTo(dateA);
       });
-      _filteredMatches = List.from(_matches); // Inicializar la lista filtrada
+      _filteredMatches = List.from(_matches);
     });
   }
 
   void _filterMatches(String matchType, String season, String rival) {
     setState(() {
       _filteredMatches = _matches.where((match) {
-        final matchData = match['data'];
-        final matchDate = DateTime.parse(matchData['matchDate']);
+        final matchDate = DateTime.parse(match['matchDate']);
         final matchYear = DateFormat('yyyy').format(matchDate);
-        
-        // Lógica de filtrado
-        final matchMatchesType = matchType == 'Todos' || matchData['matchType'] == matchType;
+        final matchMatchesType = matchType == 'Todos' || match['matchType'] == matchType;
         final matchMatchesSeason = season == 'Todos' || matchYear == season;
-        final matchMatchesRival = rival.isEmpty || matchData['rivalTeam'].toLowerCase().contains(rival.toLowerCase());
-
+        final matchMatchesRival = rival.isEmpty || match['rivalTeam'].toLowerCase().contains(rival.toLowerCase());
         return matchMatchesType && matchMatchesSeason && matchMatchesRival;
       }).toList();
     });
@@ -61,24 +60,53 @@ class _MatchesScreenState extends State<MatchesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resultados de Partidos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              setState(() {
+                _isCreatingMatchExpanded = !_isCreatingMatchExpanded;
+                _isSearchingMatchExpanded = false; // Colapsa el otro si este se expande
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.filter_alt_outlined),
+            onPressed: () {
+              setState(() {
+                _isSearchingMatchExpanded = !_isSearchingMatchExpanded;
+                _isCreatingMatchExpanded = false; // Colapsa el otro si este se expande
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MatchForm(onMatchCreated: _fetchMatches),
-            const SizedBox(height: 16.0),
-            FilterSection(
-              season: _season,
-              onFilterChanged: (String season, String matchType, String rival) {
-                _season = season; // Actualizar la temporada seleccionada
-                _matchType = matchType; // Actualizar el tipo de partido
-                _filterMatches(matchType, season, rival);
-              },
+            // Formulario para crear un nuevo partido
+            if (_isCreatingMatchExpanded) ...[
+              MatchForm(onMatchCreated: _fetchMatches),
+              const SizedBox(height: 16.0),
+            ],
+            // Formulario para buscar partidos
+            if (_isSearchingMatchExpanded) ...[
+              FilterSection(
+                season: _season,
+                onFilterChanged: (String season, String matchType, String rival) {
+                  _season = season;
+                  _matchType = matchType;
+                  _filterMatches(matchType, season, rival);
+                },
+              ),
+              const SizedBox(height: 16.0),
+            ],
+            // Lista de Partidos Filtrados
+            Expanded(
+              child: MatchList(filteredMatches: _filteredMatches),
             ),
-            const SizedBox(height: 16.0),
-            MatchList(filteredMatches: _filteredMatches),
           ],
         ),
       ),

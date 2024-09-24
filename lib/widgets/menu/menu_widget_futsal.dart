@@ -1,6 +1,7 @@
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:CoachCraft/screens/stats/matches_screen.dart';
+import 'package:CoachCraft/screens/stats/general_stats_screen.dart';
 import 'package:CoachCraft/screens/teams/teams_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -53,7 +54,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         });
       } else {        
         setState(() {
-          _userRole = 'Invitado'; 
+          _userRole = 'Jugador'; 
         });
       }
     } catch (e) {
@@ -84,6 +85,11 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         'enabledFor': ['Entrenador', 'Jugador']
       },
       {
+        'label': 'Estadísticas',
+        'route': const GeneralStatsScreen(),
+        'enabledFor': ['Entrenador', 'Jugador']
+      },
+      {
         'label': 'Volver',
         'route': const TeamsScreen(),
         'enabledFor': ['Entrenador', 'Jugador']
@@ -100,37 +106,33 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
             width: double.infinity,
             height: double.infinity,
           ),
-
-          /*
-          mainAxisAlignment: MainAxisAlignment.center,
-              children: buttonData.map((data) {
-               */
-          // Contenido de la pantalla principal
-           Center(
+          Center(
             child: _userRole == 'loading'
-                ? const CircularProgressIndicator() 
-                : SingleChildScrollView( 
+                ? const CircularProgressIndicator()
+                : SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: buttonData.map((data) {
+                        // Determina si el botón está habilitado para el rol actual
                         bool isEnabled = data['enabledFor'].contains(_userRole);
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: FractionallySizedBox(
-                            widthFactor: 0.4, // El botón ocupará el 100% del ancho disponible
+                            widthFactor: 0.4, // El botón ocupará el 40% del ancho disponible
                             child: ElevatedButton(
                               onPressed: isEnabled
                                   ? () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => data['route']),
+                                        MaterialPageRoute(
+                                            builder: (context) => data['route']),
                                       );
                                     }
-                                  : null,
+                                  : null, // Deshabilita el botón si no está permitido
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.black,
-                                backgroundColor: Colors.white,
+                                backgroundColor: Colors.white , 
                                 padding: const EdgeInsets.symmetric(vertical: 15.0), // Ajusta el padding para controlar la altura del botón
                               ),
                               child: Row(
@@ -140,7 +142,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                                     data['label'],
                                     style: TextStyle(
                                       fontSize: 22,
-                                      color: Colors.black,
+                                      color: Colors.black, // Texto gris si el botón está deshabilitado
                                     ),
                                   ),
                                   if (!isEnabled) // Muestra el candado solo si el botón está deshabilitado
@@ -148,7 +150,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                                       padding: EdgeInsets.only(left: 8.0), // Espacio entre el texto y el icono
                                       child: Icon(
                                         Icons.lock,
-                                        color: Colors.grey, // Color del icono
+                                        color: Colors.black, // Color del icono de candado
                                       ),
                                     ),
                                 ],
@@ -156,11 +158,11 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                             ),
                           ),
                         );
-
                       }).toList(),
                     ),
                   ),
           ),
+
         ],
       ),
     );

@@ -1,6 +1,8 @@
-import 'package:CoachCraft/screens/stats/stats_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart'; // Asegúrate de importar provider
+import 'package:CoachCraft/provider/match_provider.dart'; // Importa tu MatchProvider
+import 'package:CoachCraft/screens/stats/stats_screen.dart';
 
 class MatchList extends StatelessWidget {
   final List<Map<String, dynamic>> filteredMatches;
@@ -57,11 +59,15 @@ class MatchList extends StatelessWidget {
               itemBuilder: (context, index) {
                 final match = filteredMatches[index];
                 final matchData = match['data'];
+                final matchId = match['id']; // Asegúrate de tener el ID del partido
                 final matchDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(matchData['matchDate']));
                 final locationIcon = matchData['location'] == 'Casa' ? Icons.home : Icons.flight;
 
                 return GestureDetector(
                   onTap: () {
+                    // Actualiza el MatchProvider con el partido seleccionado
+                    Provider.of<MatchProvider>(context, listen: false).setSelectedMatchId(matchId);
+
                     // Navegar a StatsScreen pasando los datos del partido
                     Navigator.push(
                       context,
@@ -71,7 +77,8 @@ class MatchList extends StatelessWidget {
                           rivalTeam: matchData['rivalTeam'], 
                           result: matchData['result'],
                           matchType: matchData['matchType'],
-                          location: matchData['location'], playerStats: [],
+                          location: matchData['location'],
+                          matchId: matchId, // Pasa el matchId a la siguiente pantalla
                         ),
                       ),
                     );

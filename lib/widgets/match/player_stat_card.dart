@@ -1,238 +1,380 @@
-import 'package:flutter/material.dart';
+import 'package:CoachCraft/provider/match_provider.dart';
+import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class PlayerStatCard extends StatefulWidget {
-  final dynamic playerStat;
-
-  const PlayerStatCard({Key? key, required this.playerStat}) : super(key: key);
+class PlayerStatTable extends StatefulWidget {
+  const PlayerStatTable({Key? key}) : super(key: key);
 
   @override
-  _PlayerStatCardState createState() => _PlayerStatCardState();
+  _PlayerStatTableState createState() => _PlayerStatTableState();
 }
 
-class _PlayerStatCardState extends State<PlayerStatCard> {
-  late int goals;
-  late int assists;
-  late int yellowCards;
-  late int redCards;
-  late int shots;
-  late int shotsOnGoal;
-  late int tackle;
-  late int succesfulTackle;
-  late int foul;
-  late int passes;
-  late int failedPasses;
-  late int dribbles;
-  late int failedDribbles;
-  late int saves;
-  late int shotsReceived;
+class _PlayerStatTableState extends State<PlayerStatTable> {
+  List<Map<String, dynamic>> playerStats = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Inicializa los valores con los del jugador
-    goals = widget.playerStat.goals;
-    assists = widget.playerStat.assists;
-    yellowCards = widget.playerStat.yellowCards;
-    redCards = widget.playerStat.redCards;
-    saves = widget.playerStat.saves;
-    shotsReceived = widget.playerStat.shotsReceived;
-    shots = widget.playerStat.shots;
-    shotsOnGoal = widget.playerStat.shotsOnGoal;
-    tackle = widget.playerStat.tackle;
-    succesfulTackle = widget.playerStat.succesfulTackle;
-    foul = widget.playerStat.foul;
-    passes = widget.playerStat.passes;
-    failedPasses = widget.playerStat.failedPasses;
-    dribbles = widget.playerStat.dribbles;
-    failedDribbles = widget.playerStat.failedDribbles;
+    fetchPlayerStats();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Container(
-        padding: const EdgeInsets.all(8.0), // Padding interno
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${widget.playerStat.nombre} (#${widget.playerStat.dorsal})', // Mostrar el nombre y el dorsal
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis, // Recorta el texto si es muy largo
+  Future<void> fetchPlayerStats() async {
+    setState(() => isLoading = true);
+
+    try {
+      String? teamId = await getTeamId(context);
+      String? matchId = Provider.of<MatchProvider>(context, listen: false).selectedMatchId;
+
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('teams')
+          .doc(teamId)
+          .collection('matches')
+          .doc(matchId)
+          .collection('players')
+          .get();
+
+      playerStats = snapshot.docs.map((doc) => {
+          'id': doc.id, // Asegúrate de incluir el ID del documento
+          ...doc.data() as Map<String, dynamic>
+      }).toList();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al obtener estadísticas: $e")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _showStatDialog(BuildContext context, String playerId, String statKey, int currentValue) {
+    final TextEditingController controller = TextEditingController(text: currentValue.toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Actualizar $statKey'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Valor actual: $currentValue'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      int newValue = int.parse(controller.text) > 0 ? int.parse(controller.text) - 1 : 0;
+                      controller.text = newValue.toString();
+                    },
                   ),
-                ),
-                if (widget.playerStat.posicion == "Portero") ...[
-                  const Icon(Icons.sports_handball, size: 24.0),
-                  const SizedBox(width: 8.0),
+                  Container(
+                    width: 50,
+                    child: TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Cambiar',
+                        isDense: true,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      int newValue = int.parse(controller.text) + 1;
+                      controller.text = newValue.toString();
+                    },
+                  ),
                 ],
-              ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                int? newValue = int.tryParse(controller.text);
+                if (newValue == null || newValue < 0) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    SnackBar(content: Text("Ingrese un número válido mayor o igual a 0")),
+                  );
+                } else {
+                  int change = newValue - currentValue;
+                  await _updateStatInDB(dialogContext, playerId, statKey, change);
+                  Navigator.of(dialogContext).pop(); // Cerrar el diálogo
+                  _showSnackBar("Estadística actualizada exitosamente");
+                }
+              },
+              child: const Text('Guardar'),
             ),
-            const SizedBox(height: 4.0),
-            ..._buildStatRows(), // Añadir estadísticas
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancelar'),
+            ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
-  
 
-  List<Widget> _buildStatRows() {
-    List<Map<String, dynamic>> stats = [
-      {'label': 'Goles', 'value': goals},
-      {'label': 'Asistencias', 'value': assists},
-      {'label': 'Tarjetas Amarillas', 'value': yellowCards},
-      {'label': 'Tarjetas Rojas', 'value': redCards},
-      {'label': 'Tiros', 'value': shots},
-      {'label': 'Tiros a Puerta', 'value': shotsOnGoal},
-      {'label': 'Entradas', 'value': tackle},
-      {'label': 'Entradas Exitosas', 'value': succesfulTackle},
-      {'label': 'Faltas', 'value': foul},
-      {'label': 'Pases', 'value': passes},
-      {'label': 'Pases Fallidos', 'value': failedPasses},
-      {'label': 'Dribles', 'value': dribbles},
-      {'label': 'Dribles Fallidos', 'value': failedDribbles},
-    ];
-
-    // Ajuste específico para porteros
-    if (widget.playerStat.posicion == "Portero") {
-      stats = [
-        {'label': 'Goles', 'value': goals},
-        {'label': 'Asistencias', 'value': assists},
-        {'label': 'Tarjetas Amarillas', 'value': yellowCards},
-        {'label': 'Tarjetas Rojas', 'value': redCards},
-        {'label': 'Paradas', 'value': saves},
-        {'label': 'Tiros a Puerta Recibidos', 'value': shotsReceived},
-        {'label': 'Entradas', 'value': tackle},
-        {'label': 'Entradas Exitosas', 'value': succesfulTackle},
-        {'label': 'Faltas', 'value': foul},
-        {'label': 'Pases', 'value': passes},
-        {'label': 'Pases Fallidos', 'value': failedPasses},
-        {'label': 'Dribles', 'value': dribbles},
-        {'label': 'Dribles Fallidos', 'value': failedDribbles},
-      ];
-    }
-
-    return stats.map((stat) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('${stat['label']}: ${stat['value']}'),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => _updateStat(stat['label'], -1),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => _updateStat(stat['label'], 1),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    }).toList();
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
-  void _updateStat(String label, int change) {
-    setState(() {
-      switch (label) {
-        case 'Goles':
-          goals += change;
-          break;
-        case 'Asistencias':
-          assists += change;
-          break;
-        case 'Tarjetas Amarillas':
-          yellowCards += change;
-          break;
-        case 'Tarjetas Rojas':
-          redCards += change;
-          break;
-        case 'Tiros':
-          shots += change;
-          break;
-        case 'Tiros a Puerta':
-          shotsOnGoal += change;
-          break;
-        case 'Entradas':
-          tackle += change;
-          break;
-        case 'Entradas Exitosas':
-          succesfulTackle += change;
-          break;
-        case 'Faltas':
-          foul += change;
-          break;
-        case 'Pases':
-          passes += change;
-          break;
-        case 'Pases Fallidos':
-          failedPasses += change;
-          break;
-        case 'Dribles':
-          dribbles += change;
-          break;
-        case 'Dribles Fallidos':
-          failedDribbles += change;
-          break;
+  Future<void> _updateStatInDB(BuildContext context, String playerId, String statKey, int change) async {
+    try {
+      String? teamId = await getTeamId(context);
+      String? matchId = Provider.of<MatchProvider>(context, listen: false).selectedMatchId;
+      
+      DocumentReference playerRef = FirebaseFirestore.instance
+          .collection('teams')
+          .doc(teamId)
+          .collection('matches')
+          .doc(matchId)
+          .collection('players')
+          .doc(playerId);
+
+      // Obtener el valor actual del statKey
+      DocumentSnapshot playerDoc = await playerRef.get();
+      
+      if (playerDoc.exists) {
+        // Actualizar el campo específico con el cambio
+        await playerRef.update({statKey: FieldValue.increment(change)});
+        await fetchPlayerStats(); // Refrescar estadísticas después de la actualización
+      } else {
+        throw Exception('El documento del jugador no existe.');
       }
-    });
-
-    _updateStatInDB(label, change);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error actualizando la estadística: $e")),
+      );
+    }
   }
 
-  Future<void> _updateStatInDB(String label, int change) async {
-    DocumentReference playerRef = FirebaseFirestore.instance.collection('players').doc(widget.playerStat.id);
+@override
+Widget build(BuildContext context) {
+  return Scaffold(    
+    body: Builder(
+      builder: (BuildContext context) {
+        return isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Tabla para porteros
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Estadísticas Porteros',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          DataTable(
+                            columns: const [
+                              DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
+                              DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
+                              DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición                            
+                              DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))), // Tiros A Puerta Recibidos
+                              DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp, color: Colors.green))), // Tiros A Puerta Recibidos
+                              DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
+                              DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
+                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
+                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
+                              DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))), // Tiros
+                              DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))), // Tiros a Puerta
+                              DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas                            
+                              
+                            ],
+                            rows: playerStats.where((playerStat) => playerStat['posicion'] == 'Portero').map((playerStat) {
+                              return DataRow(cells: [
+                                DataCell(Center(child: Text(playerStat['nombre'] ?? 'Sin Nombre'))),
+                                DataCell(Center(child: Text(playerStat['dorsal']?.toString() ?? 'Sin Dorsal'))),
+                                DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsReceived', playerStat['shotsReceived'] ?? 0),
+                                    child: Center(child: Text(playerStat['shotsReceived']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'saves', playerStat['saves'] ?? 0),
+                                    child: Center(child: Text(playerStat['saves']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
+                                    child: Center(child: Text(playerStat['goals']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'assists', playerStat['assists'] ?? 0),
+                                    child: Center(child: Text(playerStat['assists']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'yellowCards', playerStat['yellowCards'] ?? 0),
+                                    child: Center(child: Text(playerStat['yellowCards']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
+                                    child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shots', playerStat['shots'] ?? 0),
+                                    child: Center(child: Text(playerStat['shots']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsOnGoal', playerStat['shotsOnGoal'] ?? 0),
+                                    child: Center(child: Text(playerStat['shotsOnGoal']?.toString() ?? '0')),
+                                  ),
+                                ),                                
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
+                                    child: Center(child: Text(playerStat['foul']?.toString() ?? '0')),
+                                  ),
+                                ),
+                              ]);
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20), // Espaciador entre tablas
+                    // Tabla para el resto de los jugadores
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Jugadores de Campo',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          DataTable(
+                            columns: const [
+                              DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
+                              DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
+                              DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición
+                              DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
+                              DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
+                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
+                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
+                              DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))), // Tiros
+                              DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))), // Tiros a Puerta
+                              DataColumn(label: Center(child: Icon(Icons.shield))), // Entradas
+                              DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))), // Entradas Exitosas
+                              DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas
+                            ],
+                            rows: playerStats.where((playerStat) => playerStat['posicion'] != 'Portero').map((playerStat) {
+                              return DataRow(cells: [
+                                DataCell(Center(child: Text(playerStat['nombre'] ?? 'Sin Nombre'))),
+                                DataCell(Center(child: Text(playerStat['dorsal']?.toString() ?? 'Sin Dorsal'))),
+                                DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
+                                    child: Center(child: Text(playerStat['goals']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'assists', playerStat['assists'] ?? 0),
+                                    child: Center(child: Text(playerStat['assists']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'yellowCards', playerStat['yellowCards'] ?? 0),
+                                    child: Center(child: Text(playerStat['yellowCards']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
+                                    child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shots', playerStat['shots'] ?? 0),
+                                    child: Center(child: Text(playerStat['shots']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsOnGoal', playerStat['shotsOnGoal'] ?? 0),
+                                    child: Center(child: Text(playerStat['shotsOnGoal']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'tackle', playerStat['tackle'] ?? 0),
+                                    child: Center(child: Text(playerStat['tackle']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'succesfulTackle', playerStat['succesfulTackle'] ?? 0),
+                                    child: Center(child: Text(playerStat['succesfulTackle']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
+                                    child: Center(child: Text(playerStat['foul']?.toString() ?? '0')),
+                                  ),
+                                ),
+                              ]);
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+      },
+    ),
+  );
+}
 
-    switch (label) {
-      case 'Goles':
-        await playerRef.update({'goals': FieldValue.increment(change)});
-        break;
-      case 'Asistencias':
-        await playerRef.update({'assists': FieldValue.increment(change)});
-        break;
-      case 'Tarjetas Amarillas':
-        await playerRef.update({'yellowCards': FieldValue.increment(change)});
-        break;
-      case 'Tarjetas Rojas':
-        await playerRef.update({'redCards': FieldValue.increment(change)});
-        break;
-      case 'Tiros':
-        await playerRef.update({'shots': FieldValue.increment(change)});
-        break;
-      case 'Tiros a Puerta':
-        await playerRef.update({'shotsOnGoal': FieldValue.increment(change)});
-        break;
-      case 'Entradas':
-        await playerRef.update({'tackle': FieldValue.increment(change)});
-        break;
-      case 'Entradas Exitosas':
-        await playerRef.update({'succesfulTackle': FieldValue.increment(change)});
-        break;
-      case 'Faltas':
-        await playerRef.update({'foul': FieldValue.increment(change)});
-        break;
-      case 'Pases':
-        await playerRef.update({'passes': FieldValue.increment(change)});
-        break;
-      case 'Pases Fallidos':
-        await playerRef.update({'failedPasses': FieldValue.increment(change)});
-        break;
-      case 'Dribles':
-        await playerRef.update({'dribbles': FieldValue.increment(change)});
-        break;
-      case 'Dribles Fallidos':
-        await playerRef.update({'failedDribbles': FieldValue.increment(change)});
-        break;
+
+  Future<String?> getTeamId(BuildContext context) async {
+    try {
+      String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
+
+      if (selectedTeam.isEmpty) {
+        throw Exception('No hay equipo seleccionado');
+      }
+
+      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
+          .collection('teams')
+          .where('name', isEqualTo: selectedTeam)
+          .limit(1)
+          .get();
+
+      if (teamSnapshot.docs.isNotEmpty) {
+        return teamSnapshot.docs.first.id;
+      } else {
+        throw Exception('No se encontró el equipo seleccionado');
+      }
+    } catch (e) {
+      throw Exception('Error al obtener el teamId: $e');
     }
   }
 }

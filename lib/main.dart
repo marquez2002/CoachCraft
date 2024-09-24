@@ -1,3 +1,4 @@
+import 'package:CoachCraft/provider/match_provider.dart';
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:CoachCraft/screens/menu/home_screen.dart'; // Pantalla principal
 import 'package:firebase_core/firebase_core.dart';
@@ -28,7 +29,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => TeamProvider()), // Agregar el TeamProvider
+        ChangeNotifierProvider(create: (_) => TeamProvider()), 
+        ChangeNotifierProvider(create: (_) => MatchProvider()), 
+
       ],
       child: MaterialApp(
         // Título de la aplicación

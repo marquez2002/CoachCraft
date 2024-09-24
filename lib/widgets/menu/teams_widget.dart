@@ -1,24 +1,13 @@
-/*
- * Archivo: teams_widget.dart
- * Descripción: Este archivo contiene la definición de la clase teamsWidget, que representa
- *              la pantalla donde se encuentran los equipos del usuario.
- * 
- * Autor: Gonzalo Márquez de Torres
- * 
- */
 import 'package:CoachCraft/models/teams.dart';
 import 'package:CoachCraft/provider/team_provider.dart'; 
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/screens/sesion/login_screen.dart'; 
-import 'package:CoachCraft/services/team_service.dart';
+import 'package:CoachCraft/services/team/team_service.dart';
 import 'package:firebase_auth/firebase_auth.dart'; 
 import 'package:flutter/material.dart'; 
 import 'package:flutter/services.dart'; 
 import 'package:provider/provider.dart';
 
-// Resto de tus imports y el código del widget
-
-// Widget principal que muestra la lista de equipos del usuario
 class TeamListWidget extends StatefulWidget {
   const TeamListWidget({Key? key}) : super(key: key);
 
@@ -26,13 +15,11 @@ class TeamListWidget extends StatefulWidget {
   _TeamListWidgetState createState() => _TeamListWidgetState();
 }
 
-// Estado del widget TeamListWidget
 class _TeamListWidgetState extends State<TeamListWidget> {
   final TeamService _teamService = TeamService(); 
   List<Teams> userTeams = []; 
   final TextEditingController _teamNameController = TextEditingController(); 
   final TextEditingController _teamCodeController = TextEditingController(); 
-  // ignore: unused_field
   bool _isAddingTeam = false; 
 
   @override
@@ -41,7 +28,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     _loadUserTeams(); 
   }
 
-  // Método para cargar equipos del usuario desde Firestore
   Future<void> _loadUserTeams() async {
     try {
       final teams = await _teamService.loadUserTeams(); 
@@ -56,7 +42,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     }
   }
 
-  // Método para agregar un nuevo equipo
   Future<void> _addTeam() async {
     String teamName = _teamNameController.text.trim(); 
 
@@ -76,7 +61,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     }
   }
 
-  // Método para unirse a un equipo existente
   Future<void> _joinTeam() async {
     String teamCode = _teamCodeController.text.trim(); 
 
@@ -99,7 +83,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     }
   }
 
-  // Método para copiar el código del equipo al portapapeles
   Future<void> _copyToClipboard(String teamId, String role) async {
     String code = _teamService.generateTeamCode(teamId, role); 
     await Clipboard.setData(ClipboardData(text: code)); 
@@ -113,7 +96,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis Equipos'),
-         actions: [
+        actions: [
           IconButton(
             icon: const Icon(Icons.add), 
             onPressed: () {
@@ -134,9 +117,8 @@ class _TeamListWidgetState extends State<TeamListWidget> {
           ),
         ],
       ),
-            body: Column(
+      body: Column(
         children: [
-          // Formulario para agregar un nuevo equipo
           if (_isAddingTeam) ...[
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -157,8 +139,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                 ],
               ),
             ),
-
-            // Formulario para unirse a un equipo existente
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -179,7 +159,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
               ),
             ),
           ],
-          // Formulario para agregar equipo o unirse a equipo (ya implementado)
           Expanded(
             child: ListView.builder(
               itemCount: userTeams.length,
@@ -204,18 +183,33 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                       children: [
                         Text('Rol: ${team.role}'),
                         Text('Número de miembros: ${team.members.length}'),
-                        // Botones de copia de códigos (ya implementados)
+                        if (team.role == 'Entrenador') // Solo mostrar los botones si el rol es "Entrenador"
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // Centra los botones horizontalmente
+                            children: [
+                              // Botón para copiar el código del entrenador
+                              ElevatedButton.icon(
+                                icon: const Icon(Icons.copy),
+                                label: const Text('Código Entrenador'),
+                                onPressed: () => _copyToClipboard(team.id, 'Entrenador'),
+                              ),
+                              const SizedBox(width: 8.0),
+                              // Botón para copiar el código del jugador
+                              ElevatedButton.icon(
+                                icon: const Icon(Icons.copy),
+                                label: const Text('Código Jugador'),
+                                onPressed: () => _copyToClipboard(team.id, 'Jugador'),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                     onTap: () {
-                      // Guardar el nombre del equipo seleccionado en el provider
                       Provider.of<TeamProvider>(context, listen: false).setSelectedTeamName(team.name);
-
-                      // Navegar al menú Futsal (u otra pantalla), ahora con el nombre del equipo seleccionado almacenado globalmente
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MenuScreenFutsal(), // Asegúrate de que esta pantalla esté implementada
+                          builder: (context) => MenuScreenFutsal(),
                         ),
                       );
                     },

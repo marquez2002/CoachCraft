@@ -14,11 +14,6 @@ class PlayerStats {
   int tackle;
   int succesfulTackle;
   int foul;
-  int passes;
-  int failedPasses;
-  int dribbles;
-  int failedDribbles;
-
   int saves;
   int shotsReceived;  
   int percentSaves;
@@ -37,11 +32,6 @@ class PlayerStats {
     this.tackle = 0,
     this.succesfulTackle = 0,
     this.foul = 0,
-    this.passes = 0,
-    this.failedPasses = 0,
-    this.dribbles = 0,
-    this.failedDribbles = 0,
-
     this.saves = 0,
     this.shotsReceived = 0,  
     this.percentSaves = 0,
@@ -62,11 +52,6 @@ class PlayerStats {
       'tackle': tackle,
       'succesfulTackle': succesfulTackle,
       'foul': foul,
-      'passes': passes,
-      'failedPasses': failedPasses,
-      'dribbles': dribbles,
-      'failedDribbles': failedDribbles,
-
       'saves': saves,
       'shotsReceived': shotsReceived,
       'percentSaves': percentSaves,
@@ -88,10 +73,6 @@ class PlayerStats {
       tackle: json['tackle'] ?? 0,
       succesfulTackle: json['succesfulTackle'] ?? 0,
       foul: json['foul'] ?? 0,
-      passes: json['passes'] ?? 0,
-      failedPasses: json['failedPasses'] ?? 0,
-      dribbles: json['dribbles'] ?? 0,
-      failedDribbles: json['failedDribbles'] ?? 0,
       saves: json['saves'] ?? 0,
       shotsReceived: json['shotsReceived'] ?? 0,
       percentSaves: json['percentSaves'] ?? 0,

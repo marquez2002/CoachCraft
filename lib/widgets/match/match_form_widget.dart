@@ -18,8 +18,7 @@ class _MatchFormState extends State<MatchForm> {
   DateTime? _selectedDate;
   String _location = 'Casa';
   String _matchType = 'Amistoso';
-  bool _isExpanded = false; 
-  
+
   Future<void> _createMatch() async {
     // Validación básica: Asegurarse de que todos los campos están completos
     if (_rivalTeamController.text.isEmpty) {
@@ -78,122 +77,107 @@ class _MatchFormState extends State<MatchForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Título con el botón de expansión
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _isExpanded = !_isExpanded; // Cambia el estado de expansión
-            });
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Crear un nuevo partido', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              Icon(_isExpanded ? Icons.expand_less : Icons.expand_more), // Ícono de expansión
-            ],
+        const Text('Crear un nuevo partido', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8.0),
+
+        // Campo para ingresar el equipo rival
+        TextField(
+          controller: _rivalTeamController,
+          decoration: const InputDecoration(
+            labelText: 'Equipo rival',
+            border: OutlineInputBorder(),
           ),
         ),
         const SizedBox(height: 8.0),
 
-        // Contenido del formulario que se expande o colapsa
-        if (_isExpanded) ...[
-          TextField(
-            controller: _rivalTeamController,
-            decoration: const InputDecoration(
-              labelText: 'Equipo rival',
-              border: OutlineInputBorder(),
-            ),
+        // Campo para ingresar el resultado
+        TextField(
+          controller: _resultController,
+          decoration: const InputDecoration(
+            labelText: 'Resultado (ej: 2-1)',
+            border: OutlineInputBorder(),
           ),
-          const SizedBox(height: 8.0),
+        ),
+        const SizedBox(height: 8.0),
 
-          TextField(
-            controller: _resultController,
-            decoration: const InputDecoration(
-              labelText: 'Resultado (ej: 2-1)',
-              border: OutlineInputBorder(),
-            ),
+        // Campo para seleccionar la fecha del partido
+        TextField(
+          decoration: const InputDecoration(
+            labelText: 'Fecha del Partido',
+            border: OutlineInputBorder(),
           ),
-          const SizedBox(height: 8.0),
-
-          // Campo para seleccionar la fecha del partido
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Fecha del Partido',
-              border: OutlineInputBorder(),
-            ),
-            onTap: () async {
-              DateTime? date = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2101),
-              );
-              if (date != null) {
-                setState(() {
-                  _selectedDate = date;
-                });
-              }
-            },
-            readOnly: true,
-            controller: TextEditingController(
-              text: _selectedDate != null ? DateFormat('dd-MM-yyyy').format(_selectedDate!) : '',
-            ),
-          ),
-          const SizedBox(height: 8.0),
-
-          // Dropdown para la ubicación
-          DropdownButtonFormField<String>(
-            value: _location,
-            decoration: const InputDecoration(
-              labelText: 'Lugar del partido',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (String? newValue) {
+          onTap: () async {
+            DateTime? date = await showDatePicker(
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2101),
+            );
+            if (date != null) {
               setState(() {
-                _location = newValue!;
+                _selectedDate = date;
               });
-            },
-            items: <String>['Casa', 'Fuera'].map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+            }
+          },
+          readOnly: true,
+          controller: TextEditingController(
+            text: _selectedDate != null ? DateFormat('dd-MM-yyyy').format(_selectedDate!) : '',
           ),
-          const SizedBox(height: 8.0),
+        ),
+        const SizedBox(height: 8.0),
 
-          // Dropdown para el tipo de partido
-          DropdownButtonFormField<String>(
-            value: _matchType,
-            decoration: const InputDecoration(
-              labelText: 'Tipo de Partido',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (String? newValue) {
-              setState(() {
-                _matchType = newValue!;
-              });
-            },
-            items: <String>['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+        // Dropdown para la ubicación
+        DropdownButtonFormField<String>(
+          value: _location,
+          decoration: const InputDecoration(
+            labelText: 'Lugar del partido',
+            border: OutlineInputBorder(),
           ),
+          onChanged: (String? newValue) {
+            setState(() {
+              _location = newValue!;
+            });
+          },
+          items: <String>['Casa', 'Fuera'].map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8.0),
 
-          const SizedBox(height: 16.0),
-
-          // Botón para crear el partido
-          Center(
-            child: ElevatedButton(
-              onPressed: _createMatch,
-              child: const Text('Crear Partido'),
-            ),
+        // Dropdown para el tipo de partido
+        DropdownButtonFormField<String>(
+          value: _matchType,
+          decoration: const InputDecoration(
+            labelText: 'Tipo de Partido',
+            border: OutlineInputBorder(),
           ),
-          const SizedBox(height: 16.0),
-        ],
+          onChanged: (String? newValue) {
+            setState(() {
+              _matchType = newValue!;
+            });
+          },
+          items: <String>['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs']
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 16.0),
+
+        // Botón para crear el partido
+        Center(
+          child: ElevatedButton(
+            onPressed: _createMatch,
+            child: const Text('Crear Partido'),
+          ),
+        ),
+        const SizedBox(height: 16.0),
       ],
     );
   }

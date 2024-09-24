@@ -1,7 +1,7 @@
+import 'package:CoachCraft/widgets/match/player_stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/services/match/match_service.dart';
-import 'package:CoachCraft/widgets/match/player_stat_card.dart';
 
 class StatsScreen extends StatefulWidget {
   final String matchDate;
@@ -9,6 +9,7 @@ class StatsScreen extends StatefulWidget {
   final String result;
   final String matchType;
   final String location;
+  final String matchId; // Añadir matchId como propiedad
 
   const StatsScreen({
     Key? key,
@@ -16,7 +17,8 @@ class StatsScreen extends StatefulWidget {
     required this.rivalTeam,
     required this.result,
     required this.matchType,
-    required this.location, required List playerStats,
+    required this.location,
+    required this.matchId,
   }) : super(key: key);
 
   @override
@@ -30,7 +32,7 @@ class _StatsScreenState extends State<StatsScreen> {
   String _matchType = '';
   String _location = '';
   bool _isExpanded = false;
-  List<dynamic> playerStats = []; // Lista para almacenar las estadísticas de jugadores
+  List<dynamic> playerStats = [];
 
   final List<String> matchTypes = ['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs'];
   final List<String> locations = ['Casa', 'Fuera'];
@@ -43,11 +45,11 @@ class _StatsScreenState extends State<StatsScreen> {
     _resultController = TextEditingController(text: widget.result);
     _matchType = widget.matchType;
     _location = widget.location;
-    _fetchPlayerStats(); // Llama a la función para cargar estadísticas de jugadores
+    _fetchPlayerStats();
   }
 
   Future<void> _fetchPlayerStats() async {
-    final fetchedStats = await MatchService().fetchPlayerStats(context, widget.rivalTeam, widget.matchDate);
+    final fetchedStats = await MatchService().fetchMatches(context);
     setState(() {
       playerStats = fetchedStats; // Actualiza la lista de estadísticas
     });
@@ -67,7 +69,6 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Future<void> _deleteMatch() async {
-    // Confirmación antes de eliminar
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -122,35 +123,28 @@ class _StatsScreenState extends State<StatsScreen> {
     }
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Estadísticas del Partido: ${_rivalController.text}'),
+        actions: [
+          IconButton(
+            icon: Icon(_isExpanded ? Icons.expand_less : Icons.edit),
+            onPressed: () {
+              // Cambia el estado para expandir o contraer la sección de edición
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Modificar Estadísticas',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8.0),
             if (_isExpanded) ...[
               // Campos de edición
               Row(
@@ -252,37 +246,16 @@ class _StatsScreenState extends State<StatsScreen> {
               const SizedBox(height: 16.0),
             ],
             const SizedBox(height: 8.0),
-             
             Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                // Calcula el ancho total disponible
-                double availableWidth = constraints.maxWidth;
-
-                // Determina cuántas tarjetas caben en una fila, basadas en un ancho deseado
-                int count = (availableWidth / 800).floor(); // Ajusta 650 según el ancho deseado de la tarjeta
-
-                return GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: count > 0 ? count : 1,
-                    mainAxisSpacing: 4.0,
-                    crossAxisSpacing: 4.0,
-                  ),
-                  itemCount: playerStats.length,
-                  itemBuilder: (context, index) {
-                    return SizedBox(
-                      height: 1400, // Altura fija de la tarjeta (ajusta según tus necesidades)
-                      width: 800, // Ancho fijo de la tarjeta
-                      child: PlayerStatCard(playerStat: playerStats[index]),
-                    );
-                  },
-                );
-              },
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    height: 140,
+                    child: PlayerStatTable(),
+                  );
+                },
+              ),
             ),
-          ),
-
-
-
           ],
         ),
       ),
