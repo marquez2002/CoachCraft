@@ -27,45 +27,65 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
 
   bool isLoading = true;
 
+  // Nuevas variables
+  String currentFilterType = 'completa'; // Tipo de filtro actual
+  int matchesCount = 0; // Contador de partidos
+
   @override
   void initState() {
     super.initState();
-    fetchGeneralStats(); // Load general stats on startup
+    fetchGeneralStats(); // Carga inicial de estadísticas
   }
 
-  // Function to calculate start date based on the selected period
   DateTime getStartDate(String period) {
     DateTime now = DateTime.now();
+
     if (period == 'semanal') {
       return now.subtract(const Duration(days: 7));
     } else if (period == 'mensual') {
       return DateTime(now.year, now.month - 1, now.day);
     } else {
-      return DateTime(now.year - 1, now.month, now.day); // Full season (one year ago)
+      DateTime augustFirst = DateTime(now.year, 8, 1);
+
+      if (now.isBefore(augustFirst)) {
+        return DateTime(now.year - 1, 8, 1);
+      } else {
+        return augustFirst;
+      }
     }
   }
 
+  // Fetch general stats from Firestore
   Future<void> fetchGeneralStats({String period = 'completa'}) async {
     setState(() => isLoading = true);
     try {
-      String? teamId = await getTeamId(context); // Get the selected team's ID
+      // Obtener ID del equipo seleccionado
+      String? teamId = await getTeamId(context);
+      currentFilterType = period;
       if (teamId == null) {
-        throw Exception('Team ID is null');
+        throw Exception('El ID del equipo es null');
       }
-      
-      DateTime startDate = getStartDate(period); // Start date based on selected period
-      print("Fetching matches from: $startDate");
 
-      // Fetch matches within the specified date range
+      // Obtener la fecha de inicio según el periodo seleccionado
+      DateTime startDate = getStartDate(period);
+      print("Buscando partidos desde: $startDate para el equipo: $teamId");
+
+      // Convertir la fecha a String para Firestore
+      String startDateAsString = startDate.toIso8601String();
+      print("startDate as String: $startDateAsString");
+
+      // Consultar partidos a partir de la fecha de inicio
       QuerySnapshot matchesSnapshot = await FirebaseFirestore.instance
           .collection('teams')
           .doc(teamId)
           .collection('matches')
-          .where('date', isGreaterThanOrEqualTo: startDate)
+          .where('matchDate', isGreaterThanOrEqualTo: startDateAsString)
           .get();
 
-      print("Matches found: ${matchesSnapshot.docs.length}");
+      print("Partidos encontrados: ${matchesSnapshot.docs.length}");
+      matchesCount = matchesSnapshot.docs.length;
 
+      // Inicializar un mapa para acumular estadísticas
       Map<String, dynamic> statsAccumulated = {
         'goals': 0,
         'assists': 0,
@@ -80,8 +100,11 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
         'succesfulTackle': 0,
       };
 
-      // Iterate through each match to accumulate player statistics
+      // Iterar a través de los partidos
       for (var match in matchesSnapshot.docs) {
+        print("Procesando partido con ID: ${match.id}");
+
+        // Acceder a la colección de jugadores dentro de cada partido
         QuerySnapshot playerSnapshot = await FirebaseFirestore.instance
             .collection('teams')
             .doc(teamId)
@@ -90,14 +113,15 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
             .collection('players')
             .get();
 
-        print("Match ID: ${match.id} - Players Found: ${playerSnapshot.docs.length}");
+        print("Jugadores encontrados en el partido: ${playerSnapshot.docs.length}");
 
-        // Accumulate general statistics from each player
+        // Acumular las estadísticas de los jugadores
         for (var player in playerSnapshot.docs) {
           Map<String, dynamic> playerData = player.data() as Map<String, dynamic>;
-          // Check if playerData contains the expected keys
-          print("Player ID: ${player.id}, Data: $playerData");
 
+          print("Datos del jugador: $playerData");
+
+          // Asegurarse de que las claves existen y no son nulas
           statsAccumulated['goals'] += playerData['goals'] ?? 0;
           statsAccumulated['assists'] += playerData['assists'] ?? 0;
           statsAccumulated['saves'] += playerData['saves'] ?? 0;
@@ -112,14 +136,15 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
         }
       }
 
-      // Assign the accumulated statistics
+      // Actualizar las estadísticas generales con las estadísticas acumuladas
       setState(() {
         generalStats = statsAccumulated;
       });
 
-      print("Accumulated Stats: $generalStats");
+      print("Estadísticas acumuladas: $generalStats");
+
     } catch (e) {
-      // Show error message if there is an issue
+      print("Error al obtener las estadísticas: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error al obtener estadísticas: $e")),
       );
@@ -129,7 +154,6 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
   }
 
 
-  // Function to get the selected team's ID
   Future<String?> getTeamId(BuildContext context) async {
     try {
       String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
@@ -191,39 +215,49 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
+                  // Mostrar el filtro y el número de partidos
+                  Text(
+                    'Filtro: $currentFilterType (${matchesCount} partidos)',
+                    style: const TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center, // Cambiado a center para centrar el texto
+                  ),
+                  const SizedBox(height: 20),
+                  // Centro la tabla
+                  Center(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(label: Center(child: Icon(Icons.sports_soccer))),
-                          DataColumn(label: Center(child: Icon(Icons.group_add_sharp))),
-                          DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))),
-                          DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp, color: Colors.green))),
-                          DataColumn(label: Center(child: Icon(Icons.sports_soccer))),
-                          DataColumn(label: Center(child: Icon(Icons.group_add_sharp))),
-                          DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))),
-                          DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))),
-                          DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))),
-                          DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))),
-                          DataColumn(label: Center(child: Icon(Icons.sports))),
-                        ],
-                        rows: [
-                          DataRow(cells: [
-                            DataCell(Text(generalStats['goals'].toString())),
-                            DataCell(Text(generalStats['assists'].toString())),
-                            DataCell(Text(generalStats['shotsReceived'].toString())), 
-                            DataCell(Text(generalStats['saves'].toString())),
-                            DataCell(Text(generalStats['shots'].toString())),
-                            DataCell(Text(generalStats['shotsOnGoal'].toString())),
-                            DataCell(Text(generalStats['yellowCards'].toString())),
-                            DataCell(Text(generalStats['redCards'].toString())),
-                            DataCell(Text(generalStats['foul'].toString())),
-                            DataCell(Text(generalStats['tackle'].toString())),
-                            DataCell(Text(generalStats['succesfulTackle'].toString())),
-                          ]),
-                        ],
+                      child: Container( // Contenedor para ajustar el ancho
+                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.95), // Ajustar el ancho
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(label: Center(child: Icon(Icons.sports_soccer))),
+                            DataColumn(label: Center(child: Icon(Icons.group_add_sharp))),
+                            DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))),
+                            DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp, color: Colors.green))),
+                            DataColumn(label: Center(child: Icon(Icons.sports_soccer))),
+                            DataColumn(label: Center(child: Icon(Icons.group_add_sharp))),
+                            DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))),
+                            DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))),
+                            DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))),
+                            DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))),
+                            DataColumn(label: Center(child: Icon(Icons.sports))),
+                          ],
+                          rows: [
+                            DataRow(cells: [
+                              DataCell(Text(generalStats['goals'].toString())),
+                              DataCell(Text(generalStats['assists'].toString())),
+                              DataCell(Text(generalStats['shotsReceived'].toString())),
+                              DataCell(Text(generalStats['saves'].toString())),
+                              DataCell(Text(generalStats['shots'].toString())),
+                              DataCell(Text(generalStats['shotsOnGoal'].toString())),
+                              DataCell(Text(generalStats['yellowCards'].toString())),
+                              DataCell(Text(generalStats['redCards'].toString())),
+                              DataCell(Text(generalStats['foul'].toString())),
+                              DataCell(Text(generalStats['tackle'].toString())),
+                              DataCell(Text(generalStats['succesfulTackle'].toString())),
+                            ]),
+                          ],
+                        ),
                       ),
                     ),
                   ),
