@@ -91,6 +91,21 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     );
   }
 
+  // Nueva función para salir del equipo
+  Future<void> _leaveTeam(String teamId) async {
+    try {
+      await _teamService.leaveTeam(teamId); 
+      await _loadUserTeams(); 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Has salido del equipo.')), 
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al salir del equipo: $e')), 
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -203,6 +218,34 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                             ],
                           ),
                       ],
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        bool confirmDelete = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Confirmar salida"),
+                              content: const Text("¿Estás seguro que quieres salir del equipo?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text("Cancelar"),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: const Text("Salir"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (confirmDelete) {
+                          await _leaveTeam(team.id); // Salir del equipo
+                        }
+                      },
                     ),
                     onTap: () {
                       Provider.of<TeamProvider>(context, listen: false).setSelectedTeamName(team.name);
