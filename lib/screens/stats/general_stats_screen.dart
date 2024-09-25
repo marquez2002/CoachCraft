@@ -2,6 +2,8 @@ import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
+
 
 class GeneralStatsScreen extends StatefulWidget {
   const GeneralStatsScreen({Key? key}) : super(key: key);
@@ -178,34 +180,34 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Estadísticas Generales'),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (String period) {
-              fetchGeneralStats(period: period);
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'semanal',
-                child: Text('Semanal'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'mensual',
-                child: Text('Mensual'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'completa',
-                child: Text('Temporada Completa'),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: isLoading
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Estadísticas Generales'),
+      actions: [
+        PopupMenuButton<String>(
+          onSelected: (String period) {
+            fetchGeneralStats(period: period);
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'semanal',
+              child: Text('Semanal'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'mensual',
+              child: Text('Mensual'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'completa',
+              child: Text('Temporada Completa'),
+            ),
+          ],
+        ),
+      ],
+    ),
+    body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -219,15 +221,15 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                   Text(
                     'Filtro: $currentFilterType (${matchesCount} partidos)',
                     style: const TextStyle(fontSize: 18),
-                    textAlign: TextAlign.center, // Cambiado a center para centrar el texto
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
                   // Centro la tabla
                   Center(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Container( // Contenedor para ajustar el ancho
-                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.95), // Ajustar el ancho
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.95),
                         child: DataTable(
                           columns: const [
                             DataColumn(label: Center(child: Icon(Icons.sports_soccer))),
@@ -261,9 +263,103 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  // Agregar el gráfico
+                  Wrap(
+                    spacing: 16.0,
+                    runSpacing: 16.0,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _buildPieChart(
+                        title: 'Tiros Recibidos vs Paradas',
+                        sectionData: [
+                          PieChartSectionData(
+                            value: generalStats['shotsReceived']?.toDouble() ?? 0,
+                            title: '${generalStats['shotsReceived']?.toString() ?? 0}',
+                            color: Colors.grey,
+                          ),
+                          PieChartSectionData(
+                            value: generalStats['saves']?.toDouble() ?? 0,
+                            title: '${generalStats['saves']?.toString() ?? 0}',
+                            color: Colors.green,
+                          ),
+                        ],
+                      ),
+                      _buildPieChart(
+                        title: 'Tiros vs Tiros a Puerta',
+                        sectionData: [
+                          PieChartSectionData(
+                            value: generalStats['shotsOnGoal']?.toDouble() ?? 0,
+                            title: '${generalStats['shotsOnGoal']?.toString() ?? 0}',
+                            color: Colors.green,
+                          ),
+                          PieChartSectionData(
+                            value: generalStats['shots']?.toDouble() ?? 0,
+                            title: '${generalStats['shots']?.toString() ?? 0}',
+                            color: Colors.red,
+                          ),
+                        ],
+                      ),
+                      _buildPieChart(
+                        title: 'Goles vs Tiros',
+                        sectionData: [
+                          PieChartSectionData(
+                            value: generalStats['goals']?.toDouble() ?? 0,
+                            title: '${generalStats['goals']?.toString() ?? 0}',
+                            color: Colors.green,
+                          ),
+                          PieChartSectionData(
+                            value: generalStats['shots']?.toDouble() ?? 0,
+                            title: '${generalStats['shots']?.toString() ?? 0}',
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                      _buildPieChart(
+                        title: 'Tarjetas Amarilla vs Rojas',
+                        sectionData: [
+                          PieChartSectionData(
+                            value: generalStats['yellowCards']?.toDouble() ?? 0,
+                            title: '${generalStats['yellowCards']?.toString() ?? 0}',
+                            color: Colors.yellow,
+                          ),
+                          PieChartSectionData(
+                            value: generalStats['redCards']?.toDouble() ?? 0,
+                            title: '${generalStats['redCards']?.toString() ?? 0}',
+                            color: Colors.red,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
     );
   }
+
+  Widget _buildPieChart({required String title, required List<PieChartSectionData> sectionData}) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: 150, // Width of the pie chart
+          height: 150, // Height of the pie chart
+          child: PieChart(
+            PieChartData(
+              sections: sectionData,
+              centerSpaceRadius: 30,
+              borderData: FlBorderData(show: false),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 }

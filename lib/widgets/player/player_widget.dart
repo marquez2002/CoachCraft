@@ -1,9 +1,10 @@
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
+import 'package:CoachCraft/screens/team_management/team_conv_player_screen.dart';
 import 'package:CoachCraft/services/player/player_service.dart';
 import 'package:flutter/material.dart';
 import '../../screens/team_management/team_modify_player_screen.dart';
 
-// Campo de formulario reutilizable con validaciones personalizadas
+/// Campo de formulario reutilizable con validaciones personalizadas
 Widget buildPlayerFormField(
   TextEditingController controller,
   String label,
@@ -56,16 +57,18 @@ Widget buildPlayerFormField(
   );
 }
 
-
 class PlayerDataTable extends StatelessWidget {
   final List<Map<String, dynamic>> players;
+
   const PlayerDataTable({super.key, required this.players});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+      scrollDirection: Axis.horizontal, // Desplazamiento horizontal
       child: DataTable(
+        // ignore: deprecated_member_use
+        dataRowHeight: 40, // Ajustar la altura de las filas
         columns: const [
           DataColumn(label: Text('Nombre')),
           DataColumn(label: Text('Dorsal')),
@@ -77,7 +80,7 @@ class PlayerDataTable extends StatelessWidget {
           DataColumn(label: Text('Eliminar')),
         ],
         rows: players.map((player) {
-          final dorsal = player['dorsal']; // Asegurarse de que el dorsal está presente
+          final dorsal = player['dorsal'];
           return DataRow(cells: [
             DataCell(Text(player['nombre'] ?? 'Nombre no disponible')),
             DataCell(Text(player['dorsal']?.toString() ?? 'Dorsal no disponible')),
@@ -91,12 +94,11 @@ class PlayerDataTable extends StatelessWidget {
                   icon: const Icon(Icons.edit),
                   onPressed: () {
                     if (dorsal != null) {
-                      // Pasar el dorsal a la pantalla de modificación
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => FootballModifyPlayer(
-                            dorsal: dorsal, // Pasar el dorsal al widget FootballModifyPlayer
+                            dorsal: dorsal,
                           ),
                         ),
                       );
@@ -126,13 +128,13 @@ class PlayerDataTable extends StatelessWidget {
                             actions: [
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop(false); // No eliminar
+                                  Navigator.of(context).pop(false);
                                 },
                                 child: const Text('Cancelar'),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop(true); // Confirmar eliminación
+                                  Navigator.of(context).pop(true);
                                 },
                                 child: const Text('Eliminar'),
                               ),
@@ -142,17 +144,14 @@ class PlayerDataTable extends StatelessWidget {
                       );
 
                       if (confirmDelete) {
-                        // Llamar a la función para eliminar el jugador
                         await deletePlayerByDorsal(context, dorsal);
 
-                        // Redirigir a MenuFutsalScreen tras eliminar el jugador
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => MenuScreenFutsalTeam()), // Navegar a MenuFutsalScreen
+                          MaterialPageRoute(builder: (context) => MenuScreenFutsalTeam()),
                         );
                       }
                     } else {
-                      // Mostrar SnackBar si no hay dorsal disponible
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Dorsal del jugador no disponible'),
@@ -170,3 +169,57 @@ class PlayerDataTable extends StatelessWidget {
   }
 }
 
+class FootballListPlayer extends StatefulWidget {
+  const FootballListPlayer({super.key});
+
+  @override
+  _FootballListPlayerState createState() => _FootballListPlayerState();
+}
+
+class _FootballListPlayerState extends State<FootballListPlayer> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Jugadores'),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: getPlayers(context),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Jugador No Encontrado.'));
+          } else {
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView( // Permitir desplazamiento vertical
+                    child: PlayerDataTable(players: snapshot.data!), // Tabla de jugadores
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Padding horizontal y vertical
+                  child: SizedBox(
+                    width: double.infinity, // Botón se ajusta al ancho disponible
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const FootballConvPlayer()),
+                        );
+                      },
+                      child: const Text('Convocatoria'),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
+}

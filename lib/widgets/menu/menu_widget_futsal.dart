@@ -67,6 +67,9 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener las dimensiones de la pantalla
+    final screenSize = MediaQuery.of(context).size;
+
     // Lista de datos para los botones con las rutas determinadas que deben seguir
     List<Map<String, dynamic>> buttonData = [
       {
@@ -95,7 +98,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         'enabledFor': ['Entrenador', 'Jugador']
       },
     ];
-    
+
     return Scaffold(
       body: Stack(
         children: [
@@ -112,57 +115,64 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                 : SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: buttonData.map((data) {
-                        // Determina si el botón está habilitado para el rol actual
-                        bool isEnabled = data['enabledFor'].contains(_userRole);
+                      children: [
+                        // Column to hold the buttons vertically
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: buttonData.map((data) {
+                            // Determina si el botón está habilitado para el rol actual
+                            bool isEnabled = data['enabledFor'].contains(_userRole);
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: FractionallySizedBox(
-                            widthFactor: 0.4, // El botón ocupará el 40% del ancho disponible
-                            child: ElevatedButton(
-                              onPressed: isEnabled
-                                  ? () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => data['route']),
-                                      );
-                                    }
-                                  : null, // Deshabilita el botón si no está permitido
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black,
-                                backgroundColor: Colors.white , 
-                                padding: const EdgeInsets.symmetric(vertical: 15.0), // Ajusta el padding para controlar la altura del botón
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    data['label'],
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      color: Colors.black, // Texto gris si el botón está deshabilitado
-                                    ),
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: SizedBox(
+                                width: screenSize.width * 0.7, // Width is 70% of the screen width
+                                child: ElevatedButton(
+                                  onPressed: isEnabled
+                                      ? () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => data['route']),
+                                          );
+                                        }
+                                      : null, // Deshabilita el botón si no está permitido
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.black,
+                                    backgroundColor: Colors.white, 
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: screenSize.height * 0.02, // Adjust the vertical padding
+                                    ), 
                                   ),
-                                  if (!isEnabled) // Muestra el candado solo si el botón está deshabilitado
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 8.0), // Espacio entre el texto y el icono
-                                      child: Icon(
-                                        Icons.lock,
-                                        color: Colors.black, // Color del icono de candado
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        data['label'],
+                                        style: TextStyle(
+                                          fontSize: 20, // Slightly smaller font size
+                                          color: Colors.black,
+                                        ),
                                       ),
-                                    ),
-                                ],
+                                      if (!isEnabled) // Show lock icon if the button is disabled
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 8.0), // Space between text and icon
+                                          child: Icon(
+                                            Icons.lock,
+                                            color: Colors.black, // Color of lock icon
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ),
                   ),
           ),
-
         ],
       ),
     );

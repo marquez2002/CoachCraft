@@ -9,6 +9,7 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     // Lista de datos para los botones con las rutas determinada que deben seguir
     List<Map<String, dynamic>> buttonData = [
       {'label': 'Añadir Jugador', 'route': FootballAddPlayer()},
@@ -30,36 +31,46 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
 
           // Contenido de la pantalla principal
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: buttonData.map((data) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: FractionallySizedBox(
-                    widthFactor: 0.4, // El botón ocupará el 40% del ancho disponible
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Acción al presionar el botón con navegación a la pantalla correspondiente
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => data['route']),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 15.0), // Ajusta la altura del botón
-                      ),
-                      child: Text(
-                        data['label'],
-                        style: const TextStyle(
-                          fontSize: 22,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Column to hold the buttons vertically
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: buttonData.map((data) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: SizedBox(
+                          width: screenSize.width * 0.7, // Width is 70% of the screen width
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Acción al presionar el botón con navegación a la pantalla correspondiente
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => data['route']),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.black,
+                              backgroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                vertical: screenSize.height * 0.02, // Ajusta la altura del botón
+                              ),
+                            ),
+                            child: Text(
+                              data['label'],
+                              style: const TextStyle(
+                                fontSize: 20, // Ajusta el tamaño de fuente
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    }).toList(),
                   ),
-                );
-              }).toList(),
+                ],
+              ),
             ),
           ),
         ],

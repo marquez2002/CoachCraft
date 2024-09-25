@@ -19,6 +19,9 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
   
+  // Hide the status bar and navigation bar
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive); // Hides both status and navigation bars
+  
   runApp(const MyApp());
 }
 
@@ -31,9 +34,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => TeamProvider()), 
         ChangeNotifierProvider(create: (_) => MatchProvider()), 
-
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         // Título de la aplicación
         title: 'CoachCraft',
 

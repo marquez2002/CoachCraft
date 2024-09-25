@@ -8,8 +8,8 @@ class FootballConvPlayer extends StatefulWidget {
   const FootballConvPlayer({super.key});
 
   @override
-    _FootballConvPlayerState createState() => _FootballConvPlayerState();
-  }
+  _FootballConvPlayerState createState() => _FootballConvPlayerState();
+}
 
 class _FootballConvPlayerState extends State<FootballConvPlayer> {
   Map<String, bool> selectedPlayers = {}; // Para mantener el estado de selección
@@ -73,84 +73,87 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Convocatoria'),
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: getPlayers(context),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No players found.'));
-          } else {
-            final players = snapshot.data!;
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: Text('Convocatoria'),
+            floating: true,
+            pinned: false, // Cambiar a true si deseas que la barra permanezca al scrollear hacia arriba
+          ),
+          SliverToBoxAdapter(
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: getPlayers(context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No players found.'));
+                } else {
+                  final players = snapshot.data!;
 
-            return Column(
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                      child: SingleChildScrollView(
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(label: Text('Seleccionar')),
-                          DataColumn(label: Text('Dorsal')),
-                          DataColumn(label: Text('Nombre')),                          
-                          DataColumn(label: Text('Posición')),
-                        ],
-                        rows: players.map((player) {
-                          String playerDorsal = player['dorsal']?.toString() ?? 'Dorsal no disponible';
-                          String playerName = player['nombre'] ?? 'Nombre no disponible';                          
-                          String playerPosition = player['posicion'] ?? 'Posición no disponible';
-                          
-                          bool isSelected = selectedPlayers[player['nombre']] ?? false;
+                  return Column(
+                    children: [
+                      SingleChildScrollView(
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(label: Text('Seleccionar')),
+                            DataColumn(label: Text('Dorsal')),
+                            DataColumn(label: Text('Nombre')),                          
+                            DataColumn(label: Text('Posición')),
+                          ],
+                          rows: players.map((player) {
+                            String playerDorsal = player['dorsal']?.toString() ?? 'Dorsal no disponible';
+                            String playerName = player['nombre'] ?? 'Nombre no disponible';                          
+                            String playerPosition = player['posicion'] ?? 'Posición no disponible';
+                            
+                            bool isSelected = selectedPlayers[player['nombre']] ?? false;
 
-                          return DataRow(cells: [
-                            DataCell(
-                              Checkbox(
-                                value: isSelected,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    selectedPlayers[player['nombre']] = value ?? false;
-                                  });
-                                },
+                            return DataRow(cells: [
+                              DataCell(
+                                Checkbox(
+                                  value: isSelected,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      selectedPlayers[player['nombre']] = value ?? false;
+                                    });
+                                  },
+                                ),
                               ),
-                            ),
-                            DataCell(Text(playerDorsal)),
-                            DataCell(Text(playerName)),                          
-                            DataCell(Text(playerPosition)),
-                          ]);
-                        }).toList(),
+                              DataCell(Text(playerDorsal)),
+                              DataCell(Text(playerName)),                          
+                              DataCell(Text(playerPosition)),
+                            ]);
+                          }).toList(),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final selectedPlayersData = players.where((player) {
-                        return selectedPlayers[player['nombre']] == true;
-                      }).toList();
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final selectedPlayersData = players.where((player) {
+                              return selectedPlayers[player['nombre']] == true;
+                            }).toList();
 
-                      if (selectedPlayersData.isNotEmpty) {
-                        generatePdf(selectedPlayersData);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('No players selected.')),
-                        );
-                      }
-                    },
-                    child: Text('Generar PDF'),
-                  ),
-                ),
-              ],
-            );
-          }
-        },
+                            if (selectedPlayersData.isNotEmpty) {
+                              generatePdf(selectedPlayersData);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('No players selected.')),
+                              );
+                            }
+                          },
+                          child: Text('Generar PDF'),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

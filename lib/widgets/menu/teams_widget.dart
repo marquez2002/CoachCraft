@@ -191,14 +191,14 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                               ElevatedButton.icon(
                                 icon: const Icon(Icons.copy),
                                 label: const Text('Código Entrenador'),
-                                onPressed: () => _copyToClipboard(team.id, 'Entrenador'),
+                                onPressed: () => _copyToClipboard(team.id, '0'),
                               ),
                               const SizedBox(width: 8.0),
                               // Botón para copiar el código del jugador
                               ElevatedButton.icon(
                                 icon: const Icon(Icons.copy),
                                 label: const Text('Código Jugador'),
-                                onPressed: () => _copyToClipboard(team.id, 'Jugador'),
+                                onPressed: () => _copyToClipboard(team.id, '1'),
                               ),
                             ],
                           ),

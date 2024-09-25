@@ -92,36 +92,42 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
     }
   }
 
-  // Método para construir la interfaz de usuario
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Añadir Jugador'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Campos del formulario para los datos del jugador
-                buildPlayerFormField(_nameController, 'Nombre', 'Por favor ingrese un nombre'),
-                buildPlayerFormField(_dorsalController, 'Dorsal', 'Por favor ingrese un dorsal', isNumber: true),
-                buildPlayerFormField(_positionController, 'Posición', 'Por favor ingrese la posición'),
-                buildPlayerFormField(_ageController, 'Edad', 'Por favor ingrese la edad', isNumber: true),
-                buildPlayerFormField(_heightController, 'Altura (cm)', 'Por favor ingrese la altura', isNumber: true),
-                buildPlayerFormField(_weightController, 'Peso (kg)', 'Por favor ingrese el peso', isNumber: true),
-                const SizedBox(height: 20), 
-                ElevatedButton(
-                  onPressed: _submitPlayer, 
-                  child: const Text('Añadir Jugador'), 
+      body: CustomScrollView(
+        slivers: <Widget>[
+          // SliverAppBar with the title
+          SliverAppBar(
+            title: const Text('Añadir Jugador'),
+            floating: true, // This allows the AppBar to reappear when scrolling up
+            pinned: false, // The AppBar won't be pinned            
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // Fields for player data
+                    buildPlayerFormField(_nameController, 'Nombre', 'Por favor ingrese un nombre'),
+                    buildPlayerFormField(_dorsalController, 'Dorsal', 'Por favor ingrese un dorsal', isNumber: true),
+                    buildPlayerFormField(_positionController, 'Posición', 'Por favor ingrese la posición'),
+                    buildPlayerFormField(_ageController, 'Edad', 'Por favor ingrese la edad', isNumber: true),
+                    buildPlayerFormField(_heightController, 'Altura (cm)', 'Por favor ingrese la altura', isNumber: true),
+                    buildPlayerFormField(_weightController, 'Peso (kg)', 'Por favor ingrese el peso', isNumber: true),
+                    const SizedBox(height: 20), 
+                    ElevatedButton(
+                      onPressed: _submitPlayer, 
+                      child: const Text('Añadir Jugador'), 
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
