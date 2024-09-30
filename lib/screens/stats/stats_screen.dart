@@ -31,7 +31,8 @@ class _StatsScreenState extends State<StatsScreen> {
   late TextEditingController _resultController;
   String _matchType = '';
   String _location = '';
-  bool _isExpanded = false;
+  bool _isModifyExpanded = false;
+  bool _isInfoExpanded = false;
   List<dynamic> playerStats = [];
 
   final List<String> matchTypes = ['Amistoso', 'Liga', 'Copa', 'Supercopa', 'Playoffs'];
@@ -130,11 +131,24 @@ class _StatsScreenState extends State<StatsScreen> {
         title: Text('Estadísticas del Partido: ${_rivalController.text}'),
         actions: [
           IconButton(
-            icon: Icon(_isExpanded ? Icons.expand_less : Icons.edit),
+            icon: const Icon(Icons.info_outline),
             onPressed: () {
-              // Cambia el estado para expandir o contraer la sección de edición
               setState(() {
-                _isExpanded = !_isExpanded;
+                _isInfoExpanded = !_isInfoExpanded; // Cambia el estado del infoExpanded
+                if (_isInfoExpanded) {
+                  _isModifyExpanded = false; // Cierra el filtro si se abre la info
+                }
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.filter_alt_outlined),
+            onPressed: () {
+              setState(() {
+                _isModifyExpanded = !_isModifyExpanded; // Cambia el estado del isSearchingExpanded
+                if (_isModifyExpanded) {
+                  _isInfoExpanded = false; // Cierra la info si se abre el filtro
+                }
               });
             },
           ),
@@ -143,9 +157,9 @@ class _StatsScreenState extends State<StatsScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (_isExpanded) ...[
+            if (_isModifyExpanded) ...[
               // Campos de edición
               Row(
                 children: [
@@ -245,20 +259,117 @@ class _StatsScreenState extends State<StatsScreen> {
               ),
               const SizedBox(height: 16.0),
             ],
-            const SizedBox(height: 8.0),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SizedBox(
-                    height: 140,
-                    child: PlayerStatTable(),
-                  );
-                },
+            if (_isInfoExpanded) ...[
+              Wrap(
+                spacing: 20.0, // Espacio entre los íconos
+                runSpacing: 20.0, // Espacio entre las filas
+                alignment: WrapAlignment.center, // Centrar los íconos
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sports_soccer),
+                      Text('Gol'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.group_add_sharp),
+                      Text('Asistencia'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sports_handball_sharp),
+                      Text('Tiros Recibidos'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sports_handball_sharp, color: Colors.green),
+                      Text('Paradas'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.gps_not_fixed),
+                      Text('Tiros'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.gps_fixed_rounded),
+                      Text('Tiros a Puerta'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.square, color: Colors.yellow),
+                      Text('Tarjeta Amarilla'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.square, color: Colors.red),
+                      Text('Tarjeta Roja'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sports),
+                      Text('Otros'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shield),
+                      Text('Entradas'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shield, color: Colors.green),
+                      Text('Entradas Exitosas'),
+                    ],
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
+              const SizedBox(height: 8.0),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SizedBox(
+                      height: 140,
+                      child: PlayerStatTable(),
+                    );
+                  },
+                ),
+              ),            
+            ],          
+          ),
         ),
-      ),
-    );
+      );
   }
 }
