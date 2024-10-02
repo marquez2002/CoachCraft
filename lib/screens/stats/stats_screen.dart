@@ -41,7 +41,6 @@ class _StatsScreenState extends State<StatsScreen> {
   @override
   void initState() {
     super.initState();
-    _dateController = TextEditingController(text: _formatDate(widget.matchDate));
     _rivalController = TextEditingController(text: widget.rivalTeam);
     _resultController = TextEditingController(text: widget.result);
     _matchType = widget.matchType;
@@ -62,11 +61,6 @@ class _StatsScreenState extends State<StatsScreen> {
     _rivalController.dispose();
     _resultController.dispose();
     super.dispose();
-  }
-
-  String _formatDate(String date) {
-    DateTime parsedDate = DateTime.parse(date);
-    return '${parsedDate.day.toString().padLeft(2, '0')}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.year}';
   }
 
   Future<void> _deleteMatch() async {

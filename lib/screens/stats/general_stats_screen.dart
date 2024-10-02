@@ -1,5 +1,6 @@
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:CoachCraft/widgets/match/filter_section_stats.dart';
+import 'package:CoachCraft/screens/stats/individual_stats_player_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -73,7 +74,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
       }
 
       // Obtener la fecha de inicio según la temporada seleccionada
-      DateTime startDate = season != 'Todos' ? getStartDate(season) : DateTime(1900); // Si 'Todos', usamos una fecha muy antigua
+      DateTime startDate = season != 'Todos' ? getStartDate(season) : DateTime(1900); 
       print("Buscando partidos desde: $startDate para el equipo: $teamId");
 
       // Convertir la fecha de inicio a String para Firestore
@@ -97,7 +98,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
       matchesCount = matchesSnapshot.docs.length;
 
       // Limpiar estadísticas previas y preparar el acumulador
-      matchesStats.clear(); // Limpiar estadísticas de partidos anteriores
+      matchesStats.clear(); 
       Map<String, dynamic> statsAccumulated = {
         'goals': 0,
         'assists': 0,
@@ -227,316 +228,341 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Estadísticas Generales'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              setState(() {
-                _isInfoExpanded = !_isInfoExpanded; // Cambia el estado del infoExpanded
-                if (_isInfoExpanded) {
-                  _isSearchingExpanded = false; // Cierra el filtro si se abre la info
-                }
-              });
-            },
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: const Text('Estadísticas Generales'),
+            pinned: false, // El AppBar no se mantiene fijo
+            floating: true, // Aparece al hacer scroll hacia arriba
+            snap: true, // Permite que el AppBar aparezca rápidamente cuando se hace scroll hacia arriba
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.person_pin_circle_rounded),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => IndividualStatsPlayerScreen()), // Navega a la InfoPage
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: () {
+                  setState(() {
+                    _isInfoExpanded = !_isInfoExpanded; // Cambia el estado del infoExpanded
+                    if (_isInfoExpanded) {
+                      _isSearchingExpanded = false; // Cierra el filtro si se abre la info
+                    }
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.filter_alt_outlined),
+                onPressed: () {
+                  setState(() {
+                    _isSearchingExpanded = !_isSearchingExpanded; // Cambia el estado del isSearchingExpanded
+                    if (_isSearchingExpanded) {
+                      _isInfoExpanded = false; // Cierra la info si se abre el filtro
+                    }
+                  });
+                },
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.filter_alt_outlined),
-            onPressed: () {
-              setState(() {
-                _isSearchingExpanded = !_isSearchingExpanded; // Cambia el estado del isSearchingExpanded
-                if (_isSearchingExpanded) {
-                  _isInfoExpanded = false; // Cierra la info si se abre el filtro
-                }
-              });
-            },
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                if (isLoading) 
+                  const Center(child: CircularProgressIndicator())
+                else
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Formulario para buscar partidos
+                        if (_isSearchingExpanded) ...[
+                          FilterSectionStats(
+                            season: _season,
+                            matchType: _matchType,
+                            onFilterChanged: (String season, String matchType) {
+                              setState(() {
+                                _season = season;
+                                _matchType = matchType;
+                                fetchGeneralStats(_season, _matchType);
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16.0),
+                        ],
+                        if (_isInfoExpanded) ...[
+                          Wrap(
+                            spacing: 20.0,
+                            runSpacing: 20.0,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              Column(
+                                children: [
+                                  Icon(Icons.sports_soccer),
+                                  Text('Gol'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.group_add_sharp),
+                                  Text('Asistencia'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.sports_handball_sharp),
+                                  Text('Tiros Recibidos'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.sports_handball_sharp, color: Colors.green),
+                                  Text('Paradas'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.gps_not_fixed),
+                                  Text('Tiros'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.gps_fixed_rounded),
+                                  Text('Tiros a Puerta'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.square, color: Colors.yellow),
+                                  Text('Tarjeta Amarilla'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.square, color: Colors.red),
+                                  Text('Tarjeta Roja'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.sports),
+                                  Text('Otros'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.shield),
+                                  Text('Entradas'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Icon(Icons.shield, color: Colors.green),
+                                  Text('Entradas Exitosas'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 20),
+                        // Mostrar las estadísticas de cada partido
+                        Text(
+                          'Estadísticas por Partido',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(label: Text('Nombre')),
+                                DataColumn(label: Text('Fecha')),
+                                DataColumn(label: Icon(Icons.sports_soccer)),
+                                DataColumn(label: Icon(Icons.group_add_sharp)),
+                                DataColumn(label: Icon(Icons.sports_handball_sharp)),
+                                DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
+                                DataColumn(label: Icon(Icons.gps_not_fixed)),
+                                DataColumn(label: Icon(Icons.gps_fixed_rounded)),
+                                DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
+                                DataColumn(label: Icon(Icons.square, color: Colors.red)),
+                                DataColumn(label: Icon(Icons.sports)),
+                                DataColumn(label: Center(child: Icon(Icons.shield))),
+                                DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))),
+                              ],
+                              rows: matchesStats.map((match) {
+                                return DataRow(cells: [
+                                  DataCell(Text(match['matchName'].toString())),
+                                  DataCell(Text(match['matchDate'].toString())),
+                                  DataCell(Text(match['goals'].toString())),
+                                  DataCell(Text(match['assists'].toString())),
+                                  DataCell(Text(match['shotsReceived'].toString())),
+                                  DataCell(Text(match['saves'].toString())),
+                                  DataCell(Text(match['shots'].toString())),
+                                  DataCell(Text(match['shotsOnGoal'].toString())),
+                                  DataCell(Text(match['yellowCards'].toString())),
+                                  DataCell(Text(match['redCards'].toString())),
+                                  DataCell(Text(match['foul'].toString())),
+                                  DataCell(Text(match['tackle'].toString())),
+                                  DataCell(Text(match['succesfulTackle'].toString())),
+                                ]);
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Estadísticas Generales',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildGeneralStatsTable(),
+                        const SizedBox(height: 20),
+                        // Agregar el gráfico
+                        Wrap(
+                          spacing: 20.0,
+                          runSpacing: 20.0,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            // Gráfico: Paradas Vs Tiros Recibidos
+                            if ((generalStats['shotsReceived']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['saves']?.toDouble() ?? 0) > 0)
+                              _buildPieChart(
+                                title: 'Paradas Vs Tiros Recibidos',
+                                sectionData: [
+                                  PieChartSectionData(
+                                    value: generalStats['shotsReceived']?.toDouble() ?? 0,
+                                    title: '${generalStats['shotsReceived']?.toString() ?? 0}',
+                                    color: Colors.grey,
+                                  ),
+                                  PieChartSectionData(
+                                    value: generalStats['saves']?.toDouble() ?? 0,
+                                    title: '${generalStats['saves']?.toString() ?? 0}',
+                                    color: Colors.green,
+                                  ),
+                                ],
+                              ),
+
+                            // Gráfico: Tiros vs Tiros a Puerta
+                            if ((generalStats['shotsOnGoal']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['shots']?.toDouble() ?? 0) > 0)
+                              _buildPieChart(
+                                title: 'Tiros vs Tiros a Puerta',
+                                sectionData: [
+                                  PieChartSectionData(
+                                    value: generalStats['shotsOnGoal']?.toDouble() ?? 0,
+                                    title: '${generalStats['shotsOnGoal']?.toString() ?? 0}',
+                                    color: Colors.green,
+                                  ),
+                                  PieChartSectionData(
+                                    value: generalStats['shots']?.toDouble() ?? 0,
+                                    title: '${generalStats['shots']?.toString() ?? 0}',
+                                    color: Colors.amber,
+                                  ),
+                                ],
+                              ),
+
+                            // Gráfico: Goles vs Tiros
+                            if ((generalStats['goals']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['shots']?.toDouble() ?? 0) > 0)
+                              _buildPieChart(
+                                title: 'Goles vs Tiros',
+                                sectionData: [
+                                  PieChartSectionData(
+                                    value: generalStats['goals']?.toDouble() ?? 0,
+                                    title: '${generalStats['goals']?.toString() ?? 0}',
+                                    color: Colors.green,
+                                  ),
+                                  PieChartSectionData(
+                                    value: generalStats['shots']?.toDouble() ?? 0,
+                                    title: '${generalStats['shots']?.toString() ?? 0}',
+                                    color: Colors.purple,
+                                  ),
+                                ],
+                              ),
+
+                            // Gráfico: Tarjetas Amarilla vs Rojas
+                            if ((generalStats['yellowCards']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['redCards']?.toDouble() ?? 0) > 0)
+                              _buildPieChart(
+                                title: 'Tarjetas Amarilla vs Rojas',
+                                sectionData: [
+                                  PieChartSectionData(
+                                    value: generalStats['yellowCards']?.toDouble() ?? 0,
+                                    title: '${generalStats['yellowCards']?.toString() ?? 0}',
+                                    color: Colors.yellow,
+                                  ),
+                                  PieChartSectionData(
+                                    value: generalStats['redCards']?.toDouble() ?? 0,
+                                    title: '${generalStats['redCards']?.toString() ?? 0}',
+                                    color: Colors.red,
+                                  ),
+                                ],
+                              ),
+
+                            // Gráfico: Faltas vs Tarjetas Amarilla
+                            if ((generalStats['yellowCards']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['foul']?.toDouble() ?? 0) > 0)
+                              _buildPieChart(
+                                title: 'Faltas vs Tarjetas Amarilla',
+                                sectionData: [
+                                  PieChartSectionData(
+                                    value: generalStats['yellowCards']?.toDouble() ?? 0,
+                                    title: '${generalStats['yellowCards']?.toString() ?? 0}',
+                                    color: Colors.yellow,
+                                  ),
+                                  PieChartSectionData(
+                                    value: generalStats['foul']?.toDouble() ?? 0,
+                                    title: '${generalStats['foul']?.toString() ?? 0}',
+                                    color: Colors.teal,
+                                  ),
+                                ],
+                              ),
+
+                            // Gráfico: Tackles vs Tackles Exitosos
+                            if ((generalStats['tackle']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['succesfulTackle']?.toDouble() ?? 0) > 0)
+                              _buildPieChart(
+                                title: 'Tackles vs Tackles Exitosos',
+                                sectionData: [
+                                  PieChartSectionData(
+                                    value: generalStats['tackle']?.toDouble() ?? 0,
+                                    title: '${generalStats['tackle']?.toString() ?? 0}',
+                                    color: Colors.pinkAccent,
+                                  ),
+                                  PieChartSectionData(
+                                    value: generalStats['succesfulTackle']?.toDouble() ?? 0,
+                                    title: '${generalStats['succesfulTackle']?.toString() ?? 0}',
+                                    color: Colors.green,
+                                  ),
+                                ],
+                              ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              scrollDirection: Axis.vertical,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Formulario para buscar partidos
-                  if (_isSearchingExpanded) ...[
-                    FilterSectionStats(
-                      season: _season,  // Pasas el valor de la temporada actual
-                      matchType: _matchType,  // Pasas el valor de la temporada actual
-                      onFilterChanged: (String season, String matchType) {
-                        setState(() {
-                          // Actualizas el estado con los nuevos valores del filtro
-                          _season = season;
-                          _matchType = matchType;
-                          fetchGeneralStats(_season, _matchType);
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                  ],
-              if (_isInfoExpanded) ...[
-                Wrap(
-                  spacing: 20.0, // Espacio entre los íconos
-                  runSpacing: 20.0, // Espacio entre las filas
-                  alignment: WrapAlignment.center, // Centrar los íconos
-                  children: [
-                    Column(
-                      children: [
-                        Icon(Icons.sports_soccer),
-                        Text('Gol'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.group_add_sharp),
-                        Text('Asistencia'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.sports_handball_sharp),
-                        Text('Tiros Recibidos'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.sports_handball_sharp, color: Colors.green),
-                        Text('Paradas'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.gps_not_fixed),
-                        Text('Tiros'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.gps_fixed_rounded),
-                        Text('Tiros a Puerta'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.square, color: Colors.yellow),
-                        Text('Tarjeta Amarilla'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.square, color: Colors.red),
-                        Text('Tarjeta Roja'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.sports),
-                        Text('Otros'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.shield),
-                        Text('Entradas'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Icon(Icons.shield, color: Colors.green),
-                        Text('Entradas Exitosas'),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 20),
-              // Mostrar las estadísticas de cada partido
-              Text(
-                'Estadísticas por Partido',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-                  const SizedBox(height: 20),
-                  Center( // Aquí centramos la tabla en el eje horizontal
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(label: Text('Nombre')),
-                          DataColumn(label: Text('Fecha')),
-                          DataColumn(label: Icon(Icons.sports_soccer)),
-                          DataColumn(label: Icon(Icons.group_add_sharp)),
-                          DataColumn(label: Icon(Icons.sports_handball_sharp)),
-                          DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
-                          DataColumn(label: Icon(Icons.gps_not_fixed)),
-                          DataColumn(label: Icon(Icons.gps_fixed_rounded)),
-                          DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
-                          DataColumn(label: Icon(Icons.square, color: Colors.red)),
-                          DataColumn(label: Icon(Icons.sports)),
-                          DataColumn(label: Center(child: Icon(Icons.shield))), // Entradas
-                          DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))),
-                        ],
-                        rows: matchesStats.map((match) {
-                          return DataRow(cells: [
-                            DataCell(Text(match['matchName'].toString())),
-                            DataCell(Text(match['matchDate'].toString())),
-                            DataCell(Text(match['goals'].toString())),
-                            DataCell(Text(match['assists'].toString())),
-                            DataCell(Text(match['shotsReceived'].toString())),
-                            DataCell(Text(match['saves'].toString())),
-                            DataCell(Text(match['shots'].toString())),
-                            DataCell(Text(match['shotsOnGoal'].toString())),
-                            DataCell(Text(match['yellowCards'].toString())),
-                            DataCell(Text(match['redCards'].toString())),
-                            DataCell(Text(match['foul'].toString())),
-                            DataCell(Text(match['tackle'].toString())),
-                            DataCell(Text(match['succesfulTackle'].toString())),
-                          ]);
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Estadísticas Generales',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  // Aquí viene el sumatorio general
-                  _buildGeneralStatsTable(),
-                  const SizedBox(height: 20),
-                  // Agregar el gráfico
-                  Wrap(
-                    spacing: 20.0,
-                    runSpacing: 20.0,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      // Gráfico: Paradas Vs Tiros Recibidos
-                      if ((generalStats['shotsReceived']?.toDouble() ?? 0) > 0 || 
-                          (generalStats['saves']?.toDouble() ?? 0) > 0)
-                        _buildPieChart(
-                          title: 'Paradas Vs Tiros Recibidos',
-                          sectionData: [
-                            PieChartSectionData(
-                              value: generalStats['shotsReceived']?.toDouble() ?? 0,
-                              title: '${generalStats['shotsReceived']?.toString() ?? 0}',
-                              color: Colors.grey,
-                            ),
-                            PieChartSectionData(
-                              value: generalStats['saves']?.toDouble() ?? 0,
-                              title: '${generalStats['saves']?.toString() ?? 0}',
-                              color: Colors.green,
-                            ),
-                          ],
-                        ),
-
-                      // Gráfico: Tiros vs Tiros a Puerta
-                      if ((generalStats['shotsOnGoal']?.toDouble() ?? 0) > 0 || 
-                          (generalStats['shots']?.toDouble() ?? 0) > 0)
-                        _buildPieChart(
-                          title: 'Tiros vs Tiros a Puerta',
-                          sectionData: [
-                            PieChartSectionData(
-                              value: generalStats['shotsOnGoal']?.toDouble() ?? 0,
-                              title: '${generalStats['shotsOnGoal']?.toString() ?? 0}',
-                              color: Colors.green,
-                            ),
-                            PieChartSectionData(
-                              value: generalStats['shots']?.toDouble() ?? 0,
-                              title: '${generalStats['shots']?.toString() ?? 0}',
-                              color: Colors.amber,
-                            ),
-                          ],
-                        ),
-
-                      // Gráfico: Goles vs Tiros
-                      if ((generalStats['goals']?.toDouble() ?? 0) > 0 || 
-                          (generalStats['shots']?.toDouble() ?? 0) > 0)
-                        _buildPieChart(
-                          title: 'Goles vs Tiros',
-                          sectionData: [
-                            PieChartSectionData(
-                              value: generalStats['goals']?.toDouble() ?? 0,
-                              title: '${generalStats['goals']?.toString() ?? 0}',
-                              color: Colors.green,
-                            ),
-                            PieChartSectionData(
-                              value: generalStats['shots']?.toDouble() ?? 0,
-                              title: '${generalStats['shots']?.toString() ?? 0}',
-                              color: Colors.purple,
-                            ),
-                          ],
-                        ),
-
-                      // Gráfico: Tarjetas Amarilla vs Rojas
-                      if ((generalStats['yellowCards']?.toDouble() ?? 0) > 0 || 
-                          (generalStats['redCards']?.toDouble() ?? 0) > 0)
-                        _buildPieChart(
-                          title: 'Tarjetas Amarilla vs Rojas',
-                          sectionData: [
-                            PieChartSectionData(
-                              value: generalStats['yellowCards']?.toDouble() ?? 0,
-                              title: '${generalStats['yellowCards']?.toString() ?? 0}',
-                              color: Colors.yellow,
-                            ),
-                            PieChartSectionData(
-                              value: generalStats['redCards']?.toDouble() ?? 0,
-                              title: '${generalStats['redCards']?.toString() ?? 0}',
-                              color: Colors.red,
-                            ),
-                          ],
-                        ),
-
-                      // Gráfico: Faltas vs Tarjetas Amarilla
-                      if ((generalStats['yellowCards']?.toDouble() ?? 0) > 0 || 
-                          (generalStats['foul']?.toDouble() ?? 0) > 0)
-                        _buildPieChart(
-                          title: 'Faltas vs Tarjetas Amarilla',
-                          sectionData: [
-                            PieChartSectionData(
-                              value: generalStats['yellowCards']?.toDouble() ?? 0,
-                              title: '${generalStats['yellowCards']?.toString() ?? 0}',
-                              color: Colors.yellow,
-                            ),
-                            PieChartSectionData(
-                              value: generalStats['foul']?.toDouble() ?? 0,
-                              title: '${generalStats['foul']?.toString() ?? 0}',
-                              color: Colors.teal,
-                            ),
-                          ],
-                        ),
-
-                      // Gráfico: Tackles vs Tackles Exitosos
-                      if ((generalStats['tackle']?.toDouble() ?? 0) > 0 || 
-                          (generalStats['succesfulTackle']?.toDouble() ?? 0) > 0)
-                        _buildPieChart(
-                          title: 'Tackles vs Tackles Exitosos',
-                          sectionData: [
-                            PieChartSectionData(
-                              value: generalStats['tackle']?.toDouble() ?? 0,
-                              title: '${generalStats['tackle']?.toString() ?? 0}',
-                              color: Colors.pinkAccent,
-                            ),
-                            PieChartSectionData(
-                              value: generalStats['succesfulTackle']?.toDouble() ?? 0,
-                              title: '${generalStats['succesfulTackle']?.toString() ?? 0}',
-                              color: Colors.green,
-                            ),
-                          ],
-                        ),
-                    ],
-                  )
-                ],
-              ),
-            ),
     );
   }
+
 
   Widget _buildGeneralStatsTable() {
     return SingleChildScrollView(
@@ -578,8 +604,9 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
 Widget _buildPieChart({required String title, required List<PieChartSectionData> sectionData}) {
   // Verifica si no hay datos para mostrar
   if (sectionData.isEmpty) {
-    return Container(); // O usar SizedBox.shrink()
+    return Container(); 
   }
+
   return Column(
     children: [
       Text(
