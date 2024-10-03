@@ -124,16 +124,17 @@ class _IndividualStatsPlayerScreenState extends State<IndividualStatsPlayerScree
                             Text(
                               player['nombre'],
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                               textAlign: TextAlign.center,
                             ),
+                            SizedBox(height: 10),
                             Text(
                               '${player['dorsal']}',
                               style: TextStyle(
-                                fontSize: 70,
+                                fontSize: 80,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
