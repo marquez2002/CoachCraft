@@ -1,3 +1,4 @@
+import 'package:CoachCraft/screens/board/video_player_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -43,9 +44,7 @@ class VideoList extends StatelessWidget {
     }
   }
 
-  Future<void> _viewVideo(String videoUrl) async {
-    // Implementar la lógica para ver el video
-  }
+
 
 Future<void> _deleteVideo(String documentId, String videoUrl) async {
   /*try {
@@ -171,7 +170,15 @@ Future<void> _deleteVideo(String documentId, String videoUrl) async {
                                   children: [
                                     IconButton(
                                       icon: const Icon(Icons.play_arrow),
-                                      onPressed: () => _viewVideo(videoUrl),
+                                      onPressed: () {
+                                        // Aquí directamente implementamos la lógica para navegar a la pantalla que reproduce el video
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => VideoPlayerScreen(videoUrl: videoUrl),
+                                          ),
+                                        );
+                                      },
                                       tooltip: 'Ver Video',
                                     ),
                                     IconButton(
