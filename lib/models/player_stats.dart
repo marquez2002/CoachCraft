@@ -10,13 +10,10 @@ class PlayerStats {
   int redCards;
   int shots;
   int shotsOnGoal;
-  int percentShots;
-  int tackle;
-  int succesfulTackle;
   int foul;
   int saves;
-  int shotsReceived;  
-  int percentSaves;
+  int shotsReceived;
+  int goalsReceived;  
 
   PlayerStats({
     required this.nombre,
@@ -28,13 +25,10 @@ class PlayerStats {
     this.redCards = 0,
     this.shots = 0,
     this.shotsOnGoal = 0,
-    this.percentShots = 0,
-    this.tackle = 0,
-    this.succesfulTackle = 0,
     this.foul = 0,
     this.saves = 0,
     this.shotsReceived = 0,  
-    this.percentSaves = 0,
+    this.goalsReceived = 0,
   });
 
   Map<String, dynamic> toJson() {
@@ -48,13 +42,10 @@ class PlayerStats {
       'redCards': redCards,
       'shots': shots,
       'shotsOnGoal': shotsOnGoal,
-      'percentShots': percentShots,
-      'tackle': tackle,
-      'succesfulTackle': succesfulTackle,
       'foul': foul,
       'saves': saves,
       'shotsReceived': shotsReceived,
-      'percentSaves': percentSaves,
+      'goalsReceived': goalsReceived,
     };
   }
 
@@ -69,14 +60,10 @@ class PlayerStats {
       redCards: json['redCards'] ?? 0,
       shots: json['shots'] ?? 0,
       shotsOnGoal: json['shotsOnGoal'] ?? 0,
-      percentShots: json['percentShots'] ?? 0,
-      tackle: json['tackle'] ?? 0,
-      succesfulTackle: json['succesfulTackle'] ?? 0,
       foul: json['foul'] ?? 0,
       saves: json['saves'] ?? 0,
       shotsReceived: json['shotsReceived'] ?? 0,
-      percentSaves: json['percentSaves'] ?? 0,
-      
+      goalsReceived: json['goalsReceived'] ?? 0,
     );
   }
 }

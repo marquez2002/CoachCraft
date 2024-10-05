@@ -295,6 +295,14 @@ class _StatsScreenState extends State<StatsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Icon(Icons.sports_soccer, color: Colors.red),
+                      Text('Gol Recibido'),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Icon(Icons.gps_not_fixed),
                       Text('Tiros'),
                     ],
@@ -328,23 +336,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.sports),
-                      Text('Otros'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.shield),
-                      Text('Entradas'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.shield, color: Colors.green),
-                      Text('Entradas Exitosas'),
+                      Text('Faltas'),
                     ],
                   ),
                 ],

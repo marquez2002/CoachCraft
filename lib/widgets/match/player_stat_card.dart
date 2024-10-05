@@ -77,7 +77,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                       controller: controller,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
-                        labelText: 'Cambiar',
+                        labelText: '',
                         isDense: true,
                       ),
                       textAlign: TextAlign.center,
@@ -180,16 +180,14 @@ Widget build(BuildContext context) {
                               DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
                               DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
                               DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición                            
-                              DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))), // Tiros A Puerta Recibidos
+                              DataColumn(label: Center(child: Icon(Icons.sports_soccer, color: Colors.red))), // Goles recibidos
                               DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp, color: Colors.green))), // Tiros A Puerta Recibidos
+                              DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))), // Tiros A Puerta Recibidos                            
                               DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
                               DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
                               DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
                               DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
-                              DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))), // Tiros
-                              DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))), // Tiros a Puerta
-                              DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas                            
-                              
+                              DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas                                                          
                             ],
                             rows: playerStats.where((playerStat) => playerStat['posicion'] == 'Portero').map((playerStat) {
                               return DataRow(cells: [
@@ -198,8 +196,8 @@ Widget build(BuildContext context) {
                                 DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
                                 DataCell(
                                   GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsReceived', playerStat['shotsReceived'] ?? 0),
-                                    child: Center(child: Text(playerStat['shotsReceived']?.toString() ?? '0')),
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goalsReceived', playerStat['goalsReceived'] ?? 0),
+                                    child: Center(child: Text(playerStat['goalsReceived']?.toString() ?? '0')),
                                   ),
                                 ),
                                 DataCell(
@@ -208,6 +206,13 @@ Widget build(BuildContext context) {
                                     child: Center(child: Text(playerStat['saves']?.toString() ?? '0')),
                                   ),
                                 ),
+                                DataCell(
+                                  GestureDetector(
+                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsReceived', playerStat['shotsReceived'] ?? 0),
+                                    child: Center(child: Text(playerStat['shotsReceived']?.toString() ?? '0')),
+                                  ),
+                                ),
+                                
                                 DataCell(
                                   GestureDetector(
                                     onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
@@ -231,19 +236,7 @@ Widget build(BuildContext context) {
                                     onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
                                     child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
                                   ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shots', playerStat['shots'] ?? 0),
-                                    child: Center(child: Text(playerStat['shots']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsOnGoal', playerStat['shotsOnGoal'] ?? 0),
-                                    child: Center(child: Text(playerStat['shotsOnGoal']?.toString() ?? '0')),
-                                  ),
-                                ),                                
+                                ),                                                          
                                 DataCell(
                                   GestureDetector(
                                     onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
@@ -276,8 +269,6 @@ Widget build(BuildContext context) {
                               DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
                               DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))), // Tiros
                               DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))), // Tiros a Puerta
-                              DataColumn(label: Center(child: Icon(Icons.shield))), // Entradas
-                              DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))), // Entradas Exitosas
                               DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas
                             ],
                             rows: playerStats.where((playerStat) => playerStat['posicion'] != 'Portero').map((playerStat) {
@@ -319,18 +310,6 @@ Widget build(BuildContext context) {
                                   GestureDetector(
                                     onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsOnGoal', playerStat['shotsOnGoal'] ?? 0),
                                     child: Center(child: Text(playerStat['shotsOnGoal']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'tackle', playerStat['tackle'] ?? 0),
-                                    child: Center(child: Text(playerStat['tackle']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'succesfulTackle', playerStat['succesfulTackle'] ?? 0),
-                                    child: Center(child: Text(playerStat['succesfulTackle']?.toString() ?? '0')),
                                   ),
                                 ),
                                 DataCell(

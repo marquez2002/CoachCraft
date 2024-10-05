@@ -97,8 +97,6 @@ class MatchService {
           redCards: 0,
           shots: 0,
           shotsOnGoal: 0,
-          tackle: 0,
-          succesfulTackle: 0,
           foul: 0,
         );
 

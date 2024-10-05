@@ -20,13 +20,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
     'assists': 0,
     'saves': 0,
     'shotsReceived': 0,
+    'goalsReceived': 0,
     'shots': 0,
     'shotsOnGoal': 0,
     'yellowCards': 0,
     'redCards': 0,
     'foul': 0,
-    'tackle': 0,
-    'succesfulTackle': 0,
   };
 
   List<Map<String, dynamic>> matchesStats = [];
@@ -104,13 +103,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
         'assists': 0,
         'saves': 0,
         'shotsReceived': 0,
+        'goalsReceived': 0,
         'shots': 0,
         'shotsOnGoal': 0,
         'yellowCards': 0,
         'redCards': 0,
         'foul': 0,
-        'tackle': 0,
-        'succesfulTackle': 0,
       };
 
       // Iterar a través de los partidos encontrados
@@ -130,13 +128,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
           'assists': 0,
           'saves': 0,
           'shotsReceived': 0,
+          'goalsReceived': 0,
           'shots': 0,
           'shotsOnGoal': 0,
           'yellowCards': 0,
           'redCards': 0,
           'foul': 0,
-          'tackle': 0,
-          'succesfulTackle': 0,
         };
 
         // Acceder a la colección de jugadores dentro de cada partido
@@ -161,13 +158,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
           matchStats['assists'] += playerData['assists'] ?? 0;
           matchStats['saves'] += playerData['saves'] ?? 0;
           matchStats['shotsReceived'] += playerData['shotsReceived'] ?? 0;
+          matchStats['goalsReceived'] += playerData['goalsReceived'] ?? 0;
           matchStats['shots'] += playerData['shots'] ?? 0;
           matchStats['shotsOnGoal'] += playerData['shotsOnGoal'] ?? 0;
           matchStats['yellowCards'] += playerData['yellowCards'] ?? 0;
           matchStats['redCards'] += playerData['redCards'] ?? 0;
           matchStats['foul'] += playerData['foul'] ?? 0;
-          matchStats['tackle'] += playerData['tackle'] ?? 0;
-          matchStats['succesfulTackle'] += playerData['succesfulTackle'] ?? 0;
         }
 
         // Acumular estadísticas generales
@@ -175,13 +171,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
         statsAccumulated['assists'] += matchStats['assists'];
         statsAccumulated['saves'] += matchStats['saves'];
         statsAccumulated['shotsReceived'] += matchStats['shotsReceived'];
+        statsAccumulated['goalsReceived'] += matchStats['goalsReceived'];
         statsAccumulated['shots'] += matchStats['shots'];
         statsAccumulated['shotsOnGoal'] += matchStats['shotsOnGoal'];
         statsAccumulated['yellowCards'] += matchStats['yellowCards'];
         statsAccumulated['redCards'] += matchStats['redCards'];
         statsAccumulated['foul'] += matchStats['foul'];
-        statsAccumulated['tackle'] += matchStats['tackle'];
-        statsAccumulated['succesfulTackle'] += matchStats['succesfulTackle'];
 
         // Añadir las estadísticas de este partido a la lista de partidos
         matchesStats.add(matchStats);
@@ -329,6 +324,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                               ),
                               Column(
                                 children: [
+                                  Icon(Icons.sports_soccer, color: Colors.red),
+                                  Text('Gol en Contra'),
+                                ],
+                              ),
+                              Column(
+                                children: [
                                   Icon(Icons.gps_not_fixed),
                                   Text('Tiros'),
                                 ],
@@ -354,19 +355,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                               Column(
                                 children: [
                                   Icon(Icons.sports),
-                                  Text('Otros'),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Icon(Icons.shield),
-                                  Text('Entradas'),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Icon(Icons.shield, color: Colors.green),
-                                  Text('Entradas Exitosas'),
+                                  Text('Falta'),
                                 ],
                               ),
                             ],
@@ -394,13 +383,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                                 DataColumn(label: Icon(Icons.group_add_sharp)),
                                 DataColumn(label: Icon(Icons.sports_handball_sharp)),
                                 DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
+                                DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),
                                 DataColumn(label: Icon(Icons.gps_not_fixed)),
                                 DataColumn(label: Icon(Icons.gps_fixed_rounded)),
                                 DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
                                 DataColumn(label: Icon(Icons.square, color: Colors.red)),
                                 DataColumn(label: Icon(Icons.sports)),
-                                DataColumn(label: Center(child: Icon(Icons.shield))),
-                                DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))),
                               ],
                               rows: matchesStats.map((match) {
                                 return DataRow(cells: [
@@ -410,13 +398,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                                   DataCell(Text(match['assists'].toString())),
                                   DataCell(Text(match['shotsReceived'].toString())),
                                   DataCell(Text(match['saves'].toString())),
+                                  DataCell(Text(match['goalsReceived'].toString())),
                                   DataCell(Text(match['shots'].toString())),
                                   DataCell(Text(match['shotsOnGoal'].toString())),
                                   DataCell(Text(match['yellowCards'].toString())),
                                   DataCell(Text(match['redCards'].toString())),
                                   DataCell(Text(match['foul'].toString())),
-                                  DataCell(Text(match['tackle'].toString())),
-                                  DataCell(Text(match['succesfulTackle'].toString())),
                                 ]);
                               }).toList(),
                             ),
@@ -441,12 +428,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                             if ((generalStats['shotsReceived']?.toDouble() ?? 0) > 0 || 
                                 (generalStats['saves']?.toDouble() ?? 0) > 0)
                               _buildPieChart(
-                                title: 'Paradas Vs Tiros Recibidos',
+                                title: 'Paradas Vs Goles Recibidos',
                                 sectionData: [
                                   PieChartSectionData(
-                                    value: generalStats['shotsReceived']?.toDouble() ?? 0,
-                                    title: '${generalStats['shotsReceived']?.toString() ?? 0}',
-                                    color: Colors.grey,
+                                    value: generalStats['goalsReceived']?.toDouble() ?? 0,
+                                    title: '${generalStats['goalsReceived']?.toString() ?? 0}',
+                                    color: Colors.red,
                                   ),
                                   PieChartSectionData(
                                     value: generalStats['saves']?.toDouble() ?? 0,
@@ -531,25 +518,6 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                                   ),
                                 ],
                               ),
-
-                            // Gráfico: Tackles vs Tackles Exitosos
-                            if ((generalStats['tackle']?.toDouble() ?? 0) > 0 || 
-                                (generalStats['succesfulTackle']?.toDouble() ?? 0) > 0)
-                              _buildPieChart(
-                                title: 'Tackles vs Tackles Exitosos',
-                                sectionData: [
-                                  PieChartSectionData(
-                                    value: generalStats['tackle']?.toDouble() ?? 0,
-                                    title: '${generalStats['tackle']?.toString() ?? 0}',
-                                    color: Colors.pinkAccent,
-                                  ),
-                                  PieChartSectionData(
-                                    value: generalStats['succesfulTackle']?.toDouble() ?? 0,
-                                    title: '${generalStats['succesfulTackle']?.toString() ?? 0}',
-                                    color: Colors.green,
-                                  ),
-                                ],
-                              ),
                           ],
                         )
                       ],
@@ -573,13 +541,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
           DataColumn(label: Icon(Icons.group_add_sharp)),
           DataColumn(label: Icon(Icons.sports_handball_sharp)),
           DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
+          DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),
           DataColumn(label: Icon(Icons.gps_not_fixed)),
           DataColumn(label: Icon(Icons.gps_fixed_rounded)),
           DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
           DataColumn(label: Icon(Icons.square, color: Colors.red)),
           DataColumn(label: Icon(Icons.sports)),
-          DataColumn(label: Center(child: Icon(Icons.shield))), // Entradas
-          DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))),
         ],
         rows: [
           DataRow(cells: [
@@ -587,13 +554,12 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
             DataCell(Text(generalStats['assists'].toString())),
             DataCell(Text(generalStats['shotsReceived'].toString())),
             DataCell(Text(generalStats['saves'].toString())),
+            DataCell(Text(generalStats['goalsReceived'].toString())),
             DataCell(Text(generalStats['shots'].toString())),
             DataCell(Text(generalStats['shotsOnGoal'].toString())),
             DataCell(Text(generalStats['yellowCards'].toString())),
             DataCell(Text(generalStats['redCards'].toString())),
             DataCell(Text(generalStats['foul'].toString())),
-            DataCell(Text(generalStats['tackle'].toString())),
-            DataCell(Text(generalStats['succesfulTackle'].toString())),
           ]),
         ],
       ),

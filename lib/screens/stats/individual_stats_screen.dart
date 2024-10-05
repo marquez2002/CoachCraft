@@ -23,17 +23,16 @@ class IndividualStatsScreen extends StatefulWidget {
 class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
   List<Map<String, dynamic>> matchesStats = [];
   Map<String, int> totalStats = {
-    'goals': 0,
-    'assists': 0,
-    'shotsReceived': 0,
-    'saves': 0,
-    'shots': 0,
-    'shotsOnGoal': 0,
-    'yellowCards': 0,
-    'redCards': 0,
-    'fouls': 0,
-    'tackles': 0,
-    'successfulTackles': 0,
+      'goals': 0,
+      'assists': 0,
+      'goalsReceived': 0,
+      'shotsReceived': 0,
+      'saves': 0,
+      'shots': 0,
+      'shotsOnGoal': 0,
+      'yellowCards': 0,
+      'redCards': 0,
+      'fouls': 0,
   };
 
   // Mapa para almacenar estadísticas agrupadas por tipo de partido
@@ -119,6 +118,7 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
       'matchType': matchDoc['matchType'], // Asegúrate de que esto exista en tu documento
       'goals': 0,
       'assists': 0,
+      'goalsReceived': 0,
       'shotsReceived': 0,
       'saves': 0,
       'shots': 0,
@@ -126,14 +126,13 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
       'yellowCards': 0,
       'redCards': 0,
       'fouls': 0,
-      'tackles': 0,
-      'successfulTackles': 0,
     };
   }
 
   void _updateMatchStats(Map<String, dynamic> matchStats, Map<String, dynamic> playerData) {
     matchStats['goals'] += (playerData['goals'] as num?)?.toInt() ?? 0;
     matchStats['assists'] += (playerData['assists'] as num?)?.toInt() ?? 0;
+    matchStats['goalsReceived'] += (playerData['goalReceived'] as num?)?.toInt() ?? 0;
     matchStats['shotsReceived'] += (playerData['shotsReceived'] as num?)?.toInt() ?? 0;
     matchStats['saves'] += (playerData['saves'] as num?)?.toInt() ?? 0;
     matchStats['shots'] += (playerData['shots'] as num?)?.toInt() ?? 0;
@@ -141,13 +140,12 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
     matchStats['yellowCards'] += (playerData['yellowCards'] as num?)?.toInt() ?? 0;
     matchStats['redCards'] += (playerData['redCards'] as num?)?.toInt() ?? 0;
     matchStats['fouls'] += (playerData['foul'] as num?)?.toInt() ?? 0;
-    matchStats['tackles'] += (playerData['tackle'] as num?)?.toInt() ?? 0;
-    matchStats['successfulTackles'] += (playerData['successfulTackle'] as num?)?.toInt() ?? 0;
   }
 
   void _accumulateTotalStats(Map<String, dynamic> matchStats) {
     totalStats['goals'] = (totalStats['goals'] ?? 0) + (matchStats['goals'] as num?)!.toInt();
     totalStats['assists'] = (totalStats['assists'] ?? 0) + (matchStats['assists'] as num?)!.toInt();
+    totalStats['goalsReceived'] = (totalStats['goalsReceived'] ?? 0) + (matchStats['goalsReceived'] as num?)!.toInt();
     totalStats['shotsReceived'] = (totalStats['shotsReceived'] ?? 0) + (matchStats['shotsReceived'] as num?)!.toInt();
     totalStats['saves'] = (totalStats['saves'] ?? 0) + (matchStats['saves'] as num?)!.toInt();
     totalStats['shots'] = (totalStats['shots'] ?? 0) + (matchStats['shots'] as num?)!.toInt();
@@ -155,8 +153,6 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
     totalStats['yellowCards'] = (totalStats['yellowCards'] ?? 0) + (matchStats['yellowCards'] as num?)!.toInt();
     totalStats['redCards'] = (totalStats['redCards'] ?? 0) + (matchStats['redCards'] as num?)!.toInt();
     totalStats['fouls'] = (totalStats['fouls'] ?? 0) + (matchStats['fouls'] as num?)!.toInt();
-    totalStats['tackles'] = (totalStats['tackles'] ?? 0) + (matchStats['tackles'] as num?)!.toInt();
-    totalStats['successfulTackles'] = (totalStats['successfulTackles'] ?? 0) + (matchStats['successfulTackles'] as num?)!.toInt();
   }
 
   void _accumulateStatsByMatchType(Map<String, dynamic> matchStats) {
@@ -166,6 +162,7 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
       groupedStatsByMatchType[matchType] = {
         'goals': 0,
         'assists': 0,
+        'goalsReceived': 0,
         'shotsReceived': 0,
         'saves': 0,
         'shots': 0,
@@ -173,22 +170,19 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
         'yellowCards': 0,
         'redCards': 0,
         'fouls': 0,
-        'tackles': 0,
-        'successfulTackles': 0,
       };
     }
 
     groupedStatsByMatchType[matchType]!['goals'] = (groupedStatsByMatchType[matchType]!['goals'] ?? 0) + (matchStats['goals'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['assists'] = (groupedStatsByMatchType[matchType]!['assists'] ?? 0) + (matchStats['assists'] as num?)!.toInt();
+    groupedStatsByMatchType[matchType]!['goalsReceived'] = (groupedStatsByMatchType[matchType]!['goalsReceived'] ?? 0) + (matchStats['goalsReceived'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['shotsReceived'] = (groupedStatsByMatchType[matchType]!['shotsReceived'] ?? 0) + (matchStats['shotsReceived'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['saves'] = (groupedStatsByMatchType[matchType]!['saves'] ?? 0) + (matchStats['saves'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['shots'] = (groupedStatsByMatchType[matchType]!['shots'] ?? 0) + (matchStats['shots'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['shotsOnGoal'] = (groupedStatsByMatchType[matchType]!['shotsOnGoal'] ?? 0) + (matchStats['shotsOnGoal'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['yellowCards'] = (groupedStatsByMatchType[matchType]!['yellowCards'] ?? 0) + (matchStats['yellowCards'] as num?)!.toInt();
     groupedStatsByMatchType[matchType]!['redCards'] = (groupedStatsByMatchType[matchType]!['redCards'] ?? 0) + (matchStats['redCards'] as num?)!.toInt();
-    groupedStatsByMatchType[matchType]!['fouls'] = (groupedStatsByMatchType[matchType]!['fouls'] ?? 0) + (matchStats['fouls'] as num?)!.toInt();
-    groupedStatsByMatchType[matchType]!['tackles'] = (groupedStatsByMatchType[matchType]!['tackles'] ?? 0) + (matchStats['tackles'] as num?)!.toInt();
-    groupedStatsByMatchType[matchType]!['successfulTackles'] = (groupedStatsByMatchType[matchType]!['successfulTackles'] ?? 0) + (matchStats['successfulTackles'] as num?)!.toInt();
+    groupedStatsByMatchType[matchType]!['fouls'] = (groupedStatsByMatchType[matchType]!['fouls'] ?? 0) + (matchStats['fouls'] as num?)!.toInt();   
   }
 
   String _formatDate(dynamic date) {
@@ -236,31 +230,29 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
                     DataColumn(label: Text('Fecha')),
                     DataColumn(label: Icon(Icons.sports_soccer)),
                     DataColumn(label: Icon(Icons.group_add_sharp)),
-                    DataColumn(label: Icon(Icons.sports_handball_sharp)),
+                    DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),
                     DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
+                    DataColumn(label: Icon(Icons.sports_handball_sharp)),                                        
                     DataColumn(label: Icon(Icons.gps_not_fixed)),
                     DataColumn(label: Icon(Icons.gps_fixed_rounded)),
                     DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
                     DataColumn(label: Icon(Icons.square, color: Colors.red)),
                     DataColumn(label: Icon(Icons.sports)),
-                    DataColumn(label: Center(child: Icon(Icons.shield))),
-                    DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))),
                   ],
                   rows: matchesStats.map((match) {
                     return DataRow(cells: [
                       DataCell(Text(match['rivalTeam'].toString())),
-                      DataCell(Text(_formatDate(match['matchDate']))), // Formatear la fecha aquí
+                      DataCell(Text(_formatDate(match['matchDate']))), 
                       DataCell(Text(match['goals'].toString())),
                       DataCell(Text(match['assists'].toString())),
-                      DataCell(Text(match['shotsReceived'].toString())),
+                      DataCell(Text(match['goalsReceived'].toString())),
                       DataCell(Text(match['saves'].toString())),
+                      DataCell(Text(match['shotsReceived'].toString())),                                            
                       DataCell(Text(match['shots'].toString())),
                       DataCell(Text(match['shotsOnGoal'].toString())),
                       DataCell(Text(match['yellowCards'].toString())),
                       DataCell(Text(match['redCards'].toString())),
                       DataCell(Text(match['fouls'].toString())),
-                      DataCell(Text(match['tackles'].toString())),
-                      DataCell(Text(match['successfulTackles'].toString())),
                     ]);
                   }).toList(),
                 ),
@@ -281,18 +273,17 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   columns: const [
-                    DataColumn(label: Icon(Icons.emoji_events)),
+                    DataColumn(label: Text('Nombre')),
                     DataColumn(label: Icon(Icons.sports_soccer)),
                     DataColumn(label: Icon(Icons.group_add_sharp)),
-                    DataColumn(label: Icon(Icons.sports_handball_sharp)),
+                    DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),
                     DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
+                    DataColumn(label: Icon(Icons.sports_handball_sharp)),                                        
                     DataColumn(label: Icon(Icons.gps_not_fixed)),
                     DataColumn(label: Icon(Icons.gps_fixed_rounded)),
                     DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
                     DataColumn(label: Icon(Icons.square, color: Colors.red)),
                     DataColumn(label: Icon(Icons.sports)),
-                    DataColumn(label: Center(child: Icon(Icons.shield))),
-                    DataColumn(label: Center(child: Icon(Icons.shield, color: Colors.green))),
                   ],
                   rows: [
                     ...groupedStatsByMatchType.entries.map((entry) {
@@ -300,15 +291,14 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
                         DataCell(Text(entry.key)),
                         DataCell(Text(entry.value['goals'].toString())),
                         DataCell(Text(entry.value['assists'].toString())),
-                        DataCell(Text(entry.value['shotsReceived'].toString())),
+                        DataCell(Text(entry.value['goalsReceived'].toString())),
                         DataCell(Text(entry.value['saves'].toString())),
+                        DataCell(Text(entry.value['shotsReceived'].toString())),
                         DataCell(Text(entry.value['shots'].toString())),
                         DataCell(Text(entry.value['shotsOnGoal'].toString())),
                         DataCell(Text(entry.value['yellowCards'].toString())),
                         DataCell(Text(entry.value['redCards'].toString())),
                         DataCell(Text(entry.value['fouls'].toString())),
-                        DataCell(Text(entry.value['tackles'].toString())),
-                        DataCell(Text(entry.value['successfulTackles'].toString())),
                       ]);
                     }).toList(),
                     // Agregar fila de totales generales
@@ -316,15 +306,14 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
                       DataCell(Text('TOTALES')),
                       DataCell(Text(totalStats['goals'].toString())),
                       DataCell(Text(totalStats['assists'].toString())),
-                      DataCell(Text(totalStats['shotsReceived'].toString())),
+                      DataCell(Text(totalStats['goalsReceived'].toString())),
                       DataCell(Text(totalStats['saves'].toString())),
+                      DataCell(Text(totalStats['shotsReceived'].toString())),                                            
                       DataCell(Text(totalStats['shots'].toString())),
                       DataCell(Text(totalStats['shotsOnGoal'].toString())),
                       DataCell(Text(totalStats['yellowCards'].toString())),
                       DataCell(Text(totalStats['redCards'].toString())),
                       DataCell(Text(totalStats['fouls'].toString())),
-                      DataCell(Text(totalStats['tackles'].toString())),
-                      DataCell(Text(totalStats['successfulTackles'].toString())),
                     ]),
                   ],
                 ),
@@ -335,7 +324,6 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
       ),
     );
   }
-
 }
 
 // Obtener el ID del equipo
