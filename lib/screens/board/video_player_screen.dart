@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -15,7 +14,6 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _controller;
   bool _isPlaying = false;
-  bool _isFullScreen = false;
 
   @override
   void initState() {
@@ -34,7 +32,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
 
     await _controller.initialize(); // Inicializar el controlador
-    setState(() {}); 
+    setState(() {});
 
     // Autoplay del video
     _controller.play();
@@ -49,26 +47,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.dispose();
   }
 
-  void _toggleFullScreen() {
-    setState(() {
-      _isFullScreen = !_isFullScreen;
-    });
-
-    if (_isFullScreen) {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    } else {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _isFullScreen ? null : AppBar(
+      appBar: AppBar(
         title: Text('Reproducir Video'),
       ),
       body: GestureDetector(
-        onTap: _toggleFullScreen, 
+        onTap: () {
+          // Manejo de tap para pausar/reproducir el video
+          setState(() {
+            if (_controller.value.isPlaying) {
+              _controller.pause();
+              _isPlaying = false;
+            } else {
+              _controller.play();
+              _isPlaying = true;
+            }
+          });
+        },
         child: Center(
           child: _controller.value.isInitialized
               ? Column(
@@ -108,16 +105,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             });
                           },
                         ),
-                        // Botón para pantalla completa
-                        IconButton(
-                          icon: Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen),
-                          onPressed: _toggleFullScreen,
-                        ),
                       ],
                     ),
                   ],
                 )
-              : CircularProgressIndicator(), 
+              : CircularProgressIndicator(),
         ),
       ),
     );

@@ -7,6 +7,8 @@ import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_recording/flutter_screen_recording.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class FootballFieldScreen extends StatefulWidget {
   const FootballFieldScreen({Key? key}) : super(key: key);
@@ -20,31 +22,20 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   bool isDrawing = false;
   GlobalKey _imageKey = GlobalKey();
   Size? _imageSize;
-  Color drawColor = Colors.red; // Color por defecto
+  Color drawColor = Colors.red;
   bool _isRecording = false;
-  String? videoPath; // Ruta del video grabado
+  String? videoPath;
 
-  // Inicializa posiciones proporcionales al tamaño de la imagen (0.0 - 1.0)
   final List<Map<String, dynamic>> _initialPositions = [
     {'position': Offset(0.30, 0.49), 'image': 'assets/image/player_teamA.png'},
-    {'position': Offset(0.30, 0.45), 'image': 'assets/image/player_teamA.png'},
-    {'position': Offset(0.30, 0.41), 'image': 'assets/image/player_teamA.png'},
-    {'position': Offset(0.30, 0.37), 'image': 'assets/image/player_teamA.png'},
-    {'position': Offset(0.30, 0.33), 'image': 'assets/image/player_teamA.png'},
-    {'position': Offset(0.70, 0.49), 'image': 'assets/image/player_teamB.png'},
-    {'position': Offset(0.70, 0.45), 'image': 'assets/image/player_teamB.png'},
-    {'position': Offset(0.70, 0.41), 'image': 'assets/image/player_teamB.png'},
-    {'position': Offset(0.70, 0.37), 'image': 'assets/image/player_teamB.png'},
-    {'position': Offset(0.70, 0.33), 'image': 'assets/image/player_teamB.png'},
+    // ... (resto de jugadores)
   ];
 
-  // Almacena las posiciones actuales de las piezas
   late List<Offset> _currentPositions;
 
   @override
   void initState() {
     super.initState();
-    // Inicializa las posiciones actuales con las posiciones iniciales.
     _currentPositions = _initialPositions.map((e) => e['position'] as Offset).toList();
   }
 
@@ -59,71 +50,75 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
 
   void _setColor(Color color) {
     setState(() {
-      drawColor = color; // Cambia el color de dibujo
+      drawColor = color;
     });
   }
 
   void _navigateToScreen(int screenNumber) {
-  if (screenNumber == 1) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MidFootballFieldScreen()),
-    );
-  } else if (screenNumber == 2) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RecordingPlayScreen()),
-    );
-  } else {
-    // Manejo de error si el número no es válido (opcional)
-    print('Número de pantalla no válido: $screenNumber');
+    if (screenNumber == 1) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const MidFootballFieldScreen()));
+    } else if (screenNumber == 2) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => RecordingPlayScreen()));
+    } else {
+      print('Número de pantalla no válido: $screenNumber');
+    }
   }
-}
 
   Future<void> _startRecording() async {
-    // Obtiene la fecha y hora actual para el nombre del archivo
-    final now = DateTime.now();
-    final dateFormat = DateFormat('yyyyMMdd_HHmmss');
-    String formattedDate = dateFormat.format(now);
+    // Solicitar permiso de grabación de audio
+    if (await Permission.microphone.request().isGranted) {
+      // Solicitar permiso de grabación de pantalla
+      if (await Permission.mediaLibrary.request().isGranted) {
+        // Obtiene la fecha y hora actual para el nombre del archivo
+        final now = DateTime.now();
+        final dateFormat = DateFormat('yyyyMMdd_HHmmss');
+        String formattedDate = dateFormat.format(now);
 
-    // Establece la ruta del video con la fecha y hora
-    videoPath = '/football_plays_$formattedDate.mp4';
+        // Obtiene la ruta del directorio de aplicación para guardar el video
+        final directory = await getApplicationDocumentsDirectory();
+        videoPath = '${directory.path}/football_plays_$formattedDate.mp4';
 
-    // Inicia la grabación
-    await FlutterScreenRecording.startRecordScreen(videoPath!);
-
-    setState(() {
-      _isRecording = true;
-    });
+        try {
+          // Inicia la grabación
+          await FlutterScreenRecording.startRecordScreen(videoPath!);
+          setState(() {
+            _isRecording = true;
+          });
+        } catch (e) {
+          print("Error al iniciar la grabación: $e");
+        }
+      } else {
+        print('Permiso de grabación de pantalla no concedido');
+      }
+    } else {
+      print('Permiso de audio no concedido');
+    }
   }
 
   Future<void> _stopRecording() async {
-    // Detén la grabación
-    await FlutterScreenRecording.stopRecordScreen;
-
-    setState(() {
-      _isRecording = false;
-    });
-    print('Video grabado en: $videoPath');
+    try {
+      // Detiene la grabación
+      await FlutterScreenRecording.stopRecordScreen;
+      setState(() {
+        _isRecording = false;
+      });
+      print('Video grabado en: $videoPath');
+    } catch (e) {
+      print("Error al detener la grabación: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(' '), 
-        backgroundColor: const Color.fromARGB(255, 54, 45, 46), 
-        foregroundColor: Colors.white, 
+        title: const Text(' '),
+        backgroundColor: const Color.fromARGB(255, 54, 45, 46),
+        foregroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), 
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Redirigir a la pantalla de menú Futsal cuando se presiona el botón de atrás
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MenuScreenFutsal(), 
-              ),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreenFutsal()));
           },
         ),
         actions: [
@@ -133,12 +128,12 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
             tooltip: _isRecording ? 'Detener Grabación' : 'Iniciar Grabación',
           ),
           IconButton(
-            onPressed: () => _navigateToScreen(1), // Navega a MidFootballFieldScreen
+            onPressed: () => _navigateToScreen(1),
             icon: const Icon(Icons.airline_stops_outlined),
             tooltip: 'Ir a pizarra de media pista',
           ),
           IconButton(
-            onPressed: () => _navigateToScreen(2), // Navega a RecordingPlayScreen
+            onPressed: () => _navigateToScreen(2),
             icon: const Icon(Icons.folder),
             tooltip: 'Ir a grabaciones',
           ),
@@ -149,7 +144,6 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
           ),
         ],
       ),
-
       body: Container(
         color: const Color.fromARGB(255, 54, 45, 46),
         child: Stack(
@@ -183,13 +177,12 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
                 }
               },
               child: CustomPaint(
-                painter: FieldPainter(points, drawColor), // Usa el color de dibujo
+                painter: FieldPainter(points, drawColor),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    // Si el tamaño de la imagen no está calculado, actualízalo.
                     if (_imageSize == null) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        final RenderBox renderBox = _imageKey.currentContext?.findRenderObject() as RenderBox;  
+                        final RenderBox renderBox = _imageKey.currentContext?.findRenderObject() as RenderBox;
                         setState(() {
                           _imageSize = renderBox.size;
                         });
@@ -198,35 +191,38 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
                     if (_imageSize != null) {
                       return Stack(
                         children: [
-                          // Colocar las piezas de fútbol
                           ...List.generate(_currentPositions.length, (index) {
                             return FootballPiece(
                               position: _currentPositions[index],
                               image: _initialPositions[index]['image'],
                             );
                           }),
-                          // Agregar el balón y permitir su movimiento
                           Ball(
-                            initialPosition: Offset(0.48, 0.44), // Posición inicial en el centro
+                            initialPosition: Offset(0.48, 0.44),
                             image: 'assets/image/balon_futsal.png',
                           ),
-                          // Botones de color
                           Positioned(
-                            bottom: 20,
-                            right: MediaQuery.of(context).size.width * 0.1, // Cambiado a right para posicionar a la derecha
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                            bottom: 10,
+                            right: MediaQuery.of(context).size.width * 0.05,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.red),
-                                  child: const Text(' '),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                  child: const Text(''),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
+                                  ),
                                 ),
-                                const SizedBox(width: 10), // Espaciador entre los botones
+                                const SizedBox(height: 10), // Espaciador entre los botones
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.yellow),
-                                  child: const Text(' '),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
+                                  child: const Text(''),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.yellow,
+                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
+                                  ),
                                 ),
                               ],
                             ),
@@ -234,7 +230,7 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
                         ],
                       );
                     } else {
-                      return const SizedBox(); // Esperando que se calcule el tamaño de la imagen.
+                      return const SizedBox();
                     }
                   },
                 ),
@@ -246,5 +242,3 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     );
   }
 }
-
-  

@@ -17,6 +17,10 @@ class Ball extends StatefulWidget {
 class _BallState extends State<Ball> {
   late Offset _position;
 
+  // Tamaño mínimo y máximo del balón
+  static const double minBallSize = 1; // tamaño mínimo en píxeles
+  static const double maxBallSize = 300; // tamaño máximo en píxeles
+
   @override
   void initState() {
     super.initState();
@@ -25,15 +29,25 @@ class _BallState extends State<Ball> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener el tamaño de la pantalla
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // Calcular el tamaño del balón en función de la altura de la pantalla
+    double ballSize = screenHeight * 0.07; // 10% de la altura de la pantalla
+
+    // Ajustar el tamaño entre el tamaño mínimo y máximo
+    ballSize = ballSize.clamp(minBallSize, maxBallSize);
+
     return Positioned(
-      left: MediaQuery.of(context).size.width * _position.dx,
-      top: MediaQuery.of(context).size.height * _position.dy,
+      left: screenWidth * _position.dx,
+      top: screenHeight * _position.dy,
       child: GestureDetector(
         onPanUpdate: (details) {
           setState(() {
             Offset newPosition = _position + Offset(
-              details.delta.dx / MediaQuery.of(context).size.width,
-              details.delta.dy / MediaQuery.of(context).size.height,
+              details.delta.dx / screenWidth,
+              details.delta.dy / screenHeight,
             );
 
             // Asegúrate de que la nueva posición esté dentro de los límites
@@ -47,8 +61,8 @@ class _BallState extends State<Ball> {
         },
         child: Image.asset(
           widget.image,
-          width: 50, // Tamaño del balón
-          height: 50,
+          width: ballSize, // Tamaño calculado dependiente de la pantalla
+          height: ballSize, // Tamaño calculado dependiente de la pantalla
         ),
       ),
     );

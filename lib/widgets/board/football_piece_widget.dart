@@ -34,7 +34,7 @@ class _FootballPieceState extends State<FootballPiece> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     // Calcular el tamaño de la pieza en función de la altura de la pantalla
-    double pieceSize = screenHeight * 0.1; // 5% de la altura de la pantalla
+    double pieceSize = screenHeight * 0.125; // 5% de la altura de la pantalla
 
     // Ajustar el tamaño entre el tamaño mínimo y máximo
     pieceSize = pieceSize.clamp(minPieceSize, maxPieceSize);

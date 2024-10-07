@@ -216,21 +216,27 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
                           ),
                           // Botones de color
                           Positioned(
-                            bottom: 20,
-                            right: MediaQuery.of(context).size.width * 0.1, // Cambiado a right para posicionar a la derecha
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                            bottom: 10,
+                            right: MediaQuery.of(context).size.width * 0.05, // Posiciona los botones a la derecha
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
                               children: [
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.red),
-                                  child: const Text(' '),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                  child: const Text(''), // Puedes agregar un texto si es necesario
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30), // Ajusta el ancho del botón
+                                  ),
                                 ),
-                                const SizedBox(width: 10), // Espaciador entre los botones
+                                const SizedBox(height: 0.00000000001), // Espaciador entre los botones
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.yellow),
-                                  child: const Text(' '),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
+                                  child: const Text(''), // Puedes agregar un texto si es necesario
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.yellow,
+                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30), // Ajusta el ancho del botón
+                                  ),
                                 ),
                               ],
                             ),

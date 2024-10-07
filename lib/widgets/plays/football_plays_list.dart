@@ -1,5 +1,6 @@
 import 'package:CoachCraft/screens/board/video_player_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 // Función para obtener el teamId basado en un criterio (por ejemplo, el primer equipo)
@@ -46,30 +47,34 @@ class VideoList extends StatelessWidget {
 
 
 
-Future<void> _deleteVideo(String documentId, String videoUrl) async {
-  /*try {
-    // Eliminar el video de Firebase Storage
-    Reference storageRef = FirebaseStorage.instance.refFromURL(videoUrl);
-    await storageRef.delete();
+  Future<void> _deleteVideo(BuildContext context, String documentId, String videoUrl) async {
+    try {
+      // Eliminar el video de Firebase Storage
+      Reference storageRef = FirebaseStorage.instance.refFromURL(videoUrl);
+      await storageRef.delete();
 
-    // Ahora eliminar el documento de Firestore
-    await FirebaseFirestore.instance.collection('teams')
-      .doc(await getTeamId()) // Asegúrate de obtener el teamId correspondiente
-      .collection('football_plays')
-      .doc(documentId)
-      .delete();
+      // Obtener el teamId (si es una función asincrónica)
+      String? teamId = await getTeamId();
 
-    // Mostrar un mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Video eliminado con éxito')),
-    );
-  } catch (e) {
-    // Manejo de errores
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error al eliminar el video: $e')),
-    );
-  }*/
-}
+      // Ahora eliminar el documento de Firestore
+      await FirebaseFirestore.instance.collection('teams')
+        .doc(teamId) // Asegúrate de que 'teamId' es válido
+        .collection('football_plays')
+        .doc(documentId)
+        .delete();
+
+      // Mostrar un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Video eliminado con éxito')),
+      );
+    } catch (e) {
+      // Manejo de errores
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al eliminar el video: $e')),
+      );
+    }
+  }
+
 
 
   @override
@@ -117,7 +122,7 @@ Future<void> _deleteVideo(String documentId, String videoUrl) async {
             if (screenWidth < 600) {
               crossAxisCount = 2; // Móviles
             } else {
-              crossAxisCount = 3; // Pantallas más grandes
+              crossAxisCount = 4; // Pantallas más grandes
             }
 
             return Column(
@@ -180,20 +185,10 @@ Future<void> _deleteVideo(String documentId, String videoUrl) async {
                                         );
                                       },
                                       tooltip: 'Ver Video',
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      onPressed: () {
-                                        // Aquí puedes implementar la lógica para modificar el video
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Modificar video no implementado')),
-                                        );
-                                      },
-                                      tooltip: 'Modificar Video',
-                                    ),
+                                    ),                                    
                                     IconButton(
                                       icon: const Icon(Icons.delete),
-                                      onPressed: () => _deleteVideo(documentId, videoUrl),
+                                      onPressed: () => _deleteVideo(context, documentId, videoUrl),
                                       tooltip: 'Eliminar Video',
                                     ),
                                   ],
