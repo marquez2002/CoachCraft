@@ -78,7 +78,7 @@ class MatchList extends StatelessWidget {
                           result: matchData['result'],
                           matchType: matchData['matchType'],
                           location: matchData['location'],
-                          matchId: matchId, // Pasa el matchId a la siguiente pantalla
+                          matchId: matchId,
                         ),
                       ),
                     );

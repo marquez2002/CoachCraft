@@ -136,59 +136,65 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Filtrar Partidos',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8.0),
-
-        // Dropdown para seleccionar la temporada
-        DropdownButtonFormField<String>(
-          value: _season, // Usamos la variable local de temporada
-          decoration: const InputDecoration(
-            labelText: 'Temporada',
-            border: OutlineInputBorder(),
+@override
+Widget build(BuildContext context) {
+  return SingleChildScrollView(  // Envuelve todo en SingleChildScrollView para hacer scroll si es necesario
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),  // Añade padding alrededor del contenido
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Filtrar Partidos',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          onChanged: _onSeasonChanged, // Usamos el método para manejar el cambio de temporada
-          items: <String>['2024', '2023', '2022', 'Todos']
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 8.0),
+          const SizedBox(height: 8.0),
 
-        // Dropdown para seleccionar el tipo de partido
-        DropdownButtonFormField<String>(
-          value: _matchType, // Usamos la variable local del tipo de partido
-          decoration: const InputDecoration(
-            labelText: 'Tipo de Partido',
-            border: OutlineInputBorder(),
+          // Dropdown para seleccionar la temporada
+          DropdownButtonFormField<String>(
+            value: _season, // Usamos la variable local de temporada
+            decoration: const InputDecoration(
+              labelText: 'Temporada',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: _onSeasonChanged, // Usamos el método para manejar el cambio de temporada
+            items: <String>['2024', '2023', '2022', 'Todos']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
-          onChanged: _onMatchTypeChanged, // Usamos el método para manejar el cambio de tipo de partido
-          items: <String>[
-            'Todos',
-            'Liga',
-            'Copa',
-            'Supercopa',
-            'Playoffs',
-            'Amistoso',
-          ].map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 16.0),
-      ],
-    );
-  }
+          const SizedBox(height: 8.0),
+
+          // Dropdown para seleccionar el tipo de partido
+          DropdownButtonFormField<String>(
+            value: _matchType, // Usamos la variable local del tipo de partido
+            decoration: const InputDecoration(
+              labelText: 'Tipo de Partido',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: _onMatchTypeChanged, // Usamos el método para manejar el cambio de tipo de partido
+            items: <String>[
+              'Todos',
+              'Liga',
+              'Copa',
+              'Supercopa',
+              'Playoffs',
+              'Amistoso',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 16.0),
+        ],
+      ),
+    ),
+  );
+}
+
 }

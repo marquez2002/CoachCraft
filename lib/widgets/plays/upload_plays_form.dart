@@ -134,58 +134,65 @@ class _UploadFormState extends State<UploadForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: 'Nombre de la jugada'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor, ingresa un nombre';
-              }
-              return null;
-            },
-          ),
-          DropdownButtonFormField<String>(
-            value: _selectedType,
-            hint: const Text('Seleccionar tipo'),
-            items: [
-              DropdownMenuItem(value: 'ataque', child: Text('Ataque')),
-              DropdownMenuItem(value: 'defensa', child: Text('Defensa')),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedType = value; // Actualiza el tipo seleccionado
-              });
-            },
-            validator: (value) {
-              if (value == null) {
-                return 'Por favor, selecciona un tipo';
-              }
-              return null;
-            },
-          ),
-          SizedBox(height: 20),
-          // Botón para seleccionar video
-          Container(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _selectVideo,
-              child: Text(
-                _videoBytes != null ? 'Video ya seleccionado' : 'Seleccionar Video',
+      child: SingleChildScrollView(  
+        child: Padding(
+          padding: const EdgeInsets.all(16.0), 
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,  
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Nombre de la jugada'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, ingresa un nombre';
+                  }
+                  return null;
+                },
               ),
-            ),
+              SizedBox(height: 20),  // Agrega espaciado entre los elementos
+              DropdownButtonFormField<String>(
+                value: _selectedType,
+                hint: const Text('Seleccionar tipo'),
+                items: [
+                  DropdownMenuItem(value: 'ataque', child: Text('Ataque')),
+                  DropdownMenuItem(value: 'defensa', child: Text('Defensa')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedType = value; // Actualiza el tipo seleccionado
+                  });
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return 'Por favor, selecciona un tipo';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+              // Botón para seleccionar video
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _selectVideo,
+                  child: Text(
+                    _videoBytes != null ? 'Video ya seleccionado' : 'Seleccionar Video',
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),  // Espaciado entre botones
+              // Botón para subir jugada
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _handleSubmit,
+                  child: const Text('Subir Jugada'),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 20), // Espaciado entre botones
-          // Botón para subir jugada
-          Container(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _handleSubmit,
-              child: const Text('Subir Jugada'),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
