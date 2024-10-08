@@ -13,37 +13,55 @@ class _RecordingPlayScreenState extends State<RecordingPlayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Jugadas'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add), // Ícono del botón de "+"
-            onPressed: () {
-              setState(() {
-                _isExpanded = !_isExpanded; // Alterna el estado de expansión del formulario
-              });
-            },
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true, 
+            snap: true, 
+            title: const Text('Jugadas'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add), 
+                onPressed: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded; 
+                  });
+                },
+              ),
+            ],
+          ),
+
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Sección de formulario de carga
+                      if (_isExpanded) // Solo muestra el formulario si está expandido
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Subida de Jugadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 1.0),
+                            UploadForm(), // Muestra el formulario de subida de jugadas
+                            const SizedBox(height: 1.0),
+                          ],
+                        ),
+                      // Lista de videos filtrados
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7, // Puedes ajustar el tamaño
+                        child: VideoList(), // Llama a VideoList aquí
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Sección de formulario de carga
-            if (_isExpanded) // Solo muestra el formulario si está expandido
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Subida de Jugadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8.0),
-                  UploadForm(), // Muestra el formulario de subida de jugadas
-                ],
-              ),
-            const SizedBox(height: 16.0),
-            Expanded(child: VideoList()), // Llama a VideoList aquí
-          ],
-        ),
       ),
     );
   }

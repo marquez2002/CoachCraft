@@ -26,10 +26,20 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   bool _isRecording = false;
   String? videoPath;
 
-  final List<Map<String, dynamic>> _initialPositions = [
+   final List<Map<String, dynamic>> _initialPositions = [
+    {'position': Offset(0.30, 0.53), 'image': 'assets/image/player_teamA.png'},
     {'position': Offset(0.30, 0.49), 'image': 'assets/image/player_teamA.png'},
-    // ... (resto de jugadores)
+    {'position': Offset(0.30, 0.45), 'image': 'assets/image/player_teamA.png'},
+    {'position': Offset(0.30, 0.41), 'image': 'assets/image/player_teamA.png'},
+    {'position': Offset(0.30, 0.37), 'image': 'assets/image/player_teamA.png'},
+    {'position': Offset(0.70, 0.53,), 'image': 'assets/image/player_teamB.png'},
+    {'position': Offset(0.70, 0.49,), 'image': 'assets/image/player_teamB.png'},
+    {'position': Offset(0.70, 0.45,), 'image': 'assets/image/player_teamB.png'},
+    {'position': Offset(0.70, 0.41,), 'image': 'assets/image/player_teamB.png'},
+    {'position': Offset(0.70, 0.37,), 'image': 'assets/image/player_teamB.png'},
+    
   ];
+
 
   late List<Offset> _currentPositions;
 

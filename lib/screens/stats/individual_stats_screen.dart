@@ -43,6 +43,7 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
     super.initState();
     fetchPlayerStats();
   }
+  
 
   Future<void> fetchPlayerStats() async {
     String? teamId = await getTeamId(context);
@@ -211,6 +212,7 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
 
 @override
   Widget build(BuildContext context) {
+    String? posicion = widget.playerPosicion;
     return Scaffold(
       appBar: AppBar(
         title: Text('Estadísticas de ${widget.playerName} #${widget.playerDorsal}'),      
@@ -221,100 +223,112 @@ class _IndividualStatsScreenState extends State<IndividualStatsScreen> {
           crossAxisAlignment: CrossAxisAlignment.center, // Cambia a center
           children: [
             // Mostrar tabla con estadísticas por partido
-            Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Nombre')),
-                    DataColumn(label: Text('Fecha')),
-                    DataColumn(label: Icon(Icons.sports_soccer)),
-                    DataColumn(label: Icon(Icons.group_add_sharp)),
-                    DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),
-                    DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
-                    DataColumn(label: Icon(Icons.sports_handball_sharp)),                                        
-                    DataColumn(label: Icon(Icons.gps_not_fixed)),
-                    DataColumn(label: Icon(Icons.gps_fixed_rounded)),
-                    DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
-                    DataColumn(label: Icon(Icons.square, color: Colors.red)),
-                    DataColumn(label: Icon(Icons.sports)),
-                  ],
-                  rows: matchesStats.map((match) {
-                    return DataRow(cells: [
-                      DataCell(Text(match['rivalTeam'].toString())),
-                      DataCell(Text(_formatDate(match['matchDate']))), 
-                      DataCell(Text(match['goals'].toString())),
-                      DataCell(Text(match['assists'].toString())),
-                      DataCell(Text(match['goalsReceived'].toString())),
-                      DataCell(Text(match['saves'].toString())),
-                      DataCell(Text(match['shotsReceived'].toString())),                                            
-                      DataCell(Text(match['shots'].toString())),
-                      DataCell(Text(match['shotsOnGoal'].toString())),
-                      DataCell(Text(match['yellowCards'].toString())),
-                      DataCell(Text(match['redCards'].toString())),
-                      DataCell(Text(match['fouls'].toString())),
-                    ]);
-                  }).toList(),
-                ),
+           Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal, // Permite desplazamiento horizontal
+              child: DataTable(
+                columns: _buildColumnsForPosition(posicion), // Llamada a la función para construir las columnas
+                rows: matchesStats
+                    .where((match) {
+                      return match['goals'] != 0 ||
+                            match['assists'] != 0 ||
+                            match['goalsReceived'] != 0 ||
+                            match['saves'] != 0 ||
+                            match['shotsReceived'] != 0 ||
+                            match['shots'] != 0 ||
+                            match['shotsOnGoal'] != 0 ||
+                            match['yellowCards'] != 0 ||
+                            match['redCards'] != 0 ||
+                            match['fouls'] != 0;
+                    })
+                    .map((match) {
+                      return DataRow(cells: _buildCellsForPosition(match, posicion)); // Celdas dinámicas según posición
+                    }).toList(),
               ),
             ),
-            SizedBox(height: 20),
-
+          ),
+          SizedBox(height: 20),
             // Mostrar sumatorio de estadísticas agrupadas por tipo de partido
             Text(
               'Por Competición',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-
             // Mostrar sumatorio de estadísticas por competición
-            Center( // Centrar la segunda tabla
+            Center(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Nombre')),
-                    DataColumn(label: Icon(Icons.sports_soccer)),
-                    DataColumn(label: Icon(Icons.group_add_sharp)),
-                    DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),
-                    DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)),
-                    DataColumn(label: Icon(Icons.sports_handball_sharp)),                                        
-                    DataColumn(label: Icon(Icons.gps_not_fixed)),
-                    DataColumn(label: Icon(Icons.gps_fixed_rounded)),
-                    DataColumn(label: Icon(Icons.square, color: Colors.yellow)),
-                    DataColumn(label: Icon(Icons.square, color: Colors.red)),
-                    DataColumn(label: Icon(Icons.sports)),
-                  ],
+                  columns: posicion == 'Portero'
+                      ? const [
+                          DataColumn(label: Text('Competición')),
+                          DataColumn(label: Icon(Icons.sports_soccer)), // Goles 
+                          DataColumn(label: Icon(Icons.group_add_sharp)), // Asistencias
+                          DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)), // Goles recibidos
+                          DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.red)), // Tiros recibidos
+                          DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)), // Paradas      
+                          DataColumn(label: Icon(Icons.square, color: Colors.yellow)), // Tarjetas amarillas
+                          DataColumn(label: Icon(Icons.square, color: Colors.red)), // Tarjetas rojas
+                          DataColumn(label: Icon(Icons.sports)), // Faltas
+                        ]
+                      : const [
+                          DataColumn(label: Text('Competición')),
+                          DataColumn(label: Icon(Icons.sports_soccer)), // Goles
+                          DataColumn(label: Icon(Icons.group_add_sharp)), // Asistencias
+                          DataColumn(label: Icon(Icons.gps_not_fixed)), // Tiros
+                          DataColumn(label: Icon(Icons.gps_fixed_rounded)), // Tiros a puerta
+                          DataColumn(label: Icon(Icons.square, color: Colors.yellow)), // Tarjetas amarillas
+                          DataColumn(label: Icon(Icons.square, color: Colors.red)), // Tarjetas rojas
+                          DataColumn(label: Icon(Icons.sports)), // Faltas
+                        ],
                   rows: [
                     ...groupedStatsByMatchType.entries.map((entry) {
-                      return DataRow(cells: [
-                        DataCell(Text(entry.key)),
-                        DataCell(Text(entry.value['goals'].toString())),
-                        DataCell(Text(entry.value['assists'].toString())),
-                        DataCell(Text(entry.value['goalsReceived'].toString())),
-                        DataCell(Text(entry.value['saves'].toString())),
-                        DataCell(Text(entry.value['shotsReceived'].toString())),
-                        DataCell(Text(entry.value['shots'].toString())),
-                        DataCell(Text(entry.value['shotsOnGoal'].toString())),
-                        DataCell(Text(entry.value['yellowCards'].toString())),
-                        DataCell(Text(entry.value['redCards'].toString())),
-                        DataCell(Text(entry.value['fouls'].toString())),
-                      ]);
-                    }).toList(),
+                      return DataRow(cells: posicion == 'Portero'
+                          ? [
+                              DataCell(Text(entry.key)), // Nombre del rival
+                              DataCell(Text(entry.value['goals'].toString())), // Goles
+                              DataCell(Text(entry.value['assists'].toString())), // Asistencias
+                              DataCell(Text(entry.value['goalsReceived'].toString())), // Goles recibidos
+                              DataCell(Text(entry.value['shotsReceived'].toString())), // Tiros recibidos
+                              DataCell(Text(entry.value['saves'].toString())), // Paradas
+                              DataCell(Text(entry.value['yellowCards'].toString())), // Tarjetas amarillas
+                              DataCell(Text(entry.value['redCards'].toString())), // Tarjetas rojas
+                              DataCell(Text(entry.value['fouls'].toString())), // Faltas
+                            ]
+                          : [
+                              DataCell(Text(entry.key)), // Nombre del rival
+                              DataCell(Text(entry.value['goals'].toString())), // Goles
+                              DataCell(Text(entry.value['assists'].toString())), // Asistencias
+                              DataCell(Text(entry.value['shots'].toString())), // Tiros
+                              DataCell(Text(entry.value['shotsOnGoal'].toString())), // Tiros a puerta
+                              DataCell(Text(entry.value['yellowCards'].toString())), // Tarjetas amarillas
+                              DataCell(Text(entry.value['redCards'].toString())), // Tarjetas rojas
+                              DataCell(Text(entry.value['fouls'].toString())), // Faltas
+                            ]);
+                    }),
                     // Agregar fila de totales generales
-                    DataRow(cells: [
-                      DataCell(Text('TOTALES')),
-                      DataCell(Text(totalStats['goals'].toString())),
-                      DataCell(Text(totalStats['assists'].toString())),
-                      DataCell(Text(totalStats['goalsReceived'].toString())),
-                      DataCell(Text(totalStats['saves'].toString())),
-                      DataCell(Text(totalStats['shotsReceived'].toString())),                                            
-                      DataCell(Text(totalStats['shots'].toString())),
-                      DataCell(Text(totalStats['shotsOnGoal'].toString())),
-                      DataCell(Text(totalStats['yellowCards'].toString())),
-                      DataCell(Text(totalStats['redCards'].toString())),
-                      DataCell(Text(totalStats['fouls'].toString())),
-                    ]),
+                    DataRow(cells: posicion == 'Portero'
+                        ? [
+                            DataCell(Text('TOTALES', style: TextStyle(fontWeight: FontWeight.bold))), // Texto de totales
+                            DataCell(Text(totalStats['goals'].toString())),
+                            DataCell(Text(totalStats['assists'].toString())),
+                            DataCell(Text(totalStats['goalsReceived'].toString())),
+                            DataCell(Text(totalStats['shotsReceived'].toString())),                                            
+                            DataCell(Text(totalStats['saves'].toString())),
+                            DataCell(Text(totalStats['yellowCards'].toString())),
+                            DataCell(Text(totalStats['redCards'].toString())),
+                            DataCell(Text(totalStats['fouls'].toString())),
+                          ]
+                        : [
+                            DataCell(Text('TOTALES', style: TextStyle(fontWeight: FontWeight.bold))), // Texto de totales
+                            DataCell(Text(totalStats['goals'].toString())),
+                            DataCell(Text(totalStats['assists'].toString())),
+                            DataCell(Text(totalStats['shots'].toString())),
+                            DataCell(Text(totalStats['shotsOnGoal'].toString())),
+                            DataCell(Text(totalStats['yellowCards'].toString())),
+                            DataCell(Text(totalStats['redCards'].toString())),
+                            DataCell(Text(totalStats['fouls'].toString())),
+                          ]),
                   ],
                 ),
               ),
@@ -348,4 +362,68 @@ Future<String?> getTeamId(BuildContext context) async {
   } catch (e) {
     throw Exception('Error al obtener el teamId: $e');
   }
+}
+
+List<DataColumn> _buildColumnsForPosition(String posicion) {
+  if (posicion == 'Portero') {
+    return const [
+      DataColumn(label: Text('Nombre')),
+      DataColumn(label: Text('Fecha')),
+      DataColumn(label: Icon(Icons.sports_soccer)),   // Goles 
+      DataColumn(label: Icon(Icons.group_add_sharp)), // Asis
+      DataColumn(label: Icon(Icons.sports_soccer, color: Colors.red)),   // Goles recibidos
+      DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.red)), // Tiros recibidos
+      DataColumn(label: Icon(Icons.sports_handball_sharp, color: Colors.green)), // Paradas      
+      DataColumn(label: Icon(Icons.square, color: Colors.yellow)), // Tarjetas amarillas
+      DataColumn(label: Icon(Icons.square, color: Colors.red)), // Tarjetas rojas
+      DataColumn(label: Icon(Icons.sports)), // Faltas
+    ];
+  } else {
+    return const [
+      DataColumn(label: Text('Nombre')),
+      DataColumn(label: Text('Fecha')),
+      DataColumn(label: Icon(Icons.sports_soccer)),   // Goles
+      DataColumn(label: Icon(Icons.group_add_sharp)), // Asistencias
+      DataColumn(label: Icon(Icons.gps_not_fixed)),
+      DataColumn(label: Icon(Icons.gps_fixed_rounded)),
+      DataColumn(label: Icon(Icons.square, color: Colors.yellow)), // Tarjetas amarillas
+      DataColumn(label: Icon(Icons.square, color: Colors.red)), // Tarjetas rojas
+      DataColumn(label: Icon(Icons.sports)), // Faltas
+    ];
+  }
+}
+
+List<DataCell> _buildCellsForPosition(Map<String, dynamic> match, String posicion) {
+  if (posicion == 'Portero') {
+    return [
+      DataCell(Text(match['rivalTeam'].toString())), // Nombre del rival
+      DataCell(Text(_formatDate(match['matchDate']))), // Fecha del partido
+      DataCell(Text(match['goals'].toString())), // Goles
+      DataCell(Text(match['assists'].toString())), // Asistencias
+      DataCell(Text(match['goalsReceived'].toString())), // Goles recibidos
+      DataCell(Text(match['saves'].toString())), // Atajadas
+      DataCell(Text(match['shotsReceived'].toString())), // Tiros recibidos
+      DataCell(Text(match['yellowCards'].toString())), // Tarjetas amarillas
+      DataCell(Text(match['redCards'].toString())), // Tarjetas rojas
+      DataCell(Text(match['fouls'].toString())), // Faltas
+    ];
+  } else {
+    return [
+      DataCell(Text(match['rivalTeam'].toString())), // Nombre del rival
+      DataCell(Text(_formatDate(match['matchDate']))), // Fecha del partido
+      DataCell(Text(match['goals'].toString())), // Goles
+      DataCell(Text(match['assists'].toString())), // Asistencias
+      DataCell(Text(match['shots'].toString())), // Tiros
+      DataCell(Text(match['shotsOnGoal'].toString())), // Tiros a puerta
+      DataCell(Text(match['yellowCards'].toString())), // Tarjetas amarillas
+      DataCell(Text(match['redCards'].toString())), // Tarjetas rojas
+      DataCell(Text(match['fouls'].toString())), // Faltas
+    ];
+  }
+}
+
+String _formatDate(String dateString) {
+  final DateTime dateTime = DateTime.parse(dateString);
+  final DateFormat formatter = DateFormat('dd/MM/yyyy'); // Formato deseado: Día/Mes/Año
+  return formatter.format(dateTime);
 }

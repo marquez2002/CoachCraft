@@ -36,7 +36,6 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
     {'position': Offset(0.45, 0.70,), 'image': 'assets/image/player_teamB.png'},
     {'position': Offset(0.41, 0.70,), 'image': 'assets/image/player_teamB.png'},
     {'position': Offset(0.37, 0.70,), 'image': 'assets/image/player_teamB.png'},
-    
   ];
 
   // Almacena las posiciones actuales de las piezas
