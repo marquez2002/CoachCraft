@@ -70,85 +70,97 @@ class _IndividualStatsPlayerScreenState extends State<IndividualStatsPlayerScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Jugadores del equipo'),
-      ),
-      body: uniquePlayers.isEmpty
-          ? Center(child: CircularProgressIndicator())
-          : GridView.builder(
-              padding: EdgeInsets.all(10.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: (MediaQuery.of(context).size.width / 200).floor(),
-                childAspectRatio: 0.75,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: uniquePlayers.length,
-              itemBuilder: (context, index) {
-                var player = uniquePlayers[index];
-                String imagePath = player['posicion'] == 'Portero'
-                    ? 'assets/image/goalkeeper_tshirt2.png'
-                    : 'assets/image/player_tshirt2.png';
-
-                return GestureDetector(
-                  onTap: () {
-                    // Navegar a la pantalla de estadísticas del jugador
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => IndividualStatsScreen(
-                          playerName: player['nombre'],
-                          playerDorsal: player['dorsal'],
-                          playerPosicion: player['posicion'],
-                        ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true, // Hace que el AppBar desaparezca al hacer scroll
+            snap: true, // Hace que el AppBar aparezca rápidamente al hacer scroll hacia arriba
+            title: Text('Jugadores del equipo'),
+          ),
+          SliverToBoxAdapter(
+            child: uniquePlayers.isEmpty
+                ? Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: GridView.builder(
+                      shrinkWrap: true, // Para que GridView no ocupe todo el espacio disponible
+                      physics: NeverScrollableScrollPhysics(), // Desactiva el scroll en GridView
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: (MediaQuery.of(context).size.width / 200).floor(),
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
                       ),
-                    );
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    elevation: 5,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(
-                          imagePath,
-                          fit: BoxFit.cover,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: 45),
-                            Text(
-                              player['nombre'],
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                      itemCount: uniquePlayers.length,
+                      itemBuilder: (context, index) {
+                        var player = uniquePlayers[index];
+                        String imagePath = player['posicion'] == 'Portero'
+                            ? 'assets/image/goalkeeper_tshirt2.png'
+                            : 'assets/image/player_tshirt2.png';
+
+                        return GestureDetector(
+                          onTap: () {
+                            // Navegar a la pantalla de estadísticas del jugador
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => IndividualStatsScreen(
+                                  playerName: player['nombre'],
+                                  playerDorsal: player['dorsal'],
+                                  playerPosicion: player['posicion'],
+                                ),
                               ),
-                              textAlign: TextAlign.center,
+                            );
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              '${player['dorsal']}',
-                              style: TextStyle(
-                                fontSize: 80,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.center,
+                            elevation: 5,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.asset(
+                                  imagePath,
+                                  fit: BoxFit.cover,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(height: 45),
+                                    Text(
+                                      player['nombre'],
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      '${player['dorsal']}',
+                                      style: const TextStyle(
+                                        fontSize: 80,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 10),
+                                  ],
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ],
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
     );
   }
 }

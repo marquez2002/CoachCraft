@@ -157,181 +157,191 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(    
-    body: Builder(
-      builder: (BuildContext context) {
-        return isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Tabla para porteros
-                    Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Estadísticas Porteros',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          DataTable(
-                            columns: const [
-                              DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
-                              DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
-                              DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición                            
-                              DataColumn(label: Center(child: Icon(Icons.sports_soccer, color: Colors.red))), // Goles recibidos
-                              DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp, color: Colors.green))), // Tiros A Puerta Recibidos
-                              DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))), // Tiros A Puerta Recibidos                            
-                              DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
-                              DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
-                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
-                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
-                              DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas                                                          
-                            ],
-                            rows: playerStats.where((playerStat) => playerStat['posicion'] == 'Portero').map((playerStat) {
-                              return DataRow(cells: [
-                                DataCell(Center(child: Text(playerStat['nombre'] ?? 'Sin Nombre'))),
-                                DataCell(Center(child: Text(playerStat['dorsal']?.toString() ?? 'Sin Dorsal'))),
-                                DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goalsReceived', playerStat['goalsReceived'] ?? 0),
-                                    child: Center(child: Text(playerStat['goalsReceived']?.toString() ?? '0')),
-                                  ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Builder(
+        builder: (BuildContext context) {
+          return isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Tabla para porteros
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Estadísticas Porteros',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            SizedBox(
+                              height: 400, // Altura limitada para hacer scroll vertical
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal, // Scroll horizontal
+                                child: DataTable(
+                                  columns: const [
+                                    DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
+                                    DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
+                                    DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición
+                                    DataColumn(label: Center(child: Icon(Icons.sports_soccer, color: Colors.red))), // Goles recibidos
+                                    DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp, color: Colors.green))), // Tiros A Puerta Recibidos
+                                    DataColumn(label: Center(child: Icon(Icons.sports_handball_sharp))), // Tiros A Puerta Recibidos
+                                    DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
+                                    DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
+                                    DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
+                                    DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
+                                    DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas
+                                  ],
+                                  rows: playerStats.where((playerStat) => playerStat['posicion'] == 'Portero').map((playerStat) {
+                                    return DataRow(cells: [
+                                      DataCell(Center(child: Text(playerStat['nombre'] ?? 'Sin Nombre'))),
+                                      DataCell(Center(child: Text(playerStat['dorsal']?.toString() ?? 'Sin Dorsal'))),
+                                      DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goalsReceived', playerStat['goalsReceived'] ?? 0),
+                                          child: Center(child: Text(playerStat['goalsReceived']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'saves', playerStat['saves'] ?? 0),
+                                          child: Center(child: Text(playerStat['saves']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsReceived', playerStat['shotsReceived'] ?? 0),
+                                          child: Center(child: Text(playerStat['shotsReceived']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
+                                          child: Center(child: Text(playerStat['goals']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'assists', playerStat['assists'] ?? 0),
+                                          child: Center(child: Text(playerStat['assists']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'yellowCards', playerStat['yellowCards'] ?? 0),
+                                          child: Center(child: Text(playerStat['yellowCards']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
+                                          child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
+                                          child: Center(child: Text(playerStat['foul']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                    ]);
+                                  }).toList(),
                                 ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'saves', playerStat['saves'] ?? 0),
-                                    child: Center(child: Text(playerStat['saves']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsReceived', playerStat['shotsReceived'] ?? 0),
-                                    child: Center(child: Text(playerStat['shotsReceived']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
-                                    child: Center(child: Text(playerStat['goals']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'assists', playerStat['assists'] ?? 0),
-                                    child: Center(child: Text(playerStat['assists']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'yellowCards', playerStat['yellowCards'] ?? 0),
-                                    child: Center(child: Text(playerStat['yellowCards']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
-                                    child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
-                                  ),
-                                ),                                                          
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
-                                    child: Center(child: Text(playerStat['foul']?.toString() ?? '0')),
-                                  ),
-                                ),
-                              ]);
-                            }).toList(),
-                          ),
-                        ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20), // Espaciador entre tablas
-                    // Tabla para el resto de los jugadores
-                    Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Jugadores de Campo',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          DataTable(
-                            columns: const [
-                              DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
-                              DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
-                              DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición
-                              DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
-                              DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
-                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
-                              DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
-                              DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))), // Tiros
-                              DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))), // Tiros a Puerta
-                              DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas
-                            ],
-                            rows: playerStats.where((playerStat) => playerStat['posicion'] != 'Portero').map((playerStat) {
-                              return DataRow(cells: [
-                                DataCell(Center(child: Text(playerStat['nombre'] ?? 'Sin Nombre'))),
-                                DataCell(Center(child: Text(playerStat['dorsal']?.toString() ?? 'Sin Dorsal'))),
-                                DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
-                                    child: Center(child: Text(playerStat['goals']?.toString() ?? '0')),
-                                  ),
+                      const SizedBox(height: 20), // Espaciador entre tablas
+                      // Tabla para el resto de los jugadores
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Jugadores de Campo',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            SizedBox(
+                              height: 400, // Altura limitada para hacer scroll vertical
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal, // Scroll horizontal
+                                child: DataTable(
+                                  columns: const [
+                                    DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
+                                    DataColumn(label: Center(child: Icon(Icons.tag))), // Dorsal
+                                    DataColumn(label: Center(child: Icon(Icons.switch_access_shortcut_add_outlined))), // Posición
+                                    DataColumn(label: Center(child: Icon(Icons.sports_soccer))), // Goles
+                                    DataColumn(label: Center(child: Icon(Icons.group_add_sharp))), // Asistencias
+                                    DataColumn(label: Center(child: Icon(Icons.square, color: Colors.yellow))), // Tarjetas Amarillas
+                                    DataColumn(label: Center(child: Icon(Icons.square, color: Colors.red))), // Tarjetas Rojas
+                                    DataColumn(label: Center(child: Icon(Icons.gps_not_fixed))), // Tiros
+                                    DataColumn(label: Center(child: Icon(Icons.gps_fixed_rounded))), // Tiros a Puerta
+                                    DataColumn(label: Center(child: Icon(Icons.sports))), // Faltas
+                                  ],
+                                  rows: playerStats.where((playerStat) => playerStat['posicion'] != 'Portero').map((playerStat) {
+                                    return DataRow(cells: [
+                                      DataCell(Center(child: Text(playerStat['nombre'] ?? 'Sin Nombre'))),
+                                      DataCell(Center(child: Text(playerStat['dorsal']?.toString() ?? 'Sin Dorsal'))),
+                                      DataCell(Center(child: Text(playerStat['posicion'] ?? 'Sin Posición'))),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'goals', playerStat['goals'] ?? 0),
+                                          child: Center(child: Text(playerStat['goals']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'assists', playerStat['assists'] ?? 0),
+                                          child: Center(child: Text(playerStat['assists']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'yellowCards', playerStat['yellowCards'] ?? 0),
+                                          child: Center(child: Text(playerStat['yellowCards']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
+                                          child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shots', playerStat['shots'] ?? 0),
+                                          child: Center(child: Text(playerStat['shots']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsOnGoal', playerStat['shotsOnGoal'] ?? 0),
+                                          child: Center(child: Text(playerStat['shotsOnGoal']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        GestureDetector(
+                                          onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
+                                          child: Center(child: Text(playerStat['foul']?.toString() ?? '0')),
+                                        ),
+                                      ),
+                                    ]);
+                                  }).toList(),
                                 ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'assists', playerStat['assists'] ?? 0),
-                                    child: Center(child: Text(playerStat['assists']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'yellowCards', playerStat['yellowCards'] ?? 0),
-                                    child: Center(child: Text(playerStat['yellowCards']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'redCards', playerStat['redCards'] ?? 0),
-                                    child: Center(child: Text(playerStat['redCards']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shots', playerStat['shots'] ?? 0),
-                                    child: Center(child: Text(playerStat['shots']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'shotsOnGoal', playerStat['shotsOnGoal'] ?? 0),
-                                    child: Center(child: Text(playerStat['shotsOnGoal']?.toString() ?? '0')),
-                                  ),
-                                ),
-                                DataCell(
-                                  GestureDetector(
-                                    onTap: () => _showStatDialog(context, playerStat['id'] ?? '', 'foul', playerStat['foul'] ?? 0),
-                                    child: Center(child: Text(playerStat['foul']?.toString() ?? '0')),
-                                  ),
-                                ),
-                              ]);
-                            }).toList(),
-                          ),
-                        ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-      },
-    ),
-  );
-}
-
+                    ],
+                  ),
+                );
+        },
+      ),
+    );
+  }
 
   Future<String?> getTeamId(BuildContext context) async {
     try {

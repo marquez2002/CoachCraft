@@ -65,11 +65,11 @@ class _MatchesScreenState extends State<MatchesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView( // Usamos CustomScrollView para scroll dinámico con AppBar
+      body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            floating: true, // Hace que el AppBar desaparezca cuando haces scroll hacia abajo
-            snap: true, // Hace que el AppBar reaparezca rápidamente cuando empiezas a hacer scroll hacia arriba
+            floating: true, // Desaparece al hacer scroll hacia abajo
+            snap: true, // Reaparece rápidamente al hacer scroll hacia arriba
             title: const Text('Resultados de Partidos'),
             actions: [
               IconButton(
@@ -77,7 +77,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 onPressed: () {
                   setState(() {
                     _isCreatingMatchExpanded = !_isCreatingMatchExpanded;
-                    _isSearchingMatchExpanded = false; // Colapsa el otro si este se expande
+                    _isSearchingMatchExpanded = false; // Colapsa el filtro si expandes la creación
                   });
                 },
               ),
@@ -86,7 +86,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 onPressed: () {
                   setState(() {
                     _isSearchingMatchExpanded = !_isSearchingMatchExpanded;
-                    _isCreatingMatchExpanded = false; // Colapsa el otro si este se expande
+                    _isCreatingMatchExpanded = false; // Colapsa la creación si expandes el filtro
                   });
                 },
               ),

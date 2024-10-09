@@ -75,35 +75,41 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   }
 
   Future<void> _startRecording() async {
-    // Solicitar permiso de grabación de audio
-    if (await Permission.microphone.request().isGranted) {
-      // Solicitar permiso de grabación de pantalla
-      if (await Permission.mediaLibrary.request().isGranted) {
-        // Obtiene la fecha y hora actual para el nombre del archivo
-        final now = DateTime.now();
-        final dateFormat = DateFormat('yyyyMMdd_HHmmss');
-        String formattedDate = dateFormat.format(now);
+    try {
+      // Verifica el permiso del micrófono
+      if (await Permission.microphone.request().isGranted) {
+        // Verifica el permiso para grabar la pantalla
+        if (await Permission.mediaLibrary.request().isGranted) {
+          // Formato de fecha para el nombre del archivo
+          final now = DateTime.now();
+          final dateFormat = DateFormat('yyyyMMdd_HHmmss');
+          String formattedDate = dateFormat.format(now);
 
-        // Obtiene la ruta del directorio de aplicación para guardar el video
-        final directory = await getApplicationDocumentsDirectory();
-        videoPath = '${directory.path}/football_plays_$formattedDate.mp4';
+          // Obtén la ruta del directorio de documentos de la aplicación
+          final directory = await getApplicationDocumentsDirectory();
+          videoPath = '${directory.path}/football_plays_$formattedDate.mp4';
 
-        try {
-          // Inicia la grabación
-          await FlutterScreenRecording.startRecordScreen(videoPath!);
-          setState(() {
-            _isRecording = true;
-          });
-        } catch (e) {
-          print("Error al iniciar la grabación: $e");
+          // Intenta iniciar la grabación
+          bool started = await FlutterScreenRecording.startRecordScreen(videoPath!);
+          if (started) {
+            setState(() {
+              _isRecording = true;
+            });
+            print('Grabación iniciada correctamente en: $videoPath');
+          } else {
+            print('Error al iniciar la grabación');
+          }
+        } else {
+          print('Permiso de grabación de pantalla no concedido');
         }
       } else {
-        print('Permiso de grabación de pantalla no concedido');
+        print('Permiso de audio no concedido');
       }
-    } else {
-      print('Permiso de audio no concedido');
+    } catch (e) {
+      print('Error general al intentar grabar: $e');
     }
   }
+
 
   Future<void> _stopRecording() async {
     try {
