@@ -1,3 +1,9 @@
+/*
+ * Archivo: mid_football_field_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente a la pizarra táctica de media pista.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/board/recording_plays_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
@@ -20,9 +26,9 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
   bool isDrawing = false;
   GlobalKey _imageKey = GlobalKey();
   Size? _imageSize;
-  Color drawColor = Colors.red; // Color por defecto
+  Color drawColor = Colors.red; 
   bool _isRecording = false;
-  String? videoPath; // Ruta del video grabado
+  String? videoPath; 
 
   // Inicializa posiciones proporcionales al tamaño de la imagen (0.0 - 1.0)
   final List<Map<String, dynamic>> _initialPositions = [
@@ -44,7 +50,6 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializa las posiciones actuales con las posiciones iniciales.
     _currentPositions = _initialPositions.map((e) => e['position'] as Offset).toList();
   }
 
@@ -59,38 +64,34 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
 
   void _setColor(Color color) {
     setState(() {
-      drawColor = color; // Cambia el color de dibujo
+      drawColor = color; 
     });
   }
 
   void _navigateToScreen(int screenNumber) {
-  if (screenNumber == 1) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FootballFieldScreen()),
-    );
-  } else if (screenNumber == 2) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RecordingPlayScreen()),
-    );
-  } else {
-    // Manejo de error si el número no es válido (opcional)
-    print('Número de pantalla no válido: $screenNumber');
+    if (screenNumber == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const FootballFieldScreen()),
+      );
+    } else if (screenNumber == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => RecordingPlayScreen()),
+      );
+    } else {
+      print('Número de pantalla no válido: $screenNumber');
+    }
   }
-}
 
-
+  // Función para grabar la pantalla.
   Future<void> _startRecording() async {
-    // Obtiene la fecha y hora actual para el nombre del archivo
     final now = DateTime.now();
     final dateFormat = DateFormat('yyyyMMdd_HHmmss');
     String formattedDate = dateFormat.format(now);
 
-    // Establece la ruta del video con la fecha y hora
     videoPath = '/football_plays_$formattedDate.mp4';
 
-    // Inicia la grabación
     await FlutterScreenRecording.startRecordScreen(videoPath!);
 
     setState(() {
@@ -99,15 +100,10 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
   }
 
   Future<void> _stopRecording() async {
-    // Detén la grabación
     await FlutterScreenRecording.stopRecordScreen;
-
     setState(() {
       _isRecording = false;
     });
-
-    // Aquí podrías guardar el video o hacer algo más con él.
-    // Por ejemplo, podrías mostrar un mensaje al usuario.
     print('Video grabado en: $videoPath');
   }
 
@@ -121,7 +117,6 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back), 
           onPressed: () {
-            // Redirigir a la pantalla de menú Futsal cuando se presiona el botón de atrás
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -137,12 +132,12 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
             tooltip: _isRecording ? 'Detener Grabación' : 'Iniciar Grabación',
           ),
           IconButton(
-            onPressed: () => _navigateToScreen(1), // Navega a MidFootballFieldScreen
+            onPressed: () => _navigateToScreen(1), 
             icon: const Icon(Icons.airline_stops_outlined),
             tooltip: 'Ir a pizarra de media pista',
           ),
           IconButton(
-            onPressed: () => _navigateToScreen(2), // Navega a RecordingPlayScreen
+            onPressed: () => _navigateToScreen(2), 
             icon: const Icon(Icons.folder),
             tooltip: 'Ir a grabaciones',
           ),
@@ -186,10 +181,9 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
                 }
               },
               child: CustomPaint(
-                painter: FieldPainter(points, drawColor), // Usa el color de dibujo
+                painter: FieldPainter(points, drawColor), 
                 child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    // Si el tamaño de la imagen no está calculado, actualízalo.
+                  builder: (context, constraints) {                    
                     if (_imageSize == null) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         final RenderBox renderBox = _imageKey.currentContext?.findRenderObject() as RenderBox;  
@@ -210,31 +204,31 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
                           }),
                           // Agregar el balón y permitir su movimiento
                           Ball(
-                            initialPosition: Offset(0.48, 0.48), // Posición inicial en el centro
+                            initialPosition: Offset(0.48, 0.48), 
                             image: 'assets/image/balon_futsal.png',
                           ),
                           // Botones de color
                           Positioned(
                             bottom: 10,
-                            right: MediaQuery.of(context).size.width * 0.05, // Posiciona los botones a la derecha
+                            right: MediaQuery.of(context).size.width * 0.05, 
                             child: Column(
-                              mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.red),
-                                  child: const Text(''), // Puedes agregar un texto si es necesario
+                                  child: const Text(''), 
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
-                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30), // Ajusta el ancho del botón
+                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30), 
                                   ),
                                 ),
-                                const SizedBox(height: 0.00000000001), // Espaciador entre los botones
+                                const SizedBox(height: 0.00000000001), 
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.yellow),
-                                  child: const Text(''), // Puedes agregar un texto si es necesario
+                                  child: const Text(''), 
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.yellow,
-                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30), // Ajusta el ancho del botón
+                                    minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30), 
                                   ),
                                 ),
                               ],
@@ -243,7 +237,7 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
                         ],
                       );
                     } else {
-                      return const SizedBox(); // Esperando que se calcule el tamaño de la imagen.
+                      return const SizedBox(); 
                     }
                   },
                 ),

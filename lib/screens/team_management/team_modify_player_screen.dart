@@ -23,8 +23,6 @@ class FootballModifyPlayer extends StatefulWidget {
 /// Estado del widget FootballModifyPlayer que maneja la lógica de la interfaz.
 class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
   final _formKey = GlobalKey<FormState>(); 
-
-  // Controladores de texto para los campos de datos del jugador
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dorsalController = TextEditingController();
   final TextEditingController _positionController = TextEditingController();
@@ -40,7 +38,6 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
 
   @override
   void dispose() {
-    // Liberar los controladores de texto al eliminar el widget
     _nameController.dispose();
     _dorsalController.dispose();
     _positionController.dispose();
@@ -54,7 +51,6 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
   Future<void> _loadPlayerData() async {
     var data = await PlayerServices.loadPlayerData(context, widget.dorsal); 
     if (data != null) {
-      // Si se encuentran datos, se cargan en los controladores de texto
       setState(() {
         _nameController.text = data['nombre'] ?? '';
         _dorsalController.text = data['dorsal']?.toString() ?? '';
@@ -64,7 +60,6 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
         _weightController.text = data['peso']?.toString() ?? '';
       });
     } else {
-      // Si no se encuentra el jugador, se muestra un mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Jugador no encontrado')),
       );
@@ -75,7 +70,6 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
   Future<void> _modifyPlayer() async {
     if (_formKey.currentState!.validate()) { 
       int newDorsal = int.tryParse(_dorsalController.text) ?? 0;
-
       // Verifica si el dorsal ya está en uso
       if (await PlayerValidations.isDorsalInUse(context, newDorsal, widget.dorsal)) {
         ScaffoldMessenger.of(context).showSnackBar(

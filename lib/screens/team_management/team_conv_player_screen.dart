@@ -1,10 +1,15 @@
+/*
+ * Archivo: team_conv_player_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente a la creación de la convocatoria del equipo.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart'; // Para imprimir y guardar PDFs
 import 'package:CoachCraft/services/player/player_service.dart';
-import 'dart:typed_data';
 
 class FootballConvPlayer extends StatefulWidget {
   const FootballConvPlayer({super.key});
@@ -21,10 +26,10 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
     super.initState();
   }
 
+  // Función que genera un pdf con la lista de convocados.
   Future<Uint8List> generatePdf(List<Map<String, dynamic>> selectedPlayersData) async {
     final pdf = pw.Document();
 
-    // Cargar fuentes Roboto desde los assets
     final fontRegular = pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
     final fontBold = pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Bold.ttf"));
 
@@ -65,7 +70,6 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
         },
       ),
     );
-
     return pdf.save();
   }
 
@@ -77,7 +81,7 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
           SliverAppBar(
             title: Text('Convocatoria'),
             floating: true,
-            pinned: false, // Cambiar a true si deseas que la barra permanezca al scrollear hacia arriba
+            pinned: false, 
           ),
           SliverToBoxAdapter(
             child: FutureBuilder<List<Map<String, dynamic>>>(

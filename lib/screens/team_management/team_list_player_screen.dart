@@ -1,9 +1,14 @@
+/*
+ * Archivo: team_list_player_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente al listado de jugadores del equipo.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/services/player/player_service.dart'; 
 import 'team_conv_player_screen.dart'; 
 import '../../widgets/player/player_widget.dart'; 
 
-/// Widget principal que representa la lista de jugadores de fútbol.
 class FootballListPlayer extends StatefulWidget {
   const FootballListPlayer({super.key});
 
@@ -11,7 +16,6 @@ class FootballListPlayer extends StatefulWidget {
   _FootballListPlayerState createState() => _FootballListPlayerState();
 }
 
-/// Estado del widget FootballListPlayer que maneja la lógica de la interfaz.
 class _FootballListPlayerState extends State<FootballListPlayer> {
   @override
   Widget build(BuildContext context) {
@@ -19,15 +23,14 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            title: const Text('Jugadores'), // Título de la AppBar
-            floating: true, // Permite que la AppBar flote
-            pinned: false, // La AppBar no permanecerá fijada en la parte superior
+            title: const Text('Jugadores'), 
+            floating: true, 
+            pinned: false, 
           ),
           SliverToBoxAdapter(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: getPlayers(context),
               builder: (context, snapshot) {
-                // Manejo de diferentes estados de la conexión
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
@@ -45,7 +48,7 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
                             scrollDirection: Axis.horizontal, 
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width, // Ancho máximo de la tabla
+                                maxWidth: MediaQuery.of(context).size.width,
                               ),
                               child: PlayerDataTable(players: snapshot.data!), 
                             ),
@@ -59,7 +62,6 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
                           width: 200, 
                           child: ElevatedButton(
                             onPressed: () {
-                              // Navegar a la pantalla de convocatoria de jugadores
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const FootballConvPlayer()),

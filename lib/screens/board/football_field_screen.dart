@@ -1,3 +1,9 @@
+/*
+ * Archivo: mid_football_field_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente a la pizarra táctica de pista completa.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
 import 'package:CoachCraft/screens/board/recording_plays_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
@@ -24,7 +30,8 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   bool _isRecording = false;
   String? videoPath;
 
-   final List<Map<String, dynamic>> _initialPositions = [
+  // Inicializa posiciones proporcionales al tamaño de la imagen (0.0 - 1.0)  
+  final List<Map<String, dynamic>> _initialPositions = [
     {'position': Offset(0.30, 0.53), 'image': 'assets/image/player_teamA.png'},
     {'position': Offset(0.30, 0.49), 'image': 'assets/image/player_teamA.png'},
     {'position': Offset(0.30, 0.45), 'image': 'assets/image/player_teamA.png'},
@@ -35,7 +42,6 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     {'position': Offset(0.70, 0.45,), 'image': 'assets/image/player_teamB.png'},
     {'position': Offset(0.70, 0.41,), 'image': 'assets/image/player_teamB.png'},
     {'position': Offset(0.70, 0.37,), 'image': 'assets/image/player_teamB.png'},
-    
   ];
 
 
@@ -58,12 +64,14 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     });
   }
 
+  // Función para elegir el color
   void _setColor(Color color) {
     setState(() {
       drawColor = color;
     });
   }
 
+  // Función para navegar entre screen.
   void _navigateToScreen(int screenNumber) {
     if (screenNumber == 1) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const MidFootballFieldScreen()));
@@ -74,7 +82,8 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     }
   }
 
-Future<void> _startRecording() async {
+  // Función para empezar a grabar la pantalla.
+  Future<void> _startRecording() async {
     try {
       // Verifica el permiso del micrófono
       if (await Permission.microphone.request().isGranted) {
@@ -92,9 +101,7 @@ Future<void> _startRecording() async {
     }
   }
 
-
   Future<void> _checkPermissions() async {
-    // Solicita permisos de micrófono y acceso a la biblioteca de medios
     if (await Permission.microphone.request().isGranted &&
         await Permission.mediaLibrary.request().isGranted) {
       print('Permisos concedidos');
@@ -103,6 +110,7 @@ Future<void> _startRecording() async {
     }
   }
 
+  // Función para detener a grabar la pantalla.
   Future<void> _stopRecording() async {
     try {
       // Detiene la grabación
@@ -223,7 +231,7 @@ Future<void> _startRecording() async {
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
                                   ),
                                 ),
-                                const SizedBox(height: 10), // Espaciador entre los botones
+                                const SizedBox(height: 10), 
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.yellow),
                                   child: const Text(''),
