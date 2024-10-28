@@ -14,6 +14,7 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _controller;
   bool _isPlaying = false;
+  bool _isLoading = true; // Variable para controlar el estado de carga
 
   @override
   void initState() {
@@ -24,26 +25,26 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Future<void> _initializeVideo() async {
     // Verificamos si el videoUrl es un archivo local o un enlace de red
     if (widget.videoUrl.startsWith('http')) {
-      // Si es un URL, usamos VideoPlayerController.networkUrl
       _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
     } else {
-      // Si es un archivo local, usamos VideoPlayerController.file
       _controller = VideoPlayerController.file(File(widget.videoUrl));
     }
 
     await _controller.initialize(); // Inicializar el controlador
-    setState(() {});
+
+    // Una vez que el video está inicializado, actualizamos el estado para eliminar el símbolo de carga
+    setState(() {
+      _isLoading = false; 
+      _isPlaying = true;
+    });
 
     // Autoplay del video
     _controller.play();
-    setState(() {
-      _isPlaying = true;
-    });
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // Asegurarse de liberar recursos cuando el widget se destruye
+    _controller.dispose();
     super.dispose();
   }
 
@@ -54,8 +55,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         title: Text('Reproducir Video'),
       ),
       body: GestureDetector(
-        onTap: () {
-          // Manejo de tap para pausar/reproducir el video
+        onTap: () {          
           setState(() {
             if (_controller.value.isPlaying) {
               _controller.pause();
@@ -67,8 +67,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           });
         },
         child: Center(
-          child: _controller.value.isInitialized
-              ? Column(
+          child: _isLoading
+              ? CircularProgressIndicator() 
+              : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(
@@ -108,8 +109,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       ],
                     ),
                   ],
-                )
-              : CircularProgressIndicator(),
+                ),
         ),
       ),
     );

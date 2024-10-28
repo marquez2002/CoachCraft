@@ -6,8 +6,6 @@ import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_recording/flutter_screen_recording.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FootballFieldScreen extends StatefulWidget {
@@ -47,6 +45,8 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   void initState() {
     super.initState();
     _currentPositions = _initialPositions.map((e) => e['position'] as Offset).toList();
+    _checkPermissions();
+
   }
 
   void _toggleDrawing() {
@@ -74,31 +74,13 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     }
   }
 
-  Future<void> _startRecording() async {
+Future<void> _startRecording() async {
     try {
       // Verifica el permiso del micrófono
       if (await Permission.microphone.request().isGranted) {
         // Verifica el permiso para grabar la pantalla
         if (await Permission.mediaLibrary.request().isGranted) {
-          // Formato de fecha para el nombre del archivo
-          final now = DateTime.now();
-          final dateFormat = DateFormat('yyyyMMdd_HHmmss');
-          String formattedDate = dateFormat.format(now);
-
-          // Obtén la ruta del directorio de documentos de la aplicación
-          final directory = await getApplicationDocumentsDirectory();
-          videoPath = '${directory.path}/football_plays_$formattedDate.mp4';
-
-          // Intenta iniciar la grabación
-          bool started = await FlutterScreenRecording.startRecordScreen(videoPath!);
-          if (started) {
-            setState(() {
-              _isRecording = true;
-            });
-            print('Grabación iniciada correctamente en: $videoPath');
-          } else {
-            print('Error al iniciar la grabación');
-          }
+          // Resto de tu código para iniciar la grabación...
         } else {
           print('Permiso de grabación de pantalla no concedido');
         }
@@ -110,6 +92,16 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     }
   }
 
+
+  Future<void> _checkPermissions() async {
+    // Solicita permisos de micrófono y acceso a la biblioteca de medios
+    if (await Permission.microphone.request().isGranted &&
+        await Permission.mediaLibrary.request().isGranted) {
+      print('Permisos concedidos');
+    } else {
+      print('Permisos no concedidos');
+    }
+  }
 
   Future<void> _stopRecording() async {
     try {

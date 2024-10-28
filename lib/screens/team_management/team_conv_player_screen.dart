@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart'; // Importar la biblioteca printing
+import 'package:printing/printing.dart'; // Para imprimir y guardar PDFs
 import 'package:CoachCraft/services/player/player_service.dart';
+import 'dart:typed_data';
 
 class FootballConvPlayer extends StatefulWidget {
   const FootballConvPlayer({super.key});
@@ -19,55 +21,52 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
     super.initState();
   }
 
-  Future<void> generatePdf(List<Map<String, dynamic>> selectedPlayersData) async {
+  Future<Uint8List> generatePdf(List<Map<String, dynamic>> selectedPlayersData) async {
     final pdf = pw.Document();
 
-    pdf.addPage(pw.Page(
-      build: (pw.Context context) {
-        return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'CONVOCATORIA',
-              style: pw.TextStyle(
-                fontSize: 24,
-                fontWeight: pw.FontWeight.bold,
-              ),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Table(
-              border: pw.TableBorder(
-                top: pw.BorderSide.none, // Sin bordes visibles
-              ),
-              children: [
-                // Títulos de las columnas
-                pw.TableRow(
-                  children: [
-                    pw.Center(child: pw.Text('Nombre', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                    pw.Center(child: pw.Text('Dorsal', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                    pw.Center(child: pw.Text('Posición', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                  ],
-                ),
-                // Filas de datos
-                ...selectedPlayersData.map((player) {
-                  return pw.TableRow(
-                    children: [
-                      pw.Center(child: pw.Text(player['dorsal']?.toString() ?? 'No disponible')),
-                      pw.Center(child: pw.Text(player['nombre'] ?? 'No disponible')),                      
-                      pw.Center(child: pw.Text(player['posicion'] ?? 'No disponible')),
-                    ],
-                  );
-                }).toList(),
-              ],
-            ),
-          ],
-        );
-      },
-    ));
+    // Cargar fuentes Roboto desde los assets
+    final fontRegular = pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
+    final fontBold = pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Bold.ttf"));
 
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'CONVOCATORIA',
+                style: pw.TextStyle(fontSize: 24, font: fontBold),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Table(
+                border: pw.TableBorder.all(),
+                children: [
+                  pw.TableRow(
+                    children: [
+                      pw.Center(child: pw.Text('Dorsal', style: pw.TextStyle(font: fontBold))),
+                      pw.Center(child: pw.Text('Nombre', style: pw.TextStyle(font: fontBold))),
+                      pw.Center(child: pw.Text('Posición', style: pw.TextStyle(font: fontBold))),
+                    ],
+                  ),
+                  ...selectedPlayersData.map((player) {
+                    return pw.TableRow(
+                      children: [
+                        pw.Center(child: pw.Text(player['dorsal']?.toString() ?? 'No disponible', style: pw.TextStyle(font: fontRegular))),
+                        pw.Center(child: pw.Text(player['nombre'] ?? 'No disponible', style: pw.TextStyle(font: fontRegular))),
+                        pw.Center(child: pw.Text(player['posicion'] ?? 'No disponible', style: pw.TextStyle(font: fontRegular))),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
     );
+
+    return pdf.save();
   }
 
   @override
@@ -100,14 +99,14 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                           columns: const [
                             DataColumn(label: Text('Seleccionar')),
                             DataColumn(label: Text('Dorsal')),
-                            DataColumn(label: Text('Nombre')),                          
+                            DataColumn(label: Text('Nombre')),
                             DataColumn(label: Text('Posición')),
                           ],
                           rows: players.map((player) {
                             String playerDorsal = player['dorsal']?.toString() ?? 'Dorsal no disponible';
-                            String playerName = player['nombre'] ?? 'Nombre no disponible';                          
+                            String playerName = player['nombre'] ?? 'Nombre no disponible';
                             String playerPosition = player['posicion'] ?? 'Posición no disponible';
-                            
+
                             bool isSelected = selectedPlayers[player['nombre']] ?? false;
 
                             return DataRow(cells: [
@@ -122,7 +121,7 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                                 ),
                               ),
                               DataCell(Text(playerDorsal)),
-                              DataCell(Text(playerName)),                          
+                              DataCell(Text(playerName)),
                               DataCell(Text(playerPosition)),
                             ]);
                           }).toList(),
@@ -131,16 +130,18 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: ElevatedButton(
-                          onPressed: () {
-                            final selectedPlayersData = players.where((player) {
-                              return selectedPlayers[player['nombre']] == true;
-                            }).toList();
-
+                          onPressed: () async {
+                            final selectedPlayersData = players.where((player) => selectedPlayers[player['nombre']] == true).toList();
                             if (selectedPlayersData.isNotEmpty) {
-                              generatePdf(selectedPlayersData);
+                              final pdfData = await generatePdf(selectedPlayersData);
+                              
+                              // Para imprimir o mostrar el PDF en móvil y web
+                              await Printing.layoutPdf(
+                                onLayout: (PdfPageFormat format) async => pdfData,
+                              );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('No players selected.')),
+                                const SnackBar(content: Text('No players selected.')),
                               );
                             }
                           },

@@ -1,10 +1,3 @@
-/*
- * Archivo: team_list_player_screen.dart
- * Descripción: Este archivo contiene la pantalla correspondiente con listar los jugadores
- *              de un equipo concreto situado en firebase.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/services/player/player_service.dart'; 
 import 'team_conv_player_screen.dart'; 
@@ -36,17 +29,11 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
               builder: (context, snapshot) {
                 // Manejo de diferentes estados de la conexión
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SliverToBoxAdapter(
-                    child: Center(child: CircularProgressIndicator()), 
-                  ); 
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return SliverToBoxAdapter(
-                    child: Center(child: Text('Error: ${snapshot.error}')),
-                  ); 
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(child: Text('Jugador No Encontrado.')),
-                  ); 
+                  return const Center(child: Text('Jugador No Encontrado.'));
                 } else {
                   return Column(
                     children: [

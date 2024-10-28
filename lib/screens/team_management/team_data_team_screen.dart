@@ -1,3 +1,10 @@
+/*
+ * Archivo: team_data_team_screen.dart
+ * Descripción: Este archivo contiene la pantalla correspondiente a los datos del equipo.
+ *              Pudiendo modificar cada uno de sus valores.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'dart:typed_data';
 
+// Clase principal para añadir/modificar los datos del club
 class TeamDataScreen extends StatefulWidget {
   const TeamDataScreen({super.key});
 
@@ -18,15 +26,15 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pavilionController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  String? _shieldImageUrl; // URL de la imagen del escudo
-  Uint8List? _shieldImageBytes; // Imagen del escudo como bytes
-  String? teamId; // Almacena el ID del documento del equipo
-  bool _isLoading = true; // Estado de carga
+  String? _shieldImageUrl; 
+  Uint8List? _shieldImageBytes; 
+  String? teamId; 
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadTeamData(); // Cargar datos al iniciar
+    _loadTeamData(); 
   }
 
   @override
@@ -37,10 +45,10 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
     super.dispose();
   }
 
+  // Función correspondiente para cargar los datos del equipo existente en Firebase
   Future<void> _loadTeamData() async {
     try {
       String teamNameToSearch = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
-
       QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
           .collection('teams')
           .where('name', isEqualTo: teamNameToSearch)
@@ -53,6 +61,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
         Map<String, dynamic> teamData = teamDoc.data() as Map<String, dynamic>;
 
         String teamName = teamData['name'] ?? '';
+        // Comprueba que el nombre del equipo no está vacio.
         if (teamName.isNotEmpty) {
           setState(() {
             _nameController.text = teamName;
@@ -77,14 +86,14 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
             'direccion': null,
             'escudo': null,
           });
-          _showSnackBar('Documento de datos creado para el equipo');
+          _showSnackBar('Nuevos datos incorporados a la base de datos.');
         } else {
           Map<String, dynamic>? data = teamDataDoc.data() as Map<String, dynamic>?;
           if (data != null) {
             _pavilionController.text = data['pabellon'] ?? '';
             _addressController.text = data['direccion'] ?? '';
             _shieldImageUrl = data['escudo'];
-            setState(() {}); // Actualiza el estado para reflejar los cambios
+            setState(() {}); 
           } else {
             _showSnackBar('No se encontraron datos del equipo');
           }
@@ -98,7 +107,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
       _showSnackBar('Error al cargar los datos: $e');
     } finally {
       setState(() {
-        _isLoading = false; // Finaliza la carga
+        _isLoading = false; 
       });
     }
   }
@@ -107,6 +116,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  // Función que permite seleccionar una imagen para modifica la imagen por default o la prexistente.
   Future<void> _pickShieldImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -120,7 +130,8 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
       _showSnackBar('No se seleccionó ninguna imagen');
     }
   }
-
+  
+  // Función que permite modificar una imagen.
   Future<String?> _uploadShieldImage() async {
     if (_shieldImageBytes != null) {
       String fileName = DateTime.now().millisecondsSinceEpoch.toString();
@@ -147,6 +158,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
     return null;
   }
 
+  // Función que permite guardar los datos del equipo.
   Future<void> _saveTeamData() async {
     if (_formKey.currentState!.validate()) {
       String? shieldUrl = await _uploadShieldImage();
@@ -174,7 +186,7 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
         }
 
         _showSnackBar('Datos del equipo guardados correctamente');
-        _loadTeamData(); // Volver a cargar los datos después de guardar
+        _loadTeamData(); 
       } catch (e) {
         print(e);
         _showSnackBar('Error al guardar los datos: $e');
@@ -191,11 +203,11 @@ class _TeamDataScreenState extends State<TeamDataScreen> {
           SliverAppBar(
             title: const Text('Datos del Equipo'),
             pinned: false,
-            floating: true, // Permite que el AppBar aparezca al hacer scroll hacia arriba
+            floating: true, 
           ),
           SliverToBoxAdapter(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator()) // Muestra el indicador de carga
+                ? Center(child: CircularProgressIndicator()) 
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Form(

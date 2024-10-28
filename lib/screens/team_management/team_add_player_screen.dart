@@ -19,9 +19,7 @@ class FootballAddPlayer extends StatefulWidget {
   _FootballAddPlayerState createState() => _FootballAddPlayerState(); 
 }
 
-// Estado asociado a FootballAddPlayer
 class _FootballAddPlayerState extends State<FootballAddPlayer> {
-  // Clave global para el formulario
   final _formKey = GlobalKey<FormState>();
   
   // Controladores de texto para cada campo del formulario
@@ -35,7 +33,6 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
   // Método que se llama al eliminar el estado
   @override
   void dispose() {
-    // Liberar los controladores
     _nameController.dispose();
     _dorsalController.dispose();
     _positionController.dispose();
@@ -45,10 +42,10 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
     super.dispose(); 
   }
 
-  // Método para enviar el formulario y añadir un jugador
+  // Función correspondiente para enviar el formulario y añadir un jugador
   Future<void> _submitPlayer() async {
-    // Validar el formulario
     if (_formKey.currentState!.validate()) {
+      
       // Crear una instancia del jugador con los datos del formulario
       Player player = Player(
         nombre: _nameController.text,
@@ -62,7 +59,7 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
       // Verificar si el dorsal es único
       bool isUnique = await isDorsalUnique(context, player.dorsal);
       if (!isUnique) {
-        // Mostrar un mensaje si el dorsal ya está en uso
+        // En caso de que ya este en uso, muestra un mensaje de error
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('El dorsal ya está en uso')),
         );
@@ -72,11 +69,9 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
       try {
         // Añadir el jugador a la base de datos
         await addPlayer(context, player.toJson());
-        // Mostrar un mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Jugador añadido correctamente')),
         );
-        // Navegar a la pantalla de menú de equipos de futsal
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -84,7 +79,7 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
           ),
         );
       } catch (e) {
-        // Mostrar un mensaje de error si falla la operación
+        // Muestra un mensaje de error si falla la operación
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al añadir jugador: $e')),
         );
@@ -97,11 +92,10 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          // SliverAppBar with the title
           SliverAppBar(
             title: const Text('Añadir Jugador'),
-            floating: true, // This allows the AppBar to reappear when scrolling up
-            pinned: false, // The AppBar won't be pinned            
+            floating: true,
+            pinned: false,           
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -110,7 +104,7 @@ class _FootballAddPlayerState extends State<FootballAddPlayer> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Fields for player data
+                    // Campos a rellenar para los datos del equipo
                     buildPlayerFormField(_nameController, 'Nombre', 'Por favor ingrese un nombre'),
                     buildPlayerFormField(_dorsalController, 'Dorsal', 'Por favor ingrese un dorsal', isNumber: true),
                     buildPlayerFormField(_positionController, 'Posición', 'Por favor ingrese la posición'),

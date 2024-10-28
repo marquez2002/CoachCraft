@@ -176,7 +176,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             SizedBox(
-                              height: 400, // Altura limitada para hacer scroll vertical
+                              height: 150, // Altura limitada para hacer scroll vertical
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal, // Scroll horizontal
                                 child: DataTable(
@@ -254,7 +254,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20), // Espaciador entre tablas
+                      const SizedBox(height: 8), // Espaciador entre tablas
                       // Tabla para el resto de los jugadores
                       Center(
                         child: Column(

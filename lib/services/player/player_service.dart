@@ -211,7 +211,7 @@ class PlayerValidations {
 
   // Valida el nombre del jugador
   static String? validateName(String? value) {
-    if (value == null || value.isEmpty) {
+    if (value == null || value.isEmpty || value.length > 3) {
       return 'Por favor ingrese un nombre';
     }
     return null;
@@ -223,8 +223,8 @@ class PlayerValidations {
       return 'Por favor ingrese un dorsal';
     }
     int? dorsal = int.tryParse(value);
-    if (dorsal == null || dorsal <= 0) {
-      return 'El dorsal debe ser un número positivo';
+    if (dorsal == null || dorsal <= 0 || dorsal >=100) {
+      return 'El dorsal debe ser un número entre 0 y 99.';
     }
     return null;
   }
@@ -242,8 +242,8 @@ class PlayerValidations {
     int? age = int.tryParse(value ?? '');
     if (value == null || value.isEmpty) {
       return 'Por favor ingrese la edad';
-    } else if (age == null || age <= 0 || age > 70) {
-      return 'La edad debe estar entre 1 y 70';
+    } else if (age == null || age <= 0 || age > 80) {
+      return 'La edad debe estar entre 1 y 80';
     }
     return null;
   }
@@ -264,8 +264,8 @@ class PlayerValidations {
     double? weight = double.tryParse(value ?? '');
     if (value == null || value.isEmpty) {
       return 'Por favor ingrese el peso';
-    } else if (weight == null || weight < 30 || weight > 150) {
-      return 'Peso no válido. Debe estar entre 30 y 150 kg';
+    } else if (weight == null || weight < 30 || weight > 200) {
+      return 'Peso no válido. Debe estar entre 30 y 200 kg';
     }
     return null;
   }

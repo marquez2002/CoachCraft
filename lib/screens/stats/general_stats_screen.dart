@@ -417,11 +417,11 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                         ),
                         const SizedBox(height: 20),
                         _buildGeneralStatsTable(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 6),
                         // Agregar el gráfico
                         Wrap(
-                          spacing: 20.0,
-                          runSpacing: 20.0,
+                          spacing: 6.0,
+                          runSpacing: 6.0,
                           alignment: WrapAlignment.center,
                           children: [
                             // Gráfico: Paradas Vs Tiros Recibidos
