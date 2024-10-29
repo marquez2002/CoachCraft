@@ -10,7 +10,7 @@ import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:CoachCraft/services/player/player_service.dart'; 
 import 'package:flutter/material.dart'; 
 
-/// Widget principal que permite modificar la información de un jugador de fútbol.
+// Widget principal que permite modificar la información de un jugador de fútbol.
 class FootballModifyPlayer extends StatefulWidget {
   final int dorsal; 
 
@@ -68,10 +68,13 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
 
   /// Función para modificar la información del jugador
   Future<void> _modifyPlayer() async {
-    if (_formKey.currentState!.validate()) { 
+    if (_formKey.currentState!.validate()) {  
       int newDorsal = int.tryParse(_dorsalController.text) ?? 0;
+
       // Verifica si el dorsal ya está en uso
-      if (await PlayerValidations.isDorsalInUse(context, newDorsal, widget.dorsal)) {
+      bool isDorsalInUse = await PlayerValidations.isDorsalInUse(context, newDorsal, widget.dorsal);
+
+      if (isDorsalInUse) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Este dorsal ya está en uso')),
         );
@@ -80,9 +83,9 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
 
       // Crear un mapa con los datos actualizados del jugador
       Map<String, dynamic> playerData = {
-        'nombre': _nameController.text,
+        'nombre': _nameController.text.trim(),
         'dorsal': newDorsal,
-        'posicion': _positionController.text,
+        'posicion': _positionController.text.trim(),
         'edad': int.tryParse(_ageController.text) ?? 0,
         'altura': double.tryParse(_heightController.text) ?? 0.0,
         'peso': double.tryParse(_weightController.text) ?? 0.0,
@@ -91,12 +94,16 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
       try {
         // Llama al servicio para modificar el jugador en Firestore
         await PlayerServices.modifyPlayer(context, widget.dorsal, playerData);
+
+        print("Jugador modificado correctamente"); 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Jugador modificado correctamente')),
         );
+
         Navigator.pop(context); 
-      } catch (e) {
-        // Muestra un mensaje de error si la modificación falla
+        
+      } catch (e, stackTrace) {    
+        print("Stack trace: $stackTrace"); // Imprimir stack trace
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al modificar jugador: $e')),
         );
@@ -156,13 +163,17 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
                 const SizedBox(height: 20), 
                 ElevatedButton(
                   onPressed: () async {
-                    await _modifyPlayer(); 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MenuScreenFutsalTeam(), 
-                      ),
-                    );
+                    // Solo procede si el formulario es válido
+                    if (_formKey.currentState!.validate()) {
+                      await _modifyPlayer(); // Modifica el jugador
+                      // Si se modifica correctamente, navega al MenuScreenFutsalTeam
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MenuScreenFutsalTeam(), 
+                        ),
+                      );
+                    } 
                   },
                   child: const Text('Modificar Jugador'),
                 ),

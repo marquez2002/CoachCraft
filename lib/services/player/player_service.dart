@@ -17,35 +17,35 @@ import 'package:provider/provider.dart';
 // Inicializa una instancia de FirebaseFirestore
 FirebaseFirestore db = FirebaseFirestore.instance;
 
-// Función para obtener el teamId basado en el equipo seleccionado en el TeamProvider
-Future<String?> getTeamId(BuildContext context) async {
-  try {
-    // Accede al nombre del equipo seleccionado desde el TeamProvider
-    String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
+  /// Función para obtener el teamId basado en el equipo seleccionado en el TeamProvider
+  Future<String?> getTeamId(BuildContext context) async {
+    try {
+      // Accede al nombre del equipo seleccionado desde el TeamProvider
+      String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
 
-    if (selectedTeam.isEmpty) {
-      throw Exception('No hay equipo seleccionado');
+      if (selectedTeam.isEmpty) {
+        throw Exception('No hay equipo seleccionado');
+      }
+
+      // Busca en Firestore el documento cuyo nombre coincida con el equipo seleccionado
+      QuerySnapshot teamSnapshot = await db
+          .collection('teams')
+          .where('name', isEqualTo: selectedTeam) // Filtra por el nombre del equipo seleccionado
+          .limit(1)
+          .get();
+
+      if (teamSnapshot.docs.isNotEmpty) {
+        // Retorna el ID del equipo seleccionado
+        return teamSnapshot.docs.first.id;
+      } else {
+        throw Exception('No se encontró el equipo seleccionado');
+      }
+    } catch (e) {
+      throw Exception('Error al obtener el teamId: $e');
     }
-
-    // Busca en Firestore el documento cuyo nombre coincida con el equipo seleccionado
-    QuerySnapshot teamSnapshot = await db
-        .collection('teams')
-        .where('name', isEqualTo: selectedTeam) // Filtra por el nombre del equipo seleccionado
-        .limit(1)
-        .get();
-
-    if (teamSnapshot.docs.isNotEmpty) {
-      // Retorna el ID del equipo seleccionado
-      return teamSnapshot.docs.first.id;
-    } else {
-      throw Exception('No se encontró el equipo seleccionado');
-    }
-  } catch (e) {
-    throw Exception('Error al obtener el teamId: $e');
   }
-}
 
-// Función para obtener la lista de jugadores actuales de un equipo
+/// Función para obtener la lista de jugadores actuales de un equipo
 Future<List<Map<String, dynamic>>> getCurrentPlayers(BuildContext context) async {
   try {
     String? teamId = await getTeamId(context); // Obtiene el ID del equipo
@@ -66,7 +66,7 @@ Future<List<Map<String, dynamic>>> getCurrentPlayers(BuildContext context) async
   }
 }
 
-// Función para obtener todos los jugadores del equipo, ordenados por dorsal
+/// Función para obtener todos los jugadores del equipo, ordenados por dorsal
 Future<List<Map<String, dynamic>>> getPlayers(BuildContext context) async {
   try {
     List<Map<String, dynamic>> players = [];
@@ -96,7 +96,7 @@ Future<List<Map<String, dynamic>>> getPlayers(BuildContext context) async {
   }
 }
 
-// Función para agregar un nuevo jugador a la colección
+/// Función para agregar un nuevo jugador a la colección
 Future<void> addPlayer(BuildContext context, Map<String, dynamic> playerData) async {
   try {
     String? teamId = await getTeamId(context);
@@ -111,7 +111,7 @@ Future<void> addPlayer(BuildContext context, Map<String, dynamic> playerData) as
   }
 }
 
-// Verifica si el dorsal ya existe en la base de datos
+/// Verifica si el dorsal ya existe en la base de datos
 Future<bool> isDorsalUnique(BuildContext context, int dorsal) async {
   String? teamId = await getTeamId(context);
   
@@ -126,55 +126,51 @@ Future<bool> isDorsalUnique(BuildContext context, int dorsal) async {
   return query.docs.isEmpty;
 }
 
-// Función para eliminar un jugador basado en el dorsal
-Future<void> deletePlayerByDorsal(BuildContext context, int dorsal) async {
-  try {
-    String? teamId = await getTeamId(context);
-    
-    // Referencia a la colección de jugadores
-    CollectionReference playersCollection = db.collection('teams').doc(teamId).collection('players');
+  /// Función para eliminar un jugador basado en el dorsal
+  Future<void> deletePlayerByDorsal(BuildContext context, int dorsal) async {
+    try {
+      String? teamId = await getTeamId(context);
 
-    // Buscar al jugador con el dorsal especificado
-    QuerySnapshot querySnapshot = await playersCollection.where('dorsal', isEqualTo: dorsal).get();
+      // Referencia a la colección de jugadores
+      CollectionReference playersCollection = db.collection('teams').doc(teamId).collection('players');
 
-    // Verificar si se encontró algún jugador con ese dorsal
-    if (querySnapshot.docs.isNotEmpty) {
-      // Eliminar el primer jugador encontrado (asume que solo hay un jugador con ese dorsal)
-      await playersCollection.doc(querySnapshot.docs.first.id).delete();
-      print('Jugador con dorsal $dorsal eliminado exitosamente.');
-    } else {
-      print('No se encontró ningún jugador con dorsal $dorsal.');
-    }
-  } catch (e) {
-    print('Error al eliminar el jugador: $e');
-  }
-}
+      // Buscar al jugador con el dorsal especificado
+      QuerySnapshot querySnapshot = await playersCollection.where('dorsal', isEqualTo: dorsal).get();
 
-// Clase que contiene servicios relacionados a los jugadores
-class PlayerServices {
-  // Carga Datos de Jugador
-  static Future<Map<String, dynamic>?> loadPlayerData(BuildContext context, int dorsal) async {
-    String? teamId = await getTeamId(context);
-    
-    // Consulta para obtener datos del jugador basado en el dorsal
-    QuerySnapshot querySnapshot = await db
-        .collection('teams')
-        .doc(teamId)
-        .collection('players')
-        .where('dorsal', isEqualTo: dorsal)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs.first.data() as Map<String, dynamic>;
-    } else {
-      return null;
+      // Verificar si se encontró algún jugador con ese dorsal
+      if (querySnapshot.docs.isNotEmpty) {
+        await playersCollection.doc(querySnapshot.docs.first.id).delete();
+      }
+    } catch (e) {
+      print('Error al eliminar el jugador: $e');
     }
   }
 
-  // Función para modificar el jugador
+ /// Clase que contiene servicios relacionados a los jugadores
+ class PlayerServices {
+   static Future<Map<String, dynamic>?> loadPlayerData(BuildContext context, int dorsal) async {
+     String? teamId = await getTeamId(context);
+     // Consulta para obtener datos del jugador basado en el dorsal
+     QuerySnapshot querySnapshot = await db
+         .collection('teams')
+         .doc(teamId)
+         .collection('players')
+         .where('dorsal', isEqualTo: dorsal)
+         .get();
+     if (querySnapshot.docs.isNotEmpty) {
+       return querySnapshot.docs.first.data() as Map<String, dynamic>;
+     } else {
+       return null;
+     }
+   }
+
   static Future<void> modifyPlayer(BuildContext context, int dorsal, Map<String, dynamic> playerData) async {
     String? teamId = await getTeamId(context);
-    
+
+    if (teamId == null) {
+      throw Exception("ID de equipo no encontrado");
+    }
+
     try {
       // Consulta para encontrar al jugador por dorsal
       QuerySnapshot querySnapshot = await db
@@ -185,8 +181,7 @@ class PlayerServices {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Obtener el ID del documento del jugador que se quiere modificar
-        var docId = querySnapshot.docs.first.id;
+        var docId = querySnapshot.docs.first.id;       
 
         // Actualizar el jugador con los nuevos datos
         await db
@@ -196,9 +191,11 @@ class PlayerServices {
             .doc(docId)
             .update(playerData);
       } else {
+        print("Jugador con dorsal $dorsal no encontrado");
         throw Exception("Jugador con dorsal $dorsal no encontrado");
       }
     } catch (e) {
+      print("Error al modificar jugador: $e");
       throw Exception('Error al modificar jugador: $e');
     }
   }
@@ -211,7 +208,7 @@ class PlayerValidations {
 
   // Valida el nombre del jugador
   static String? validateName(String? value) {
-    if (value == null || value.isEmpty || value.length > 3) {
+    if (value == null || value.isEmpty || value.length < 3) {
       return 'Por favor ingrese un nombre';
     }
     return null;
