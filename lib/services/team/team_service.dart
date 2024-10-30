@@ -18,7 +18,7 @@ class TeamService {
   // Obtiene el usuario actualmente autenticado
   final User? user = FirebaseAuth.instance.currentUser;
 
-  // Cargar equipos del usuario desde Firestore
+  /// Cargar equipos del usuario desde Firestore
   Future<List<Teams>> loadUserTeams() async {
     // Si no hay un usuario autenticado, devuelve una lista vacía
     if (user == null) return [];
@@ -69,7 +69,7 @@ class TeamService {
     }
   }
 
-  // Agregar un nuevo equipo
+  /// Agregar un nuevo equipo
   Future<void> addTeam(String teamName) async {
     final String? uid = user?.uid; 
 
@@ -94,7 +94,7 @@ class TeamService {
     }
   }
 
-  // Unirse a un equipo existente
+  /// Unirse a un equipo existente
   Future<void> joinTeam(String teamId, String role) async {
     final String? uid = user?.uid; 
 
@@ -141,63 +141,63 @@ class TeamService {
     return '$teamId$role'; 
   }
 
-Future<void> leaveTeam(String teamId) async {
-  try {
-    User? currentUser = FirebaseAuth.instance.currentUser;
+  /// Funcion para salir de un equipo concreto
+  Future<void> leaveTeam(String teamId) async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
 
-    // Verificar si hay un usuario autenticado
-    if (currentUser == null) {
-      throw Exception('No se ha encontrado un usuario autenticado.');
+      // Verificar si hay un usuario autenticado
+      if (currentUser == null) {
+        throw Exception('No se ha encontrado un usuario autenticado.');
+      }
+
+      String userId = currentUser.uid;
+
+      // Referencia al equipo en Firestore
+      DocumentReference teamRef = FirebaseFirestore.instance.collection('teams').doc(teamId);
+
+      // Obtener los datos del equipo
+      DocumentSnapshot teamSnapshot = await teamRef.get();
+
+      if (!teamSnapshot.exists) {
+        throw Exception('El equipo no existe.');
+      }
+
+      Map<String, dynamic> teamData = teamSnapshot.data() as Map<String, dynamic>;
+      List<dynamic> members = teamData['members'] ?? [];
+
+      // Buscar el miembro correspondiente al usuario
+      final memberToRemove = members.firstWhere(
+        (member) => member['uid'] == userId,
+        orElse: () => null, // Retorna null si no se encuentra el miembro
+      );
+
+      // Verificar si el usuario es miembro del equipo
+      if (memberToRemove == null) {
+        throw Exception('El usuario no es miembro de este equipo.');
+      }
+
+      // Eliminar al usuario de la lista de miembros
+      await teamRef.update({
+        'members': FieldValue.arrayRemove([memberToRemove])
+      });
+
+      // Volver a obtener el equipo actualizado
+      DocumentSnapshot updatedTeamSnapshot = await teamRef.get();
+      Map<String, dynamic> updatedTeamData = updatedTeamSnapshot.data() as Map<String, dynamic>;
+      List<dynamic> updatedMembers = updatedTeamData['members'] ?? [];
+
+      // Si después de salir, el equipo ya no tiene miembros, lo eliminamos
+      if (updatedMembers.isEmpty) {
+        await teamRef.delete();
+        print('El equipo ha sido eliminado porque no quedan miembros.');
+      } else {
+        print('El usuario ha salido del equipo correctamente.');
+      }
+    } catch (e) {
+      print('Error al salir del equipo: $e');
+      rethrow;
     }
-
-    String userId = currentUser.uid;
-
-    // Referencia al equipo en Firestore
-    DocumentReference teamRef = FirebaseFirestore.instance.collection('teams').doc(teamId);
-
-    // Obtener los datos del equipo
-    DocumentSnapshot teamSnapshot = await teamRef.get();
-
-    if (!teamSnapshot.exists) {
-      throw Exception('El equipo no existe.');
-    }
-
-    Map<String, dynamic> teamData = teamSnapshot.data() as Map<String, dynamic>;
-    List<dynamic> members = teamData['members'] ?? [];
-
-    // Buscar el miembro correspondiente al usuario
-    final memberToRemove = members.firstWhere(
-      (member) => member['uid'] == userId,
-      orElse: () => null, // Retorna null si no se encuentra el miembro
-    );
-
-    // Verificar si el usuario es miembro del equipo
-    if (memberToRemove == null) {
-      throw Exception('El usuario no es miembro de este equipo.');
-    }
-
-    // Eliminar al usuario de la lista de miembros
-    await teamRef.update({
-      'members': FieldValue.arrayRemove([memberToRemove])
-    });
-
-    // Volver a obtener el equipo actualizado
-    DocumentSnapshot updatedTeamSnapshot = await teamRef.get();
-    Map<String, dynamic> updatedTeamData = updatedTeamSnapshot.data() as Map<String, dynamic>;
-    List<dynamic> updatedMembers = updatedTeamData['members'] ?? [];
-
-    // Si después de salir, el equipo ya no tiene miembros, lo eliminamos
-    if (updatedMembers.isEmpty) {
-      await teamRef.delete();
-      print('El equipo ha sido eliminado porque no quedan miembros.');
-    } else {
-      print('El usuario ha salido del equipo correctamente.');
-    }
-  } catch (e) {
-    print('Error al salir del equipo: $e');
-    rethrow;
   }
-}
-
 }
 

@@ -45,86 +45,86 @@ FirebaseFirestore db = FirebaseFirestore.instance;
     }
   }
 
-/// Función para obtener la lista de jugadores actuales de un equipo
-Future<List<Map<String, dynamic>>> getCurrentPlayers(BuildContext context) async {
-  try {
-    String? teamId = await getTeamId(context); // Obtiene el ID del equipo
+  /// Función para obtener la lista de jugadores actuales de un equipo
+  Future<List<Map<String, dynamic>>> getCurrentPlayers(BuildContext context) async {
+    try {
+      String? teamId = await getTeamId(context); // Obtiene el ID del equipo
 
-    // Obtiene la colección de jugadores del equipo actual
-    QuerySnapshot snapshot = await db.collection('teams').doc(teamId).collection('players').get();
+      // Obtiene la colección de jugadores del equipo actual
+      QuerySnapshot snapshot = await db.collection('teams').doc(teamId).collection('players').get();
 
-    // Mapea los documentos de los jugadores a una lista de mapas
-    return snapshot.docs.map((doc) {
-      return {
-        'name': doc['nombre'],
-        'dorsal': doc['dorsal'],
-        'posicion': doc['posicion'],
-      };
-    }).toList();
-  } catch (e) {
-    throw Exception('Error al obtener jugadores: $e');
-  }
-}
-
-/// Función para obtener todos los jugadores del equipo, ordenados por dorsal
-Future<List<Map<String, dynamic>>> getPlayers(BuildContext context) async {
-  try {
-    List<Map<String, dynamic>> players = [];
-    String? teamId = await getTeamId(context); // Obtiene el ID del equipo
-
-    // Referencia a la colección de jugadores del equipo
-    CollectionReference collectionReferencePlayers = db.collection('teams').doc(teamId).collection('players');
-
-    // Obtener los documentos de los jugadores
-    QuerySnapshot queryPlayers = await collectionReferencePlayers.get();
-
-    // Agregar los jugadores a la lista
-    for (var doc in queryPlayers.docs) {
-      players.add(doc.data() as Map<String, dynamic>);
+      // Mapea los documentos de los jugadores a una lista de mapas
+      return snapshot.docs.map((doc) {
+        return {
+          'name': doc['nombre'],
+          'dorsal': doc['dorsal'],
+          'posicion': doc['posicion'],
+        };
+      }).toList();
+    } catch (e) {
+      throw Exception('Error al obtener jugadores: $e');
     }
-
-    // Ordenar los jugadores por dorsal
-    players.sort((a, b) {
-      int dorsalA = int.tryParse(a['dorsal']?.toString() ?? '0') ?? 0;
-      int dorsalB = int.tryParse(b['dorsal']?.toString() ?? '0') ?? 0;
-      return dorsalA.compareTo(dorsalB);
-    });
-
-    return players;
-  } catch (e) {
-    throw Exception('Error al obtener jugadores: $e');
   }
-}
 
-/// Función para agregar un nuevo jugador a la colección
-Future<void> addPlayer(BuildContext context, Map<String, dynamic> playerData) async {
-  try {
+  /// Función para obtener todos los jugadores del equipo, ordenados por dorsal
+  Future<List<Map<String, dynamic>>> getPlayers(BuildContext context) async {
+    try {
+      List<Map<String, dynamic>> players = [];
+      String? teamId = await getTeamId(context); // Obtiene el ID del equipo
+
+      // Referencia a la colección de jugadores del equipo
+      CollectionReference collectionReferencePlayers = db.collection('teams').doc(teamId).collection('players');
+
+      // Obtener los documentos de los jugadores
+      QuerySnapshot queryPlayers = await collectionReferencePlayers.get();
+
+      // Agregar los jugadores a la lista
+      for (var doc in queryPlayers.docs) {
+        players.add(doc.data() as Map<String, dynamic>);
+      }
+
+      // Ordenar los jugadores por dorsal
+      players.sort((a, b) {
+        int dorsalA = int.tryParse(a['dorsal']?.toString() ?? '0') ?? 0;
+        int dorsalB = int.tryParse(b['dorsal']?.toString() ?? '0') ?? 0;
+        return dorsalA.compareTo(dorsalB);
+      });
+
+      return players;
+    } catch (e) {
+      throw Exception('Error al obtener jugadores: $e');
+    }
+  }
+
+  /// Función para agregar un nuevo jugador a la colección
+  Future<void> addPlayer(BuildContext context, Map<String, dynamic> playerData) async {
+    try {
+      String? teamId = await getTeamId(context);
+      if (teamId != null) {
+        // Agregar el nuevo jugador a la colección de jugadores
+        await db.collection('teams').doc(teamId).collection('players').add(playerData);
+      } else {
+        throw Exception('teamId no encontrado');
+      }
+    } catch (e) {
+      throw Exception('Error al añadir jugador: $e');
+    }
+  }
+
+  /// Verifica si el dorsal ya existe en la base de datos
+  Future<bool> isDorsalUnique(BuildContext context, int dorsal) async {
     String? teamId = await getTeamId(context);
-    if (teamId != null) {
-      // Agregar el nuevo jugador a la colección de jugadores
-      await db.collection('teams').doc(teamId).collection('players').add(playerData);
-    } else {
-      throw Exception('teamId no encontrado');
-    }
-  } catch (e) {
-    throw Exception('Error al añadir jugador: $e');
+    
+    // Consulta para buscar jugadores con el mismo dorsal
+    QuerySnapshot query = await db
+        .collection('teams')
+        .doc(teamId)
+        .collection('players')
+        .where('dorsal', isEqualTo: dorsal)
+        .get();
+
+    return query.docs.isEmpty;
   }
-}
-
-/// Verifica si el dorsal ya existe en la base de datos
-Future<bool> isDorsalUnique(BuildContext context, int dorsal) async {
-  String? teamId = await getTeamId(context);
-  
-  // Consulta para buscar jugadores con el mismo dorsal
-  QuerySnapshot query = await db
-      .collection('teams')
-      .doc(teamId)
-      .collection('players')
-      .where('dorsal', isEqualTo: dorsal)
-      .get();
-
-  return query.docs.isEmpty;
-}
 
   /// Función para eliminar un jugador basado en el dorsal
   Future<void> deletePlayerByDorsal(BuildContext context, int dorsal) async {
@@ -148,22 +148,25 @@ Future<bool> isDorsalUnique(BuildContext context, int dorsal) async {
 
  /// Clase que contiene servicios relacionados a los jugadores
  class PlayerServices {
-   static Future<Map<String, dynamic>?> loadPlayerData(BuildContext context, int dorsal) async {
-     String? teamId = await getTeamId(context);
-     // Consulta para obtener datos del jugador basado en el dorsal
-     QuerySnapshot querySnapshot = await db
-         .collection('teams')
-         .doc(teamId)
-         .collection('players')
-         .where('dorsal', isEqualTo: dorsal)
-         .get();
-     if (querySnapshot.docs.isNotEmpty) {
-       return querySnapshot.docs.first.data() as Map<String, dynamic>;
-     } else {
-       return null;
-     }
-   }
 
+  /// Funcion para cargar los datos del equipo.
+  static Future<Map<String, dynamic>?> loadPlayerData(BuildContext context, int dorsal) async {
+    String? teamId = await getTeamId(context);
+    // Consulta para obtener datos del jugador basado en el dorsal
+    QuerySnapshot querySnapshot = await db
+        .collection('teams')
+        .doc(teamId)
+        .collection('players')
+        .where('dorsal', isEqualTo: dorsal)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first.data() as Map<String, dynamic>;
+    } else {
+      return null;
+    }
+  }
+
+  /// Funcion para modificar los datos de un jugador
   static Future<void> modifyPlayer(BuildContext context, int dorsal, Map<String, dynamic> playerData) async {
     String? teamId = await getTeamId(context);
 

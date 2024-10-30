@@ -1,3 +1,14 @@
+/*
+ * Archivo: player_service.dart
+ * Descripción: Este archivo contiene un servicio que permite realizar diferentes operaciones sobre
+ *              la base de datos a nivel de jugadores, como añadir jugador, listar jugadores, etc.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ * 
+ * Dependencias:
+ * - cloud_firestore: Con el objetivo de realizar las operaciones en Firebase.
+ * - provider: Para la gestión del estado del equipo seleccionado.
+ */
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:CoachCraft/screens/team_management/team_conv_player_screen.dart';
 import 'package:CoachCraft/services/player/player_service.dart';
@@ -57,6 +68,7 @@ Widget buildPlayerFormField(
   );
 }
 
+/// Clase correspondiente a los datos del jugador
 class PlayerDataTable extends StatelessWidget {
   final List<Map<String, dynamic>> players;
 
@@ -65,7 +77,7 @@ class PlayerDataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal, // Desplazamiento horizontal
+      scrollDirection: Axis.horizontal, 
       child: DataTable(
         // ignore: deprecated_member_use
         dataRowHeight: 40, // Ajustar la altura de las filas
@@ -196,14 +208,14 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
             return Column(
               children: [
                 Expanded(
-                  child: SingleChildScrollView( // Permitir desplazamiento vertical
+                  child: SingleChildScrollView( 
                     child: PlayerDataTable(players: snapshot.data!), // Tabla de jugadores
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0), // Padding horizontal y vertical
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                   child: SizedBox(
-                    width: double.infinity, // Botón se ajusta al ancho disponible
+                    width: double.infinity, 
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
