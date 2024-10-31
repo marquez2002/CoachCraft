@@ -44,7 +44,6 @@ class _TeamListWidgetState extends State<TeamListWidget> {
 
   Future<void> _addTeam() async {
     String teamName = _teamNameController.text.trim(); 
-
     if (teamName.isNotEmpty) {
       try {
         await _teamService.addTeam(teamName); 

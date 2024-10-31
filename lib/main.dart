@@ -18,10 +18,7 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-  
-  // Hide the status bar and navigation bar
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive); // Hides both status and navigation bars
-  
+    
   runApp(const MyApp());
 }
 

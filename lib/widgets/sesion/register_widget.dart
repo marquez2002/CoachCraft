@@ -5,8 +5,8 @@
  * 
  * Autor: Gonzalo Márquez de Torres
  */
+import 'package:CoachCraft/screens/teams/teams_screen.dart';
 import 'package:CoachCraft/services/login/login_service.dart';
-import 'package:CoachCraft/screens/menu/menu_screen.dart';
 import 'package:CoachCraft/widgets/sesion/login_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -139,7 +139,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const MenuScreen()),
+                                    builder: (context) => const TeamsScreen()),
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(

@@ -32,34 +32,50 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
 
       if (_currentUser != null) {
         // Obtener todos los equipos
-        QuerySnapshot teamsSnapshot =
-            await FirebaseFirestore.instance.collection('teams').get();
+        QuerySnapshot teamsSnapshot = await FirebaseFirestore.instance.collection('teams').get();
 
         // Buscar el rol del usuario en los miembros de los equipos
         for (var teamDoc in teamsSnapshot.docs) {
           List<dynamic> members = teamDoc['members'];
+
+          // Imprimir el ID del equipo y los miembros para depuración
+          print("Miembros del equipo ${teamDoc.id}: $members");
+
           for (var member in members) {
-            if (member['uid'] == _currentUser!.uid) {
-              setState(() {
-                _userRole = member['role'] ?? 'Jugador'; 
-              });
-              return; 
+            // Si member es un mapa con 'uid' y 'role'
+            if (member is Map<String, dynamic>) {
+              print("Miembro UID: ${member['uid']}, Rol: ${member['role']}");
+              if (member['uid'] == _currentUser!.uid) {
+                setState(() {
+                  _userRole = member['role'] ?? 'Jugador';
+                });
+                return;
+              }
+            } else if (member is String) { 
+              // Si member es directamente un UID como cadena
+              print("Miembro UID (sin rol específico): $member");
+              if (member == _currentUser!.uid) {
+                setState(() {
+                  _userRole = 'Jugador';  // Rol por defecto si solo está el `uid` sin rol explícito
+                });
+                return;
+              }
             }
           }
         }
 
         // Si no se encuentra el rol, establecerlo por defecto
         setState(() {
-          _userRole = 'Jugador'; 
+          _userRole = 'Jugador';
         });
-      } else {        
+      } else {
         setState(() {
-          _userRole = 'Jugador'; 
+          _userRole = 'Jugador';
         });
       }
     } catch (e) {
       setState(() {
-        _userRole = 'error'; 
+        _userRole = 'error';
       });
       print('Error al obtener el rol del usuario: $e');
     }
