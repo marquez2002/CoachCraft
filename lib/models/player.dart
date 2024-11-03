@@ -1,4 +1,10 @@
-
+/*
+ * Archivo: player.dart
+ * Descripción: Este archivo contiene la definición de la clase Player, 
+ *              con información detallada sobre los datos de cada jugador.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 class Player {
   final String nombre;
   final int dorsal;
@@ -27,6 +33,7 @@ class Player {
     };
   }
 
+  // Permite crear una instancia de Player a partir de un Map, permitiendo convertir los datos en un objeto Match
   factory Player.fromJson(Map<String, dynamic> json) {
     return Player(
       nombre: json['nombre'] ?? '',

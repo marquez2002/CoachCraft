@@ -1,22 +1,18 @@
 /*
  * Archivo: teams.dart
- * Descripción: Este archivo contiene la definición de la clase teams.
+ * Descripción: Este archivo contiene la definición de la clase Teams 
+ *              con la información relativa a los equipos.
  * 
  * Autor: Gonzalo Márquez de Torres
  * 
  */
 class Teams {
-  final String id; // Identificador único del equipo
-  final String name; // Nombre del equipo
-  final String role; // Rol del usuario dentro del equipo (ej. 'Entrenador', 'Jugador')
-  final List<String> members; // Lista de identificadores de miembros que pertenecen al equipo
+  final String id; 
+  final String name;
+  final String role; 
+  final List<String> members; 
 
   /// Constructor de la clase Teams.
-  ///
-  /// [id] - Identificador único del equipo.
-  /// [name] - Nombre del equipo.
-  /// [role] - Rol del usuario en el equipo.
-  /// [members] - Lista de miembros del equipo.
   Teams({
     required this.id, // Inicializa el ID del equipo
     required this.name, // Inicializa el nombre del equipo

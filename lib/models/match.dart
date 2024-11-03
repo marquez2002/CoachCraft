@@ -1,3 +1,10 @@
+/*
+ * Archivo: match.dart
+ * Descripción: Este archivo contiene la definición de la clase Match, 
+ *              con información detallada.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 class Match {
   final String id;
   final String rivalTeam;
@@ -15,6 +22,7 @@ class Match {
     required this.matchType,
   });
 
+  // Permite crear una instancia de Match a partir de un Map, permitiendo convertir los datos en un objeto Match
   factory Match.fromMap(Map<String, dynamic> data, String id) {
     return Match(
       id: id,

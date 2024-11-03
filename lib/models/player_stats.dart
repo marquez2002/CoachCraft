@@ -1,5 +1,10 @@
-// player_stats.dart
-
+/*
+ * Archivo: player_stats.dart
+ * Descripción: Este archivo contiene la definición de la clase PlayerStat, 
+ *              con información detallada sobre las estadísticas de cada jugador.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 class PlayerStats {
   final String nombre;
   final String posicion;
@@ -49,6 +54,7 @@ class PlayerStats {
     };
   }
 
+  // Permite crear una instancia de PlayerStats a partir de un Map, permitiendo convertir los datos en un objeto Match
   factory PlayerStats.fromJson(Map<String, dynamic> json) {
     return PlayerStats(
       nombre: json['nombre'] ?? '',
