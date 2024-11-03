@@ -14,9 +14,9 @@ class Teams {
 
   /// Constructor de la clase Teams.
   Teams({
-    required this.id, // Inicializa el ID del equipo
-    required this.name, // Inicializa el nombre del equipo
-    required this.role, // Inicializa el rol del usuario en el equipo
-    required this.members, // Inicializa la lista de miembros del equipo
+    required this.id, 
+    required this.name,
+    required this.role,
+    required this.members, 
   });
 }
