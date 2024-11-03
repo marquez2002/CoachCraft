@@ -1,3 +1,10 @@
+/*
+ * Archivo: match_service.dart
+ * Descripción: Este archivo contiene la clase concreta para los servicios que se pueden realizar sobre los partidos.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ * 
+ */
 import 'package:CoachCraft/models/player_stats.dart';
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +14,7 @@ import 'package:provider/provider.dart';
 class MatchService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Función para obtener el id correspondiente del equipo concreto.
   Future<String?> getTeamId(BuildContext context) async {
     try {
       String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
@@ -31,6 +39,7 @@ class MatchService {
     }
   }
 
+  /// Función para permitir la búsqueda de partidos concretos en función de una serie de parámetros.
   Future<List<Map<String, dynamic>>> fetchMatches(
     BuildContext context,
   ) async {
@@ -63,6 +72,7 @@ class MatchService {
     return loadedMatches;
   }
 
+  /// Función que permite crear un partido e introducirlo en el sistema.
   Future<String> createMatch(BuildContext context, Map<String, dynamic> matchData) async {
     String? teamId = await getTeamId(context);
 
@@ -114,6 +124,7 @@ class MatchService {
     }
   }
 
+  /// Función para modificar los detalles de un partido concreto.
   Future<void> updateMatchByDetails(BuildContext context, Map<String, dynamic> updatedData) async {
     try {
       String? teamId = await getTeamId(context);
@@ -146,7 +157,8 @@ class MatchService {
       throw Exception('Error al actualizar el partido: $e');
     }
   }
-
+ 
+  /// Función para eliminar un partido concreto.
   Future<void> deleteMatch(BuildContext context, String rivalTeam, String matchDate) async {
     String? teamId = await getTeamId(context);
 
@@ -171,6 +183,7 @@ class MatchService {
     }
   }
 
+  /// Función para eliminar los jugadores de un equipo concreto.
   Future<void> _deletePlayers(DocumentReference matchRef) async {
     var playersRef = matchRef.collection('players');
     var playersDocs = await playersRef.get();

@@ -44,7 +44,6 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     {'position': Offset(0.70, 0.37,), 'image': 'assets/image/player_teamB.png'},
   ];
 
-
   late List<Offset> _currentPositions;
 
   @override

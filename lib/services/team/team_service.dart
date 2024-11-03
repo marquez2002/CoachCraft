@@ -12,15 +12,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 // Clase de servicio para manejar operaciones relacionadas con equipos
 class TeamService {
-  // Instancia de Firestore para interactuar con la base de datos
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
-  // Obtiene el usuario actualmente autenticado
   final User? user = FirebaseAuth.instance.currentUser;
 
   /// Cargar equipos del usuario desde Firestore
-  Future<List<Teams>> loadUserTeams() async {
-    // Si no hay un usuario autenticado, devuelve una lista vacía
+  Future<List<Teams>> loadUserTeams() async {    
     if (user == null) return [];
 
     try {
@@ -96,19 +92,14 @@ class TeamService {
   /// Unirse a un equipo existente
   Future<void> joinTeam(String teamId, String role) async {
     final String? uid = user?.uid; 
-
     // Si no hay usuario autenticado, lanza una excepción
     if (uid == null) throw Exception('Usuario no autenticado');
 
     try {
       // Obtiene el documento del equipo correspondiente al teamId
       DocumentSnapshot teamDoc = await _firestore.collection('teams').doc(teamId).get();
-      // Verifica si el equipo existe
       if (!teamDoc.exists) throw Exception('Equipo no encontrado.');
-
       List<dynamic> members = teamDoc['members'] ?? []; 
-
-      // Verifica si el usuario ya es miembro del equipo
       bool userIsMember = members.any((member) {
         if (member is Map<String, dynamic> && member.containsKey('uid')) {
           return member['uid'] == uid; 
@@ -120,7 +111,6 @@ class TeamService {
       if (userIsMember) {
         throw Exception('Ya eres miembro de este equipo.');
       } else {
-        // Agrega al usuario a la lista de miembros del equipo
         await _firestore.collection('teams').doc(teamId).update({
           'members': FieldValue.arrayUnion([
             {
@@ -168,7 +158,7 @@ class TeamService {
       // Buscar el miembro correspondiente al usuario
       final memberToRemove = members.firstWhere(
         (member) => member['uid'] == userId,
-        orElse: () => null, // Retorna null si no se encuentra el miembro
+        orElse: () => null, 
       );
 
       // Verificar si el usuario es miembro del equipo

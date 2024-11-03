@@ -4,10 +4,6 @@
  *              la base de datos a nivel de jugadores, como añadir jugador, listar jugadores, etc.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Dependencias:
- * - cloud_firestore: Con el objetivo de realizar las operaciones en Firebase.
- * - provider: Para la gestión del estado del equipo seleccionado.
  */
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +16,6 @@ FirebaseFirestore db = FirebaseFirestore.instance;
   /// Función para obtener el teamId basado en el equipo seleccionado en el TeamProvider
   Future<String?> getTeamId(BuildContext context) async {
     try {
-      // Accede al nombre del equipo seleccionado desde el TeamProvider
       String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
 
       if (selectedTeam.isEmpty) {
@@ -30,12 +25,11 @@ FirebaseFirestore db = FirebaseFirestore.instance;
       // Busca en Firestore el documento cuyo nombre coincida con el equipo seleccionado
       QuerySnapshot teamSnapshot = await db
           .collection('teams')
-          .where('name', isEqualTo: selectedTeam) // Filtra por el nombre del equipo seleccionado
+          .where('name', isEqualTo: selectedTeam) 
           .limit(1)
           .get();
 
       if (teamSnapshot.docs.isNotEmpty) {
-        // Retorna el ID del equipo seleccionado
         return teamSnapshot.docs.first.id;
       } else {
         throw Exception('No se encontró el equipo seleccionado');
@@ -48,12 +42,9 @@ FirebaseFirestore db = FirebaseFirestore.instance;
   /// Función para obtener la lista de jugadores actuales de un equipo
   Future<List<Map<String, dynamic>>> getCurrentPlayers(BuildContext context) async {
     try {
-      String? teamId = await getTeamId(context); // Obtiene el ID del equipo
-
-      // Obtiene la colección de jugadores del equipo actual
+      String? teamId = await getTeamId(context); 
       QuerySnapshot snapshot = await db.collection('teams').doc(teamId).collection('players').get();
 
-      // Mapea los documentos de los jugadores a una lista de mapas
       return snapshot.docs.map((doc) {
         return {
           'name': doc['nombre'],
@@ -70,12 +61,8 @@ FirebaseFirestore db = FirebaseFirestore.instance;
   Future<List<Map<String, dynamic>>> getPlayers(BuildContext context) async {
     try {
       List<Map<String, dynamic>> players = [];
-      String? teamId = await getTeamId(context); // Obtiene el ID del equipo
-
-      // Referencia a la colección de jugadores del equipo
+      String? teamId = await getTeamId(context); 
       CollectionReference collectionReferencePlayers = db.collection('teams').doc(teamId).collection('players');
-
-      // Obtener los documentos de los jugadores
       QuerySnapshot queryPlayers = await collectionReferencePlayers.get();
 
       // Agregar los jugadores a la lista
@@ -101,7 +88,6 @@ FirebaseFirestore db = FirebaseFirestore.instance;
     try {
       String? teamId = await getTeamId(context);
       if (teamId != null) {
-        // Agregar el nuevo jugador a la colección de jugadores
         await db.collection('teams').doc(teamId).collection('players').add(playerData);
       } else {
         throw Exception('teamId no encontrado');
@@ -114,8 +100,7 @@ FirebaseFirestore db = FirebaseFirestore.instance;
   /// Verifica si el dorsal ya existe en la base de datos
   Future<bool> isDorsalUnique(BuildContext context, int dorsal) async {
     String? teamId = await getTeamId(context);
-    
-    // Consulta para buscar jugadores con el mismo dorsal
+  
     QuerySnapshot query = await db
         .collection('teams')
         .doc(teamId)
@@ -130,14 +115,9 @@ FirebaseFirestore db = FirebaseFirestore.instance;
   Future<void> deletePlayerByDorsal(BuildContext context, int dorsal) async {
     try {
       String? teamId = await getTeamId(context);
-
-      // Referencia a la colección de jugadores
       CollectionReference playersCollection = db.collection('teams').doc(teamId).collection('players');
-
-      // Buscar al jugador con el dorsal especificado
       QuerySnapshot querySnapshot = await playersCollection.where('dorsal', isEqualTo: dorsal).get();
-
-      // Verificar si se encontró algún jugador con ese dorsal
+      
       if (querySnapshot.docs.isNotEmpty) {
         await playersCollection.doc(querySnapshot.docs.first.id).delete();
       }
@@ -147,9 +127,7 @@ FirebaseFirestore db = FirebaseFirestore.instance;
   }
 
  /// Clase que contiene servicios relacionados a los jugadores
- class PlayerServices {
-
-  /// Funcion para cargar los datos del equipo.
+ class PlayerServices {  
   static Future<Map<String, dynamic>?> loadPlayerData(BuildContext context, int dorsal) async {
     String? teamId = await getTeamId(context);
     // Consulta para obtener datos del jugador basado en el dorsal
