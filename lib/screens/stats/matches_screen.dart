@@ -20,6 +20,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
   // ignore: unused_field
   String _matchType = 'Todos';
 
+
   // Controladores de expansión
   bool _isCreatingMatchExpanded = false;
   bool _isSearchingMatchExpanded = false;

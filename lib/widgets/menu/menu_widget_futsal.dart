@@ -38,22 +38,16 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         for (var teamDoc in teamsSnapshot.docs) {
           List<dynamic> members = teamDoc['members'];
 
-          // Imprimir el ID del equipo y los miembros para depuración
-          print("Miembros del equipo ${teamDoc.id}: $members");
-
           for (var member in members) {
             // Si member es un mapa con 'uid' y 'role'
             if (member is Map<String, dynamic>) {
-              print("Miembro UID: ${member['uid']}, Rol: ${member['role']}");
               if (member['uid'] == _currentUser!.uid) {
                 setState(() {
                   _userRole = member['role'] ?? 'Jugador';
                 });
                 return;
               }
-            } else if (member is String) { 
-              // Si member es directamente un UID como cadena
-              print("Miembro UID (sin rol específico): $member");
+            } else if (member is String) {               
               if (member == _currentUser!.uid) {
                 setState(() {
                   _userRole = 'Jugador';  // Rol por defecto si solo está el `uid` sin rol explícito
@@ -138,11 +132,10 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                           children: buttonData.map((data) {
                             // Determina si el botón está habilitado para el rol actual
                             bool isEnabled = data['enabledFor'].contains(_userRole);
-
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8.0),
                               child: SizedBox(
-                                width: screenSize.width * 0.7, // Width is 70% of the screen width
+                                width: screenSize.width * 0.7, 
                                 child: ElevatedButton(
                                   onPressed: isEnabled
                                       ? () {
@@ -152,13 +145,14 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                                                 builder: (context) => data['route']),
                                           );
                                         }
-                                      : null, // Deshabilita el botón si no está permitido
+                                      : null, 
                                   style: ElevatedButton.styleFrom(
                                     foregroundColor: Colors.black,
                                     backgroundColor: Colors.white, 
+                                    disabledBackgroundColor: Colors.white, 
                                     padding: EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.02, // Adjust the vertical padding
-                                    ), 
+                                      vertical: screenSize.height * 0.02, 
+                                    ),
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -166,16 +160,16 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                                       Text(
                                         data['label'],
                                         style: TextStyle(
-                                          fontSize: 20, // Slightly smaller font size
+                                          fontSize: 20,
                                           color: Colors.black,
                                         ),
                                       ),
-                                      if (!isEnabled) // Show lock icon if the button is disabled
+                                      if (!isEnabled) // Muestra el icono de candado si el botón está deshabilitado
                                         const Padding(
-                                          padding: EdgeInsets.only(left: 8.0), // Space between text and icon
+                                          padding: EdgeInsets.only(left: 8.0), 
                                           child: Icon(
                                             Icons.lock,
-                                            color: Colors.black, // Color of lock icon
+                                            color: Colors.black, 
                                           ),
                                         ),
                                     ],
