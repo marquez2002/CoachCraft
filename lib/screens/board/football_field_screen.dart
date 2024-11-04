@@ -6,13 +6,14 @@
  */
 import 'package:CoachCraft/screens/board/mid_football_field_screen.dart';
 import 'package:CoachCraft/screens/board/recording_plays_screen.dart';
+import 'package:CoachCraft/screens/board/photos_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/widgets/board/ball_widget.dart';
 import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screen_recording/flutter_screen_recording.dart';
-import 'package:permission_handler/permission_handler.dart';
+/*import 'package:flutter_screen_recording/flutter_screen_recording.dart';
+import 'package:permission_handler/permission_handler.dart';*/
 
 class FootballFieldScreen extends StatefulWidget {
   const FootballFieldScreen({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   GlobalKey _imageKey = GlobalKey();
   Size? _imageSize;
   Color drawColor = Colors.red;
-  bool _isRecording = false;
+  //bool _isRecording = false;
   String? videoPath;
 
   // Inicializa posiciones proporcionales al tamaño de la imagen (0.0 - 1.0)  
@@ -50,7 +51,7 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   void initState() {
     super.initState();
     _currentPositions = _initialPositions.map((e) => e['position'] as Offset).toList();
-    _checkPermissions();
+    //_checkPermissions();
 
   }
 
@@ -76,11 +77,14 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const MidFootballFieldScreen()));
     } else if (screenNumber == 2) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => RecordingPlayScreen()));
+    } else if (screenNumber == 3) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => PhotosScreen()));
     } else {
       print('Número de pantalla no válido: $screenNumber');
     }
   }
 
+  /*
   // Función para empezar a grabar la pantalla.
   Future<void> _startRecording() async {
     try {
@@ -121,7 +125,7 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     } catch (e) {
       print("Error al detener la grabación: $e");
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -137,15 +141,20 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
           },
         ),
         actions: [
-          IconButton(
+          /*IconButton(
             icon: Icon(_isRecording ? Icons.stop : Icons.videocam),
             onPressed: _isRecording ? _stopRecording : _startRecording,
             tooltip: _isRecording ? 'Detener Grabación' : 'Iniciar Grabación',
-          ),
+          ),*/
           IconButton(
             onPressed: () => _navigateToScreen(1),
             icon: const Icon(Icons.airline_stops_outlined),
             tooltip: 'Ir a pizarra de media pista',
+          ),
+          IconButton(
+            onPressed: () => _navigateToScreen(3),
+            icon: const Icon(Icons.photo_camera),
+            tooltip: 'Ir a grabaciones',
           ),
           IconButton(
             onPressed: () => _navigateToScreen(2),
