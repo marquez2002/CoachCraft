@@ -2,6 +2,7 @@ import 'package:CoachCraft/widgets/match/player_stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
 import 'package:CoachCraft/services/match/match_service.dart';
+import 'package:intl/intl.dart';
 
 class StatsScreen extends StatefulWidget {
   final String matchDate;
@@ -9,7 +10,7 @@ class StatsScreen extends StatefulWidget {
   final String result;
   final String matchType;
   final String location;
-  final String matchId; // Añadir matchId como propiedad
+  final String matchId;
 
   const StatsScreen({
     Key? key,
@@ -26,9 +27,9 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> {
-  late TextEditingController _dateController;
   late TextEditingController _rivalController;
   late TextEditingController _resultController;
+  late TextEditingController _dateController;
   String _matchType = '';
   String _location = '';
   bool _isModifyExpanded = false;
@@ -43,6 +44,9 @@ class _StatsScreenState extends State<StatsScreen> {
     super.initState();
     _rivalController = TextEditingController(text: widget.rivalTeam);
     _resultController = TextEditingController(text: widget.result);
+    _dateController = TextEditingController(
+      text: DateFormat('dd-MM-yyyy').format(DateTime.parse(widget.matchDate)),
+    );
     _matchType = widget.matchType;
     _location = widget.location;
     _fetchPlayerStats();
@@ -51,15 +55,15 @@ class _StatsScreenState extends State<StatsScreen> {
   Future<void> _fetchPlayerStats() async {
     final fetchedStats = await MatchService().fetchMatches(context);
     setState(() {
-      playerStats = fetchedStats; // Actualiza la lista de estadísticas
+      playerStats = fetchedStats;
     });
   }
 
   @override
   void dispose() {
-    _dateController.dispose();
     _rivalController.dispose();
     _resultController.dispose();
+    _dateController.dispose();
     super.dispose();
   }
 
@@ -85,7 +89,7 @@ class _StatsScreenState extends State<StatsScreen> {
     if (confirm == true) {
       try {
         await MatchService().deleteMatch(context, widget.rivalTeam, widget.matchDate);
-        Navigator.pop(context); // Regresar a la pantalla anterior
+        Navigator.pop(context); // Volver a la pantalla anterior
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Partido eliminado exitosamente.')),
         );
@@ -128,21 +132,17 @@ class _StatsScreenState extends State<StatsScreen> {
             icon: const Icon(Icons.info_outline),
             onPressed: () {
               setState(() {
-                _isInfoExpanded = !_isInfoExpanded; // Cambia el estado del infoExpanded
-                if (_isInfoExpanded) {
-                  _isModifyExpanded = false; // Cierra el filtro si se abre la info
-                }
+                _isInfoExpanded = !_isInfoExpanded;
+                _isModifyExpanded = false; // Cierra modificación al abrir info
               });
             },
           ),
           IconButton(
-            icon: const Icon(Icons.filter_alt_outlined),
+            icon: const Icon(Icons.edit),
             onPressed: () {
               setState(() {
-                _isModifyExpanded = !_isModifyExpanded; // Cambia el estado del isSearchingExpanded
-                if (_isModifyExpanded) {
-                  _isInfoExpanded = false; // Cierra la info si se abre el filtro
-                }
+                _isModifyExpanded = !_isModifyExpanded;
+                _isInfoExpanded = false; // Cierra info al abrir modificación
               });
             },
           ),
@@ -154,7 +154,6 @@ class _StatsScreenState extends State<StatsScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (_isModifyExpanded) ...[
-              // Campos de edición
               Row(
                 children: [
                   Expanded(
@@ -175,7 +174,7 @@ class _StatsScreenState extends State<StatsScreen> {
                         labelText: 'Fecha',
                         border: OutlineInputBorder(),
                       ),
-                      enabled: false,
+                      enabled: false, // Mantiene el campo fijo
                     ),
                   ),
                 ],
@@ -242,120 +241,99 @@ class _StatsScreenState extends State<StatsScreen> {
                   const SizedBox(width: 16.0),
                   ElevatedButton(
                     onPressed: () async {
-                      await _deleteMatch();
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                      final confirmDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirmar Borrado'),
+                            content: const Text('¿Está seguro de que desea borrar este partido?'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Cancelar'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                              ),
+                              TextButton(
+                                child: const Text('Borrar'),
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
+
+                      if (confirmDelete == true) {
+                        await _deleteMatch();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                        );
+                      }
                     },
                     child: const Text('Borrar Partido'),
                   ),
                 ],
               ),
-              const SizedBox(height: 16.0),
             ],
             if (_isInfoExpanded) ...[
               Wrap(
-                spacing: 20.0, // Espacio entre los íconos
-                runSpacing: 20.0, // Espacio entre las filas
-                alignment: WrapAlignment.center, // Centrar los íconos
+                spacing: 20.0,
+                runSpacing: 20.0,
+                alignment: WrapAlignment.center,
                 children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.sports_soccer),
-                      Text('Gol'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.group_add_sharp),
-                      Text('Asistencia'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.sports_handball_sharp),
-                      Text('Tiros Recibidos'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.sports_handball_sharp, color: Colors.green),
-                      Text('Paradas'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.sports_soccer, color: Colors.red),
-                      Text('Gol Recibido'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.gps_not_fixed),
-                      Text('Tiros'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.gps_fixed_rounded),
-                      Text('Tiros a Puerta'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.square, color: Colors.yellow),
-                      Text('Tarjeta Amarilla'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.square, color: Colors.red),
-                      Text('Tarjeta Roja'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.sports),
-                      Text('Faltas'),
-                    ],
-                  ),
+                  IconInfoColumn(icon: Icons.sports_soccer, label: 'Gol'),
+                  IconInfoColumn(icon: Icons.group_add_sharp, label: 'Asistencia'),
+                  IconInfoColumn(icon: Icons.sports_handball_sharp, label: 'Tiros Recibidos'),
+                  IconInfoColumn(icon: Icons.sports_handball_sharp, label: 'Paradas', iconColor: Colors.green),
+                  IconInfoColumn(icon: Icons.sports_soccer, label: 'Gol Recibido', iconColor: Colors.red),
+                  IconInfoColumn(icon: Icons.gps_not_fixed, label: 'Tiros'),
+                  IconInfoColumn(icon: Icons.gps_fixed_rounded, label: 'Tiros a Puerta'),
+                  IconInfoColumn(icon: Icons.square, label: 'Tarjeta Amarilla', iconColor: Colors.yellow),
+                  IconInfoColumn(icon: Icons.square, label: 'Tarjeta Roja', iconColor: Colors.red),
+                  IconInfoColumn(icon: Icons.sports, label: 'Faltas'),
                 ],
               ),
             ],
-              const SizedBox(height: 8.0),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SizedBox(
-                      height: 140,
-                      child: PlayerStatTable(),
-                    );
-                  },
-                ),
-              ),            
-            ],          
-          ),
+            const SizedBox(height: 8.0),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    height: 140,
+                    child: PlayerStatTable(),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
+  }
+}
+
+class IconInfoColumn extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color? iconColor;
+
+  const IconInfoColumn({
+    required this.icon,
+    required this.label,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, color: iconColor),
+        Text(label),
+      ],
+    );
   }
 }

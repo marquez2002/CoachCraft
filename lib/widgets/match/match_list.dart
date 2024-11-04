@@ -27,6 +27,7 @@ class MatchList extends StatelessWidget {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     int crossAxisCount = screenWidth < 600 ? 2 : (screenWidth < 900 ? 3 : 4);
@@ -46,17 +47,19 @@ class MatchList extends StatelessWidget {
                 ),
                 const SizedBox(height: 8.0),
 
-                // FutureBuilder para esperar 2 segundos antes de mostrar "No hay partidos disponibles"
                 FutureBuilder(
                   future: Future.delayed(const Duration(seconds: 2)),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(); // Espacio vacío mientras esperamos
+                      return const SizedBox(); // Empty space while waiting
                     }
                     if (filteredMatches.isEmpty) {
-                      return const Text(
-                        'No hay partidos disponibles',
-                        style: TextStyle(color: Colors.red),
+                      return const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'No hay partidos disponibles',
+                          style: TextStyle(color: Colors.red),
+                        ),
                       );
                     }
                     return const SizedBox();
@@ -129,9 +132,10 @@ class MatchList extends StatelessWidget {
                                       'Rival: ${matchData['rivalTeam']}',
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -148,9 +152,10 @@ class MatchList extends StatelessWidget {
                                 Text(
                                   matchData['matchType'],
                                   style: const TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      fontSize: 14,
-                                      color: Colors.black),
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ],
                             ),
