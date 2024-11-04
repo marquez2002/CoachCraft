@@ -4,10 +4,6 @@
  *              en el sistema, para acceder al mismo.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Notas adicionales:
- * - El widget permite redirigir a sitios externos (Instagram y Twitter) y mostrar contacto por correo.
- * - También incluye un botón para navegar a la pantalla de inicio de sesión.
  */
 import 'package:CoachCraft/screens/sesion/password_recovery_screen.dart';
 import 'package:CoachCraft/screens/sesion/register_screen.dart';
@@ -47,7 +43,7 @@ class _LoginWidgetState extends State<LoginWidget> {
             width: double.infinity,
             height: double.infinity,
           ),
-          Center( // Centrar el contenido en la pantalla
+          Center(
             child: SingleChildScrollView(
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 60), 

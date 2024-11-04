@@ -1,3 +1,9 @@
+/*
+ * Archivo: filter_section.dart
+ * Descripción: Este archivo contiene la clase correspondiente al filtro de partidos.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 
 class FilterSection extends StatefulWidget {
@@ -11,7 +17,7 @@ class FilterSection extends StatefulWidget {
 }
 
 class _FilterSectionState extends State<FilterSection> {
-  String _matchType = 'Todos'; // Inicializar con el tipo de partido por defecto
+  String _matchType = 'Todos'; 
   String _rival = '';
 
   @override
@@ -93,7 +99,7 @@ class _FilterSectionState extends State<FilterSection> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 16.0),  // Espaciado adicional
+            const SizedBox(height: 16.0), 
           ],
         ),
       ),

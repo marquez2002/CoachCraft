@@ -1,3 +1,9 @@
+/*
+ * Archivo: menu_widget_futsal.dart
+ * Descripción: Este archivo contiene la definición de la clase del menú de la aplicación.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:CoachCraft/screens/stats/matches_screen.dart';
@@ -15,8 +21,8 @@ class MenuWidgetFutsal extends StatefulWidget {
 }
 
 class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
-  String _userRole = 'loading'; // Estado para el tipo de usuario
-  User? _currentUser; // Estado para almacenar el usuario autenticado
+  String _userRole = 'loading'; 
+  User? _currentUser; 
 
   @override
   void initState() {
@@ -24,7 +30,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
     _getUserData();
   }
 
-  // Método para obtener el tipo de usuario desde Firestore
+  /// Función para obtener el tipo de usuario desde Firestore
   Future<void> _getUserData() async {
     try {
       // Obtener el usuario autenticado actual
@@ -50,7 +56,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
             } else if (member is String) {               
               if (member == _currentUser!.uid) {
                 setState(() {
-                  _userRole = 'Jugador';  // Rol por defecto si solo está el `uid` sin rol explícito
+                  _userRole = 'Jugador';
                 });
                 return;
               }
@@ -126,7 +132,6 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Column to hold the buttons vertically
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buttonData.map((data) {

@@ -1,9 +1,15 @@
+/*
+ * Archivo: football_plays_list.dart
+ * Descripción: Este archivo contiene un servicio que permite listar las jugadas que se guardan en el sistema.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/screens/board/video_player_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-// Función para obtener el teamId basado en un criterio (por ejemplo, el primer equipo)
+// Función para obtener el teamId
 Future<String?> getTeamId() async {
   try {
     // Obtener el primer documento de la colección 'teams'
@@ -23,6 +29,7 @@ Future<String?> getTeamId() async {
 class VideoList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Función que permite modificar el fondo de las tarjetas de los videos.
   String getBackgroundImage(String type) {
     switch (type) {
       case 'ataque':
@@ -30,23 +37,23 @@ class VideoList extends StatelessWidget {
       case 'defensa':
         return 'assets/image/defensa_type.png';
       default:
-        return 'assets/image/ataque_type.png'; // Imagen por defecto si no se encuentra el tipo
+        return 'assets/image/ataque_type.png'; 
     }
   }
 
+  /// Función que permite modificar el icono que aparece en las tarjetas de los videos.
   IconData getIconForType(String type) {
     switch (type) {
       case 'ataque':
-        return Icons.sports_soccer; // Ícono de balón de fútbol
+        return Icons.sports_soccer; 
       case 'defensa':
-        return Icons.shield_rounded; // Ícono de candado
+        return Icons.shield_rounded;
       default:
-        return Icons.help; // Ícono por defecto si no se encuentra el tipo
+        return Icons.help;
     }
   }
 
-
-
+  /// Función que permite modificar videos.
   Future<void> _deleteVideo(BuildContext context, String documentId, String videoUrl) async {
     try {
       // Eliminar el video de Firebase Storage
@@ -75,12 +82,10 @@ class VideoList extends StatelessWidget {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: getTeamId(), // Llama a la función asincrónica
+      future: getTeamId(), 
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -120,9 +125,9 @@ class VideoList extends StatelessWidget {
             // Calcula cuántas tarjetas se pueden mostrar en una fila
             int crossAxisCount;
             if (screenWidth < 600) {
-              crossAxisCount = 2; // Móviles
+              crossAxisCount = 2; 
             } else {
-              crossAxisCount = 4; // Pantallas más grandes
+              crossAxisCount = 4; 
             }
 
             return Column(
@@ -133,7 +138,7 @@ class VideoList extends StatelessWidget {
                 Expanded(
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount, // Usar el número calculado de tarjetas por fila
+                      crossAxisCount: crossAxisCount, 
                       crossAxisSpacing: 8.0,
                       mainAxisSpacing: 8.0,
                       childAspectRatio: 1.2,
@@ -143,14 +148,14 @@ class VideoList extends StatelessWidget {
                       final plays = videos[index];
                       final nombre = plays['name'];
                       final tipo = plays['type'];
-                      final videoUrl = plays['videoUrl']; // Asumiendo que el URL del video está en el campo 'videoUrl'
-                      final documentId = plays.id; // El ID del documento para eliminar
+                      final videoUrl = plays['videoUrl']; 
+                      final documentId = plays.id; 
 
                       return Card(
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage(getBackgroundImage(tipo)), // Se utiliza el tipo de la jugada
+                              image: AssetImage(getBackgroundImage(tipo)), 
                               fit: BoxFit.cover,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
@@ -185,7 +190,7 @@ class VideoList extends StatelessWidget {
                                         );
                                       },
                                       tooltip: 'Ver Video',
-                                    ),                                    
+                                    ),
                                     IconButton(
                                       icon: const Icon(Icons.delete),
                                       onPressed: () => _deleteVideo(context, documentId, videoUrl),

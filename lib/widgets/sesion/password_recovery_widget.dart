@@ -6,14 +6,10 @@
  *              de inicio de sesión.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Notas adicionales:
- * - El widget permite redirigir a sitios externos (Instagram y Twitter) y mostrar contacto por correo.
- * - También incluye un botón para navegar a la pantalla de inicio de sesión.
  */
 import 'package:CoachCraft/screens/sesion/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart'; // Se importa el paquete para lanzar URLs
+import 'package:url_launcher/url_launcher_string.dart'; 
 
 /// Widget principal que representa la pantalla de recuperación de contraseña.
 class PasswordRecoveryWidget extends StatelessWidget {
@@ -24,7 +20,7 @@ class PasswordRecoveryWidget extends StatelessWidget {
     if (await canLaunchUrlString(url)) {
       await launchUrlString(url, mode: LaunchMode.externalApplication);
     } else {
-      throw 'No se pudo abrir $url'; // Mensaje de error si no se puede abrir la URL
+      throw 'No se pudo abrir $url'; 
     }
   }
 
@@ -68,7 +64,7 @@ class PasswordRecoveryWidget extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 10), // Espaciado vertical
+                  const SizedBox(height: 10), 
 
                   const Text(
                     'soporte@coachcraft.com',
@@ -86,7 +82,7 @@ class PasswordRecoveryWidget extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 10), // Espaciado vertical
+                  const SizedBox(height: 10), 
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

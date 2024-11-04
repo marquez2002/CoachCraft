@@ -1,3 +1,9 @@
+/*
+ * Archivo: match_form_widget.dart
+ * Descripción: Este archivo contiene la clase correspondiente al formulario de los datos de los partidos.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/services/match/match_service.dart';
 import 'package:CoachCraft/services/player/player_service.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +25,7 @@ class _MatchFormState extends State<MatchForm> {
   String _location = 'Casa';
   String _matchType = 'Amistoso';
 
+  /// Función que permite crear un partido.
   Future<void> _createMatch() async {
     // Validación básica: Asegurarse de que todos los campos están completos
     if (_rivalTeamController.text.isEmpty) {
@@ -57,8 +64,9 @@ class _MatchFormState extends State<MatchForm> {
     // Guardar los jugadores en la colección raíz del partido
     await MatchService().savePlayersForMatch(context, matchId, players);
 
-    _clearForm(); // Limpiar el formulario después de crear el partido
-    widget.onMatchCreated(); // Notificar que se ha creado el partido
+    _clearForm(); 
+    // Notificar que se ha creado el partido
+    widget.onMatchCreated(); 
   }
 
   // Limpiar el formulario

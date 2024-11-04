@@ -1,18 +1,13 @@
 /*
- * Archivo: main_widget.dart
+ * Archivo: home_widget.dart
  * Descripción: Este archivo contiene la definición de la clase MainWidget, 
  *              que representa la pantalla principal de bienvenida de la aplicación CoachCraft.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Dependencias: 
- * - login_screen.dart: Proporciona la pantalla de inicio de sesión (LoginScreen) 
- *   a la que se navega desde MainWidget.
- * - team_screen.dart: Pantalla a la que se navega si el usuario ya está autenticado.
  */
 import 'package:CoachCraft/screens/sesion/login_screen.dart';
-import 'package:CoachCraft/screens/teams/teams_screen.dart'; // Asegúrate de importar el TeamScreen
-import 'package:firebase_auth/firebase_auth.dart'; // Importa Firebase Auth
+import 'package:CoachCraft/screens/teams/teams_screen.dart'; 
+import 'package:firebase_auth/firebase_auth.dart'; 
 import 'package:flutter/material.dart';
 
 /// Clase que representa el widget principal de la pantalla de bienvenida.
@@ -36,7 +31,7 @@ class HomeWidget extends StatelessWidget {
         // Contenido principal centrado en la pantalla
         Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Centra los elementos verticalmente.
+            mainAxisAlignment: MainAxisAlignment.center, 
             children: [
               // Se añade el logo de la aplicación.
               Image.asset(
@@ -48,7 +43,7 @@ class HomeWidget extends StatelessWidget {
               // Botón para acceder a la aplicación
               ElevatedButton(
                 onPressed: () async {
-                  User? user = await _checkUserLoggedIn(); // Verificamos el estado de autenticación
+                  User? user = await _checkUserLoggedIn(); 
                   if (user != null) {
                     // Si el usuario está autenticado, navega a TeamScreen
                     Navigator.pushReplacement(
@@ -77,6 +72,6 @@ class HomeWidget extends StatelessWidget {
   /// Verifica si hay un usuario autenticado.
   Future<User?> _checkUserLoggedIn() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
-    return auth.currentUser; // Retorna el usuario actual, si existe
+    return auth.currentUser; 
   }
 }

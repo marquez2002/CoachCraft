@@ -1,3 +1,9 @@
+/*
+ * Archivo: filter_section_widget.dart
+ * Descripción: Este archivo contiene la clase correspondiente al filtro de las estadisticas de los jugadores.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Filtros de Partidos',
+      title: 'Filtrado de Partidos',
       home: ParentWidget(),
     );
   }
@@ -22,20 +28,21 @@ class ParentWidget extends StatefulWidget {
 }
 
 class _ParentWidgetState extends State<ParentWidget> {
-  String _season = '2024'; // Valor inicial para la temporada
-  String _matchType = 'Todos'; // Valor inicial para el tipo de partido
-  bool _isSearchingExpanded = false; // Para controlar la expansión de los filtros
+  String _season = '2024'; 
+  String _matchType = 'Todos';
+  bool _isSearchingExpanded = false;
 
+  /// Función que permite actualizar los filtros correspondientes.
   void _onFilterChanged(String season, String matchType) {
     setState(() {
-      _season = season; // Actualizamos la temporada
-      _matchType = matchType; // Actualizamos el tipo de partido
-      fetchGeneralStats(_season, _matchType); // Aquí se llamaría a tu función de estadísticas
+      _season = season; 
+      _matchType = matchType;
+      fetchGeneralStats(_season, _matchType);
     });
   }
 
+  /// Función que permite buscar una serie determinada de partidos.
   void fetchGeneralStats(String season, String matchType) {
-    // Lógica para obtener las estadísticas generales según la temporada y el tipo de partido
     print('Fetching stats for season: $season and match type: $matchType');
   }
 
@@ -43,13 +50,13 @@ class _ParentWidgetState extends State<ParentWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Filtros de Partidos'),
+        title: const Text('Filtrado de Partidos'),
         actions: [
           IconButton(
             icon: Icon(_isSearchingExpanded ? Icons.arrow_upward : Icons.arrow_downward),
             onPressed: () {
               setState(() {
-                _isSearchingExpanded = !_isSearchingExpanded; // Alternar la expansión
+                _isSearchingExpanded = !_isSearchingExpanded; 
               });
             },
           ),
@@ -62,9 +69,9 @@ class _ParentWidgetState extends State<ParentWidget> {
           children: [
             if (_isSearchingExpanded) ...[
               FilterSectionStats(
-                season: _season, // Pasas el valor de la temporada actual
-                matchType: _matchType, // Pasas el valor de tipo de partido actual
-                onFilterChanged: _onFilterChanged, // Callback para cambios en los filtros
+                season: _season, 
+                matchType: _matchType,
+                onFilterChanged: _onFilterChanged, 
               ),
               const SizedBox(height: 16.0),
             ],
@@ -78,10 +85,11 @@ class _ParentWidgetState extends State<ParentWidget> {
   }
 }
 
+/// Clase para filtrar las estadisticas de los jugadores.
 class FilterSectionStats extends StatefulWidget {
-  final String season; // Temporada actual
-  final String matchType; // Tipo de partido actual
-  final Function(String, String) onFilterChanged; // Callback para cambiar filtros
+  final String season; 
+  final String matchType;
+  final Function(String, String) onFilterChanged;
 
   const FilterSectionStats({
     Key? key,
@@ -98,18 +106,18 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
   late String _season;
   late String _matchType;
 
+  /// Función para inicializar el widget padre.
   @override
   void initState() {
     super.initState();
-    // Inicializamos el estado con los valores del widget padre
     _season = widget.season;
     _matchType = widget.matchType;
   }
 
+  /// Función para actualizar el estado del widget padre
   @override
   void didUpdateWidget(FilterSectionStats oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Actualizamos el estado cuando el widget padre cambia
     if (oldWidget.season != widget.season || oldWidget.matchType != widget.matchType) {
       setState(() {
         _season = widget.season;
@@ -118,83 +126,84 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
     }
   }
 
+  /// Función para cambiar la temporada buscada.
   void _onSeasonChanged(String? newSeason) {
     if (newSeason != null) {
       setState(() {
-        _season = newSeason; // Actualizamos el estado de la temporada
-        widget.onFilterChanged(_season, _matchType); // Aplicamos el filtro
+        _season = newSeason; 
+        widget.onFilterChanged(_season, _matchType); 
       });
     }
   }
 
+  /// Función para cambiar el tipo de partido buscado.
   void _onMatchTypeChanged(String? newMatchType) {
     if (newMatchType != null) {
       setState(() {
-        _matchType = newMatchType; // Actualizamos el estado del tipo de partido
-        widget.onFilterChanged(_season, _matchType); // Aplicamos el filtro
+        _matchType = newMatchType; 
+        widget.onFilterChanged(_season, _matchType); 
       });
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return SingleChildScrollView(  // Envuelve todo en SingleChildScrollView para hacer scroll si es necesario
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),  // Añade padding alrededor del contenido
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Filtrar Partidos',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8.0),
-
-          // Dropdown para seleccionar la temporada
-          DropdownButtonFormField<String>(
-            value: _season, // Usamos la variable local de temporada
-            decoration: const InputDecoration(
-              labelText: 'Temporada',
-              border: OutlineInputBorder(),
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(  
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),  
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Filtrar Partidos',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            onChanged: _onSeasonChanged, // Usamos el método para manejar el cambio de temporada
-            items: <String>['2024', '2023', '2022', 'Todos']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
 
-          // Dropdown para seleccionar el tipo de partido
-          DropdownButtonFormField<String>(
-            value: _matchType, // Usamos la variable local del tipo de partido
-            decoration: const InputDecoration(
-              labelText: 'Tipo de Partido',
-              border: OutlineInputBorder(),
+            // Dropdown para seleccionar la temporada
+            DropdownButtonFormField<String>(
+              value: _season, 
+              decoration: const InputDecoration(
+                labelText: 'Temporada',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: _onSeasonChanged, 
+              items: <String>['2024', '2023', '2022', 'Todos']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
-            onChanged: _onMatchTypeChanged, // Usamos el método para manejar el cambio de tipo de partido
-            items: <String>[
-              'Todos',
-              'Liga',
-              'Copa',
-              'Supercopa',
-              'Playoffs',
-              'Amistoso',
-            ].map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16.0),
-        ],
+            const SizedBox(height: 8.0),
+
+            // Dropdown para seleccionar el tipo de partido
+            DropdownButtonFormField<String>(
+              value: _matchType, 
+              decoration: const InputDecoration(
+                labelText: 'Tipo de Partido',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: _onMatchTypeChanged, 
+              items: <String>[
+                'Todos',
+                'Liga',
+                'Copa',
+                'Supercopa',
+                'Playoffs',
+                'Amistoso',
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16.0),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 }

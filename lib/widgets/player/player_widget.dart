@@ -4,10 +4,6 @@
  *              la base de datos a nivel de jugadores, como añadir jugador, listar jugadores, etc.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Dependencias:
- * - cloud_firestore: Con el objetivo de realizar las operaciones en Firebase.
- * - provider: Para la gestión del estado del equipo seleccionado.
  */
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:CoachCraft/screens/team_management/team_conv_player_screen.dart';

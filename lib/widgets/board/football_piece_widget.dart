@@ -1,3 +1,9 @@
+/*
+ * Archivo: football_piece_widget.dart
+ * Descripción: Este archivo contiene la clase correspondiente a la fichas/tazos de la pizarra.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 
 class FootballPiece extends StatefulWidget {
@@ -18,8 +24,8 @@ class _FootballPieceState extends State<FootballPiece> {
   late Offset _position;
 
   // Tamaño mínimo y máximo de la pieza
-  static const double minPieceSize = 1; // tamaño mínimo en píxeles
-  static const double maxPieceSize = 300; // tamaño máximo en píxeles
+  static const double minPieceSize = 1; 
+  static const double maxPieceSize = 300;
 
   @override
   void initState() {
@@ -34,7 +40,7 @@ class _FootballPieceState extends State<FootballPiece> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     // Calcular el tamaño de la pieza en función de la altura de la pantalla
-    double pieceSize = screenHeight * 0.125; // 5% de la altura de la pantalla
+    double pieceSize = screenHeight * 0.125; 
 
     // Ajustar el tamaño entre el tamaño mínimo y máximo
     pieceSize = pieceSize.clamp(minPieceSize, maxPieceSize);
@@ -60,9 +66,10 @@ class _FootballPieceState extends State<FootballPiece> {
           });
         },
         child: Image.asset(
+          // Tamaño calculado dependiente de la pantalla
           widget.image,
-          width: pieceSize, // Tamaño calculado dependiente de la pantalla
-          height: pieceSize, // Tamaño calculado dependiente de la pantalla
+          width: pieceSize, 
+          height: pieceSize, 
         ),
       ),
     );

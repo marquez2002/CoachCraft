@@ -1,7 +1,13 @@
+/*
+ * Archivo: ball_widget.dart
+ * Descripción: Este archivo contiene la clase correspondiente a la bola de la pizarra.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 
 class Ball extends StatefulWidget {
-  final Offset initialPosition; // Posición inicial del balón
+  final Offset initialPosition; 
   final String image;
 
   const Ball({
@@ -17,14 +23,13 @@ class Ball extends StatefulWidget {
 class _BallState extends State<Ball> {
   late Offset _position;
 
-  // Tamaño mínimo y máximo del balón
-  static const double minBallSize = 1; // tamaño mínimo en píxeles
-  static const double maxBallSize = 300; // tamaño máximo en píxeles
+  static const double minBallSize = 1; 
+  static const double maxBallSize = 300;
 
   @override
   void initState() {
     super.initState();
-    _position = widget.initialPosition; // Establece la posición inicial
+    _position = widget.initialPosition;
   }
 
   @override
@@ -33,8 +38,7 @@ class _BallState extends State<Ball> {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
 
-    // Calcular el tamaño del balón en función de la altura de la pantalla
-    double ballSize = screenHeight * 0.07; // 10% de la altura de la pantalla
+    double ballSize = screenHeight * 0.07; 
 
     // Ajustar el tamaño entre el tamaño mínimo y máximo
     ballSize = ballSize.clamp(minBallSize, maxBallSize);
@@ -60,9 +64,10 @@ class _BallState extends State<Ball> {
           });
         },
         child: Image.asset(
+          // Tamaño calculado dependiente de la pantalla
           widget.image,
-          width: ballSize, // Tamaño calculado dependiente de la pantalla
-          height: ballSize, // Tamaño calculado dependiente de la pantalla
+          width: ballSize, 
+          height: ballSize,
         ),
       ),
     );

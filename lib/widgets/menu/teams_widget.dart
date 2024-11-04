@@ -1,3 +1,9 @@
+/*
+ * Archivo: teams_widget.dart
+ * Descripción: Este archivo contiene la definición de la clase del menú de los equipos que tienen los usuarios.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/models/teams.dart';
 import 'package:CoachCraft/provider/team_provider.dart'; 
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';
@@ -27,7 +33,8 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     super.initState();
     _loadUserTeams(); 
   }
-
+  
+  /// Función que permite cargas los equipos a los que esta asociado un determinado usuario.
   Future<void> _loadUserTeams() async {
     try {
       final teams = await _teamService.loadUserTeams(); 
@@ -42,6 +49,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     }
   }
 
+  /// Función para añadir un equipo al sistema.
   Future<void> _addTeam() async {
     String teamName = _teamNameController.text.trim(); 
     if (teamName.isNotEmpty) {
@@ -60,6 +68,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     }
   }
 
+  /// Función para añadir un usuario a un determinado equipo.
   Future<void> _joinTeam() async {
     String teamCode = _teamCodeController.text.trim(); 
 
@@ -82,6 +91,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     }
   }
 
+  /// Función para copiar un determinado contenido.
   Future<void> _copyToClipboard(String teamId, String role) async {
     String code = _teamService.generateTeamCode(teamId, role); 
     await Clipboard.setData(ClipboardData(text: code)); 
@@ -90,7 +100,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
     );
   }
 
-  // Nueva función para salir del equipo
+  /// Función para que un usuario salga de un equipo.
   Future<void> _leaveTeam(String teamId) async {
     try {
       await _teamService.leaveTeam(teamId); 
@@ -240,9 +250,9 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                             );
                           },
                         );
-
+                        // Salir del equipo
                         if (confirmDelete) {
-                          await _leaveTeam(team.id); // Salir del equipo
+                          await _leaveTeam(team.id); 
                         }
                       },
                     ),

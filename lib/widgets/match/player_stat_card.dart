@@ -1,3 +1,9 @@
+/*
+ * Archivo: player_stat_card.dart
+ * Descripción: Este archivo contiene la clase correspondiente a la tabla de las estadisticas de cada jugador.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/match_provider.dart';
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,6 +27,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
     fetchPlayerStats();
   }
 
+  /// Función correspondiente a la búsqueda de las estadisticas de un jugador.
   Future<void> fetchPlayerStats() async {
     setState(() => isLoading = true);
 
@@ -37,7 +44,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
           .get();
 
       playerStats = snapshot.docs.map((doc) => {
-          'id': doc.id, // Asegúrate de incluir el ID del documento
+          'id': doc.id, 
           ...doc.data() as Map<String, dynamic>
       }).toList();
     } catch (e) {
@@ -49,6 +56,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
     }
   }
 
+  /// Función para mostrar el cuadro de texto para modificar las estadísticas.
   void _showStatDialog(BuildContext context, String playerId, String statKey, int currentValue) {
     final TextEditingController controller = TextEditingController(text: currentValue.toString());
 
@@ -56,7 +64,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text('Actualizar $statKey'),
+          title: Text('Actualizar ${_getStatTitle(statKey)}'), 
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -65,7 +73,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.remove),
+                    icon: const Icon(Icons.remove),
                     onPressed: () {
                       int newValue = int.parse(controller.text) > 0 ? int.parse(controller.text) - 1 : 0;
                       controller.text = newValue.toString();
@@ -84,7 +92,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.add),
+                    icon: const Icon(Icons.add),
                     onPressed: () {
                       int newValue = int.parse(controller.text) + 1;
                       controller.text = newValue.toString();
@@ -100,7 +108,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                 int? newValue = int.tryParse(controller.text);
                 if (newValue == null || newValue < 0) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text("Ingrese un número válido mayor o igual a 0")),
+                    const SnackBar(content: Text("Ingrese un número válido mayor o igual a 0")),
                   );
                 } else {
                   int change = newValue - currentValue;
@@ -121,12 +129,38 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
     );
   }
 
+  // Función para obtener un título específico para cada estadística
+  String _getStatTitle(String statKey) {
+    switch (statKey) {
+      case 'goals':
+        return 'goles';
+      case 'assists':
+        return 'asistencias';
+      case 'fouls':
+        return 'faltas';
+      case 'shotsReceived':
+        return 'tiros recibidos';
+      case 'goalsReceived':
+        return 'goles recibidos';
+      case 'saves':
+        return 'paradas';
+      case 'yellowCards':
+        return 'tarjetas amarillas';         
+      case 'redCards':
+        return 'tarjetas rojas';
+      default:
+        return ' ';
+    }
+  }
+
+  /// Función que permite mostrar la snackBar
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
+  /// Función que permtie actualizar las estadisticas de la base de datos.
   Future<void> _updateStatInDB(BuildContext context, String playerId, String statKey, int change) async {
     try {
       String? teamId = await getTeamId(context);
@@ -146,7 +180,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
       if (playerDoc.exists) {
         // Actualizar el campo específico con el cambio
         await playerRef.update({statKey: FieldValue.increment(change)});
-        await fetchPlayerStats(); // Refrescar estadísticas después de la actualización
+        await fetchPlayerStats(); 
       } else {
         throw Exception('El documento del jugador no existe.');
       }
@@ -167,6 +201,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
+
                       // Tabla para porteros
                       Center(
                         child: Column(
@@ -176,9 +211,9 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             SizedBox(
-                              height: 150, // Altura limitada para hacer scroll vertical
+                              height: 150, 
                               child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal, // Scroll horizontal
+                                scrollDirection: Axis.horizontal, 
                                 child: DataTable(
                                   columns: const [
                                     DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
@@ -254,7 +289,8 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8), // Espaciador entre tablas
+                      const SizedBox(height: 8), 
+                
                       // Tabla para el resto de los jugadores
                       Center(
                         child: Column(
@@ -264,9 +300,9 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             SizedBox(
-                              height: 400, // Altura limitada para hacer scroll vertical
+                              height: 400, 
                               child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal, // Scroll horizontal
+                                scrollDirection: Axis.horizontal, 
                                 child: DataTable(
                                   columns: const [
                                     DataColumn(label: Center(child: Icon(Icons.person))), // Nombre
@@ -343,6 +379,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
     );
   }
 
+  /// Función para obtener el id de un determinado equipo.
   Future<String?> getTeamId(BuildContext context) async {
     try {
       String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;

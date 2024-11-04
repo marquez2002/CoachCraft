@@ -43,8 +43,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             width: double.infinity,
             height: double.infinity,
           ),
-          // Usar SingleChildScrollView para evitar overflow
-          Center( // Centrar el contenido en la pantalla
+          Center( 
             child: SingleChildScrollView(
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 60),

@@ -1,3 +1,9 @@
+/*
+ * Archivo: menu_widget_futsal_team.dart
+ * Descripción: Este archivo contiene la definición de la clase del menú del equipo de fútbol sala.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/screens/team_management/team_add_player_screen.dart';
 import 'package:CoachCraft/screens/team_management/team_data_team_screen.dart';
 import 'package:CoachCraft/screens/team_management/team_list_player_screen.dart';
@@ -42,7 +48,7 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: SizedBox(
-                          width: screenSize.width * 0.7, // Width is 70% of the screen width
+                          width: screenSize.width * 0.7, 
                           child: ElevatedButton(
                             onPressed: () {
                               // Acción al presionar el botón con navegación a la pantalla correspondiente
@@ -55,13 +61,13 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
                               foregroundColor: Colors.black,
                               backgroundColor: Colors.white,
                               padding: EdgeInsets.symmetric(
-                                vertical: screenSize.height * 0.02, // Ajusta la altura del botón
+                                vertical: screenSize.height * 0.02, 
                               ),
                             ),
                             child: Text(
                               data['label'],
                               style: const TextStyle(
-                                fontSize: 20, // Ajusta el tamaño de fuente
+                                fontSize: 20, 
                               ),
                             ),
                           ),

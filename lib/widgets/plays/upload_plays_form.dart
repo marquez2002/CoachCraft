@@ -1,3 +1,9 @@
+/*
+ * Archivo: upload_plays_form.dart
+ * Descripción: Este archivo contiene un servicio que permite subir las jugadas que se guardan en el sistema.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,8 +35,8 @@ class UploadForm extends StatefulWidget {
 class _UploadFormState extends State<UploadForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  String? _selectedType; // Tipo de jugada: ataque o defensa
-  Uint8List? _videoBytes; // Almacena los bytes del video seleccionado
+  String? _selectedType; 
+  Uint8List? _videoBytes;
 
   // Función para seleccionar un video
   Future<void> _selectVideo() async {
@@ -70,7 +76,7 @@ class _UploadFormState extends State<UploadForm> {
         return null;
       }
     }
-    return null; // Si no hay video, retornar null
+    return null; 
   }
 
   Future<void> _handleSubmit() async {
@@ -80,7 +86,7 @@ class _UploadFormState extends State<UploadForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Por favor, selecciona un video.')),
         );
-        return; // Salir de la función si no hay video
+        return;
       }
 
       String? videoUrl = await _uploadVideo();
@@ -108,12 +114,10 @@ class _UploadFormState extends State<UploadForm> {
             // Limpiar los campos después de guardar
             _nameController.clear();
             setState(() {
-              _videoBytes = null; // Limpiar los bytes del video
-              _selectedType = null; // Limpiar tipo de jugada
-            });
-
-            // Aquí se puede forzar la recarga del contenido si se requiere
-            // setState(() {}); // Este es opcional ya que la pantalla se debería actualizar automáticamente si se utiliza un StreamBuilder.
+              _videoBytes = null; 
+              _selectedType = null;
+            });        
+          
           } else {
             // Mostrar error si no se obtiene el teamId
             ScaffoldMessenger.of(context).showSnackBar(

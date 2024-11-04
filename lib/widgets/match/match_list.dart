@@ -1,3 +1,9 @@
+/*
+ * Archivo: match_list.dart
+ * Descripción: Este archivo contiene la clase correspondiente a la lista de los partidos que corresponden con las caracteristicas del filtrado.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +16,7 @@ class MatchList extends StatelessWidget {
 
   const MatchList({Key? key, required this.filteredMatches, this.isLoading = false}) : super(key: key);
 
+  /// Función que permite obtener el fondo de la tarjeta en función del tipo de partido.
   String getBackgroundImage(String matchType) {
     switch (matchType) {
       case 'Amistoso':
@@ -47,11 +54,12 @@ class MatchList extends StatelessWidget {
                 ),
                 const SizedBox(height: 8.0),
 
+                // En caso de que no haya partidos, indica un mensaje avisando de que no hay partidos disponibles.
                 FutureBuilder(
                   future: Future.delayed(const Duration(seconds: 2)),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(); // Empty space while waiting
+                      return const SizedBox(); 
                     }
                     if (filteredMatches.isEmpty) {
                       return const Padding(
