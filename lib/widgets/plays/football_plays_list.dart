@@ -1,35 +1,26 @@
-/*
- * Archivo: football_plays_list.dart
- * Descripción: Este archivo contiene un servicio que permite listar las jugadas que se guardan en el sistema.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:CoachCraft/screens/board/video_player_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-// Función para obtener el teamId
 Future<String?> getTeamId() async {
   try {
-    // Obtener el primer documento de la colección 'teams'
     QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('teams').limit(1).get();
     
     if (teamSnapshot.docs.isNotEmpty) {
-      // Retornar el ID del primer equipo encontrado
       return teamSnapshot.docs.first.id;
     } else {
-      throw Exception('No se encontraron equipos'); 
+      throw Exception('No se encontraron equipos');
     }
   } catch (e) {
-    throw Exception('Error al obtener el teamId: $e'); 
+    throw Exception('Error al obtener el teamId: $e');
   }
 }
 
 class VideoList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Función que permite modificar el fondo de las tarjetas de los videos.
+  // Función que permite modificar el fondo de las tarjetas de los videos.
   String getBackgroundImage(String type) {
     switch (type) {
       case 'ataque':
@@ -41,11 +32,11 @@ class VideoList extends StatelessWidget {
     }
   }
 
-  /// Función que permite modificar el icono que aparece en las tarjetas de los videos.
+  // Función que permite modificar el icono que aparece en las tarjetas de los videos.
   IconData getIconForType(String type) {
     switch (type) {
       case 'ataque':
-        return Icons.sports_soccer; 
+        return Icons.sports_soccer;
       case 'defensa':
         return Icons.shield_rounded;
       default:
@@ -53,7 +44,7 @@ class VideoList extends StatelessWidget {
     }
   }
 
-  /// Función que permite modificar videos.
+  // Función que permite modificar videos.
   Future<void> _deleteVideo(BuildContext context, String documentId, String videoUrl) async {
     try {
       // Eliminar el video de Firebase Storage
@@ -85,24 +76,24 @@ class VideoList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: getTeamId(), 
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      future: getTeamId(),
+      builder: (context, teamIdSnapshot) {
+        if (teamIdSnapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+        if (teamIdSnapshot.hasError) {
+          return Center(child: Text('Error: ${teamIdSnapshot.error}'));
         }
 
         // Verifica si se obtuvo un ID de equipo
-        if (!snapshot.hasData || snapshot.data == null) {
+        if (!teamIdSnapshot.hasData || teamIdSnapshot.data == null) {
           return const Center(child: Text('No hay equipos disponibles.'));
         }
 
-        String teamId = snapshot.data!;
+        String teamId = teamIdSnapshot.data!;
 
-        // Ahora puedes usar el teamId para crear el StreamBuilder
+        // Ahora podemos usar el teamId para crear el StreamBuilder
         return StreamBuilder<QuerySnapshot>(
           stream: _firestore
               .collection('teams')
@@ -120,36 +111,16 @@ class VideoList extends StatelessWidget {
 
             final videos = snapshot.data!.docs;
 
-            double screenWidth = MediaQuery.of(context).size.width;
-
-            // Calcula cuántas tarjetas se pueden mostrar en una fila
-            int crossAxisCount;
-            if (screenWidth < 600) {
-              crossAxisCount = 2; 
-            } else {
-              crossAxisCount = 4; 
-            }
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Jugadas Guardadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8.0),
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount, 
-                      crossAxisSpacing: 8.0,
-                      mainAxisSpacing: 8.0,
-                      childAspectRatio: 1.2,
-                    ),
-                    itemCount: videos.length,
-                    itemBuilder: (context, index) {
+            return CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
                       final plays = videos[index];
                       final nombre = plays['name'];
                       final tipo = plays['type'];
-                      final videoUrl = plays['videoUrl']; 
-                      final documentId = plays.id; 
+                      final videoUrl = plays['videoUrl'];
+                      final documentId = plays.id;
 
                       return Card(
                         child: Container(
@@ -204,6 +175,7 @@ class VideoList extends StatelessWidget {
                         ),
                       );
                     },
+                    childCount: videos.length,
                   ),
                 ),
               ],

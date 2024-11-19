@@ -15,50 +15,48 @@ class _RecordingPlayScreenState extends State<RecordingPlayScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          // SliverAppBar con el botón de acción
           SliverAppBar(
-            floating: true, 
-            snap: true, 
+            floating: true,
+            snap: true,
             title: const Text('Jugadas'),
             actions: [
               IconButton(
-                icon: const Icon(Icons.add), 
+                icon: const Icon(Icons.add),
                 onPressed: () {
                   setState(() {
-                    _isExpanded = !_isExpanded; 
+                    _isExpanded = !_isExpanded;
                   });
                 },
               ),
             ],
           ),
 
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Sección de formulario de carga
-                      if (_isExpanded) // Solo muestra el formulario si está expandido
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Subida de Jugadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 1.0),
-                            UploadForm(), // Muestra el formulario de subida de jugadas
-                            const SizedBox(height: 1.0),
-                          ],
-                        ),
-                      // Lista de videos filtrados
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.7, // Puedes ajustar el tamaño
-                        child: VideoList(), // Llama a VideoList aquí
-                      ),
-                    ],
-                  ),
+          // Si el formulario de subida está expandido, lo mostramos aquí
+          if (_isExpanded)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Subida de Jugadas',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8.0),
+                    UploadForm(), // Widget de formulario para subir jugadas
+                    const SizedBox(height: 16.0),
+                  ],
                 ),
-              ],
+              ),
+            ),
+
+          // Lista de videos usando SliverToBoxAdapter
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6, // Establecer altura para evitar problemas de desbordamiento
+              child: VideoList(), // Este widget contiene la lista de videos
             ),
           ),
         ],

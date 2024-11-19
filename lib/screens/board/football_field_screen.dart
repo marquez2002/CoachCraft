@@ -84,49 +84,6 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
     }
   }
 
-  /*
-  // Función para empezar a grabar la pantalla.
-  Future<void> _startRecording() async {
-    try {
-      // Verifica el permiso del micrófono
-      if (await Permission.microphone.request().isGranted) {
-        // Verifica el permiso para grabar la pantalla
-        if (await Permission.mediaLibrary.request().isGranted) {
-          // Resto de tu código para iniciar la grabación...
-        } else {
-          print('Permiso de grabación de pantalla no concedido');
-        }
-      } else {
-        print('Permiso de audio no concedido');
-      }
-    } catch (e) {
-      print('Error general al intentar grabar: $e');
-    }
-  }
-
-  Future<void> _checkPermissions() async {
-    if (await Permission.microphone.request().isGranted &&
-        await Permission.mediaLibrary.request().isGranted) {
-      print('Permisos concedidos');
-    } else {
-      print('Permisos no concedidos');
-    }
-  }
-
-  // Función para detener a grabar la pantalla.
-  Future<void> _stopRecording() async {
-    try {
-      // Detiene la grabación
-      await FlutterScreenRecording.stopRecordScreen;
-      setState(() {
-        _isRecording = false;
-      });
-      print('Video grabado en: $videoPath');
-    } catch (e) {
-      print("Error al detener la grabación: $e");
-    }
-  }*/
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,11 +98,6 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
           },
         ),
         actions: [
-          /*IconButton(
-            icon: Icon(_isRecording ? Icons.stop : Icons.videocam),
-            onPressed: _isRecording ? _stopRecording : _startRecording,
-            tooltip: _isRecording ? 'Detener Grabación' : 'Iniciar Grabación',
-          ),*/
           IconButton(
             onPressed: () => _navigateToScreen(1),
             icon: const Icon(Icons.airline_stops_outlined),
@@ -154,7 +106,7 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
           IconButton(
             onPressed: () => _navigateToScreen(3),
             icon: const Icon(Icons.photo_camera),
-            tooltip: 'Ir a grabaciones',
+            tooltip: 'Ir a galeria',
           ),
           IconButton(
             onPressed: () => _navigateToScreen(2),
@@ -233,19 +185,25 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
                               children: [
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.red),
-                                  child: const Text(''),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red,
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit, // Ícono de lápiz
+                                    color: Colors.white, // Color del ícono (opcional, ajustado para contrastar)
                                   ),
                                 ),
                                 const SizedBox(height: 10), 
                                 ElevatedButton(
                                   onPressed: () => _setColor(Colors.yellow),
-                                  child: const Text(''),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.yellow,
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit, // Ícono de lápiz
+                                    color: Colors.white, // Color del ícono (opcional)
                                   ),
                                 ),
                               ],
