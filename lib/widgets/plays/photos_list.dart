@@ -83,7 +83,7 @@ class PhotosList extends StatelessWidget {
           stream: _firestore
               .collection('teams')
               .doc(teamId)
-              .collection('photos') // Cambia 'football_plays' por 'photos'
+              .collection('photos') 
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -109,7 +109,7 @@ class PhotosList extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Fotos Guardadas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(' ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8.0),
                 Expanded(
                   child: GridView.builder(

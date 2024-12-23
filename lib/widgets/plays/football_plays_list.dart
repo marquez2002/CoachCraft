@@ -124,6 +124,7 @@ class VideoList extends StatelessWidget {
 
                       return Card(
                         child: Container(
+                          height: 120,
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: AssetImage(getBackgroundImage(tipo)), 
@@ -141,7 +142,7 @@ class VideoList extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(getIconForType(tipo), size: 20, color: Colors.black),
-                                    const SizedBox(width: 8.0),
+                                    const SizedBox(width: 12.0),
                                     Text('$nombre', style: const TextStyle(fontSize: 14, color: Colors.black)),
                                   ],
                                 ),

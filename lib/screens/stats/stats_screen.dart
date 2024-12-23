@@ -154,129 +154,137 @@ class _StatsScreenState extends State<StatsScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (_isModifyExpanded) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _rivalController,
+              SingleChildScrollView( // Agrega SingleChildScrollView para hacer que el contenido sea desplazable
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, // Alinea los elementos a la izquierda si es necesario
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _rivalController,
+                            decoration: const InputDecoration(
+                              labelText: 'Rival',
+                              border: OutlineInputBorder(),
+                            ),
+                            enabled: false, // Mantiene el campo fijo
+                          ),
+                        ),
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextField(
+                            controller: _dateController,
+                            decoration: const InputDecoration(
+                              labelText: 'Fecha',
+                              border: OutlineInputBorder(),
+                            ),
+                            enabled: false, // Mantiene el campo fijo
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8.0),
+                    TextField(
+                      controller: _resultController,
                       decoration: const InputDecoration(
-                        labelText: 'Rival',
+                        labelText: 'Resultado',
                         border: OutlineInputBorder(),
                       ),
-                      enabled: false,
                     ),
-                  ),
-                  const SizedBox(width: 8.0),
-                  Expanded(
-                    child: TextField(
-                      controller: _dateController,
+                    const SizedBox(height: 8.0),
+                    DropdownButtonFormField<String>(
+                      value: _matchType,
                       decoration: const InputDecoration(
-                        labelText: 'Fecha',
+                        labelText: 'Tipo de Partido',
                         border: OutlineInputBorder(),
                       ),
-                      enabled: false, // Mantiene el campo fijo
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8.0),
-              TextField(
-                controller: _resultController,
-                decoration: const InputDecoration(
-                  labelText: 'Resultado',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8.0),
-              DropdownButtonFormField<String>(
-                value: _matchType,
-                decoration: const InputDecoration(
-                  labelText: 'Tipo de Partido',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _matchType = newValue!;
-                  });
-                },
-                items: matchTypes.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 8.0),
-              DropdownButtonFormField<String>(
-                value: _location,
-                decoration: const InputDecoration(
-                  labelText: 'Lugar del Partido',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _location = newValue!;
-                  });
-                },
-                items: locations.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _updateMatch();
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
-                      );
-                    },
-                    child: const Text('Guardar'),
-                  ),
-                  const SizedBox(width: 16.0),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final confirmDelete = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Confirmar Borrado'),
-                            content: const Text('¿Está seguro de que desea borrar este partido?'),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('Cancelar'),
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                              ),
-                              TextButton(
-                                child: const Text('Borrar'),
-                                onPressed: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (confirmDelete == true) {
-                        await _deleteMatch();
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _matchType = newValue!;
+                        });
+                      },
+                      items: matchTypes.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
                         );
-                      }
-                    },
-                    child: const Text('Borrar Partido'),
-                  ),
-                ],
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 8.0),
+                    DropdownButtonFormField<String>(
+                      value: _location,
+                      decoration: const InputDecoration(
+                        labelText: 'Lugar del Partido',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _location = newValue!;
+                        });
+                      },
+                      items: locations.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            await _updateMatch();
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                            );
+                          },
+                          child: const Text('Guardar'),
+                        ),
+                        const SizedBox(width: 16.0),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final confirmDelete = await showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Confirmar Borrado'),
+                                  content: const Text('¿Está seguro de que desea borrar este partido?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Cancelar'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('Borrar'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (confirmDelete == true) {
+                              await _deleteMatch();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (context) => MenuScreenFutsal()),
+                              );
+                            }
+                          },
+                          child: const Text('Borrar Partido'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
+
             if (_isInfoExpanded) ...[
               Wrap(
                 spacing: 20.0,

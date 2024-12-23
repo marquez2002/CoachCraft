@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:CoachCraft/widgets/plays/football_plays_list.dart';
 import 'package:CoachCraft/widgets/plays/upload_plays_form.dart';
 
+
 class RecordingPlayScreen extends StatefulWidget {
   @override
   _RecordingPlayScreenState createState() => _RecordingPlayScreenState();

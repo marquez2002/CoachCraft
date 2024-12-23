@@ -32,16 +32,4 @@ class Player {
       'peso': peso,
     };
   }
-
-  // Permite crear una instancia de Player a partir de un Map, permitiendo convertir los datos en un objeto Match
-  factory Player.fromJson(Map<String, dynamic> json) {
-    return Player(
-      nombre: json['nombre'] ?? '',
-      dorsal: json['dorsal'] ?? 0,
-      posicion: json['posicion'] ?? '',
-      edad: json['edad'] ?? 0,
-      altura: json['altura'] ?? 0.0,
-      peso: json['peso'] ?? 0.0,
-    );
-  }
 }

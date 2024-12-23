@@ -21,16 +21,4 @@ class Match {
     required this.location,
     required this.matchType,
   });
-
-  // Permite crear una instancia de Match a partir de un Map, permitiendo convertir los datos en un objeto Match
-  factory Match.fromMap(Map<String, dynamic> data, String id) {
-    return Match(
-      id: id,
-      rivalTeam: data['rivalTeam'],
-      matchDate: DateTime.parse(data['matchDate']),
-      result: data['result'],
-      location: data['location'],
-      matchType: data['matchType'],
-    );
-  }
 }

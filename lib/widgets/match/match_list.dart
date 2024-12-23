@@ -128,21 +128,25 @@ class MatchList extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center, // Centra el contenido verticalmente
+                              crossAxisAlignment: CrossAxisAlignment.center, // Centra el contenido horizontalmente
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center, // Centra los elementos del Row
                                   children: [
                                     Icon(locationIcon, size: 16),
                                     const SizedBox(width: 8.0),
-                                    Text(
-                                      'Rival: ${matchData['rivalTeam']}',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                    // Usamos Expanded para limitar el texto y aplicar el truncamiento
+                                    Expanded(
+                                      child: Text(
+                                        'Rival: ${matchData['rivalTeam']}',
+                                        overflow: TextOverflow.ellipsis, // Agrega "..." si el texto es largo
+                                        maxLines: 1,                     // Limita el texto a una línea
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
                                       ),
                                     ),
                                   ],

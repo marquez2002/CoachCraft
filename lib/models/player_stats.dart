@@ -53,23 +53,4 @@ class PlayerStats {
       'goalsReceived': goalsReceived,
     };
   }
-
-  // Permite crear una instancia de PlayerStats a partir de un Map, permitiendo convertir los datos en un objeto Match
-  factory PlayerStats.fromJson(Map<String, dynamic> json) {
-    return PlayerStats(
-      nombre: json['nombre'] ?? '',
-      posicion: json['posicion'] ?? '',
-      dorsal: json['dorsal'] ?? 0,
-      goals: json['goals'] ?? 0,
-      assists: json['assists'] ?? 0,
-      yellowCards: json['yellowCards'] ?? 0,
-      redCards: json['redCards'] ?? 0,
-      shots: json['shots'] ?? 0,
-      shotsOnGoal: json['shotsOnGoal'] ?? 0,
-      foul: json['foul'] ?? 0,
-      saves: json['saves'] ?? 0,
-      shotsReceived: json['shotsReceived'] ?? 0,
-      goalsReceived: json['goalsReceived'] ?? 0,
-    );
-  }
 }

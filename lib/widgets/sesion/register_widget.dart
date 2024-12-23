@@ -76,6 +76,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 20),
                       // Campo de texto para ingresar el correo electrónico
                       TextFormField(
+                        key: const Key('emailField'), // Agregamos la clave aquí
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
@@ -92,6 +93,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 20),
                       // Campo de texto para ingresar la contraseña
                       TextFormField(
+                        key: const Key('passwordField'), // Agregamos la clave aquí
                         controller: _passwordController,
                         obscureText: true,
                         decoration: const InputDecoration(
@@ -108,6 +110,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 20),
                       // Campo de texto para confirmar la contraseña
                       TextFormField(
+                        key: const Key('confirmPasswordField'), // Agregamos la clave aquí
                         controller: _confirmPasswordController,
                         obscureText: true,
                         decoration: const InputDecoration(
@@ -126,6 +129,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 30),
                       // Botón para registrar un nuevo usuario
                       ElevatedButton(
+                        key: const Key('registerButton'), // Agregamos la clave aquí
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             try {

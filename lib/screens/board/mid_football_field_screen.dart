@@ -128,7 +128,7 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return Image.asset(
-                    'assets/image/football_field.png',
+                    'assets/image/mid_football_field.png',
                     key: _imageKey,
                     fit: BoxFit.contain,
                     width: constraints.maxWidth,

@@ -1,29 +1,21 @@
-/*
- * Archivo: upload_photos_form.dart
- * Descripción: Este archivo contiene un servicio que permite subir las fotos que se guardan en el sistema.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:typed_data';
 
-// Función para obtener el teamId basado en un criterio (por ejemplo, el primer equipo)
+/// Función para obtener el ID del equipo (teamId)
 Future<String?> getTeamId() async {
   try {
-    // Obtener el primer documento de la colección 'teams'
     QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('teams').limit(1).get();
-    
     if (teamSnapshot.docs.isNotEmpty) {
-      // Retornar el ID del primer equipo encontrado
-      return teamSnapshot.docs.first.id;
+      return teamSnapshot.docs.first.id; // Retorna el ID del primer equipo
     } else {
-      throw Exception('No se encontraron equipos'); 
+      throw Exception('No se encontraron equipos');
     }
   } catch (e) {
-    throw Exception('Error al obtener el teamId: $e'); 
+    throw Exception('Error al obtener el teamId: $e');
   }
 }
 
@@ -35,24 +27,45 @@ class UploadPhotosForm extends StatefulWidget {
 class _UploadPhotosFormState extends State<UploadPhotosForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  String? _selectedType; 
-  Uint8List? _photoBytes;
+  String? _selectedType; // Tipo de foto
+  Uint8List? _photoBytes; // Bytes de la foto seleccionada
+  bool _isUploading = false; // Estado de carga
 
-  // Función para seleccionar una foto
+  /// Función para seleccionar una foto
   Future<void> _selectPhoto() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
+    // Solicitar permisos de almacenamiento
+    if (await Permission.storage.request().isGranted) {
+      try {
+        // Abrir selector de archivos
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+        );
 
-    if (result != null) {
-      _photoBytes = result.files.first.bytes;
-      setState(() {});
+        if (result != null && result.files.single.bytes != null) {
+          setState(() {
+            _photoBytes = result.files.single.bytes;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se seleccionó ninguna foto.')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al seleccionar la foto: $e')),
+        );
+      }
+    } else {
+      // Mostrar mensaje si el permiso es denegado
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permiso denegado. Actívelo en configuración.')),
+      );
     }
   }
 
+  /// Función para subir la foto a Firebase Storage
   Future<String?> _uploadPhoto() async {
     if (_photoBytes != null) {
-      // El nombre del archivo es simplemente un timestamp con la extensión ".jpg"
       String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       Reference storageRef = FirebaseStorage.instance.ref().child('photos/$fileName');
 
@@ -76,12 +89,12 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
         return null;
       }
     }
-    return null; 
+    return null;
   }
 
+  /// Función para manejar el envío del formulario
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
-      // Verificar si se ha seleccionado una foto
       if (_photoBytes == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Por favor, selecciona una foto.')),
@@ -89,24 +102,25 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
         return;
       }
 
+      setState(() {
+        _isUploading = true; // Activar estado de carga
+      });
+
       String? photoUrl = await _uploadPhoto();
       if (photoUrl != null) {
         try {
-          // Obtener el teamId utilizando la función getTeamId
           String? teamId = await getTeamId();
-          
           if (teamId != null) {
-            // Añadir la foto en la subcolección 'photos' del equipo correspondiente
             await FirebaseFirestore.instance.collection('teams')
-              .doc(teamId)
-              .collection('photos')
-              .add({
-                'name': _nameController.text.trim(),
-                'type': _selectedType,
-                'photoUrl': photoUrl,
-              });
-              
-            // Mostrar un mensaje de éxito
+                .doc(teamId)
+                .collection('photos')
+                .add({
+              'name': _nameController.text.trim(),
+              'type': _selectedType,
+              'photoUrl': photoUrl,
+              'timestamp': FieldValue.serverTimestamp(),
+            });
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Foto guardada con éxito')),
             );
@@ -114,23 +128,24 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
             // Limpiar los campos después de guardar
             _nameController.clear();
             setState(() {
-              _photoBytes = null; 
+              _photoBytes = null;
               _selectedType = null;
-            });        
-          
+            });
           } else {
-            // Mostrar error si no se obtiene el teamId
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('No se encontró ningún equipo')),
             );
           }
         } catch (e) {
-          // Manejo de errores al obtener el teamId o guardar la foto
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error al guardar foto: $e')),
           );
         }
       }
+
+      setState(() {
+        _isUploading = false; // Desactivar estado de carga
+      });
     }
   }
 
@@ -138,15 +153,15 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(  
+      child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0), 
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,  
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Nombre de la foto'),
+                decoration: const InputDecoration(labelText: 'Nombre de la foto'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, ingresa un nombre';
@@ -154,17 +169,17 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),  // Agrega espaciado entre los elementos
+              const SizedBox(height: 20),
               DropdownButtonFormField<String>(
                 value: _selectedType,
                 hint: const Text('Seleccionar tipo'),
-                items: [
+                items: const [
                   DropdownMenuItem(value: 'ataque', child: Text('Ataque')),
                   DropdownMenuItem(value: 'defensa', child: Text('Defensa')),
                 ],
                 onChanged: (value) {
                   setState(() {
-                    _selectedType = value; // Actualiza el tipo seleccionado
+                    _selectedType = value;
                   });
                 },
                 validator: (value) {
@@ -174,24 +189,25 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
-              // Botón para seleccionar foto
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _selectPhoto,
                   child: Text(
-                    _photoBytes != null ? 'Foto ya seleccionada' : 'Seleccionar Foto',
+                    _photoBytes != null ? 'Foto seleccionada' : 'Seleccionar Foto',
                   ),
                 ),
               ),
-              SizedBox(height: 20),  // Espaciado entre botones
-              // Botón para subir foto
+              const SizedBox(height: 20),
+              // Botón para subir la foto
               Container(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _handleSubmit,
-                  child: const Text('Subir Foto'),
+                  onPressed: _isUploading ? null : _handleSubmit, // Deshabilitar mientras se sube
+                  child: _isUploading
+                      ? const CircularProgressIndicator()
+                      : const Text('Subir Foto'),
                 ),
               ),
             ],

@@ -19,7 +19,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
           SliverAppBar(
             floating: true,
             snap: true,
-            title: const Text('Fotos'),
+            title: const Text('Imágenes'),
             actions: [
               IconButton(
                 icon: const Icon(Icons.add),
@@ -32,33 +32,33 @@ class _PhotosScreenState extends State<PhotosScreen> {
             ],
           ),
 
-          // Si el formulario de fotos está expandido, lo mostramos aquí
-          if (_isExpanded) 
+          // Si el formulario de subida está expandido, lo mostramos aquí
+          if (_isExpanded)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Subida de Fotos',
+                      'Subida de Jugadas',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 16.0),
-                    UploadPhotosForm(),
-                    const SizedBox(height: 16.0),
+                    const SizedBox(height: 8.0),
+                    UploadPhotosForm(), 
+                    const SizedBox(height: 8.0),
                   ],
                 ),
               ),
             ),
 
-          // SliverList para la lista de fotos
+          // Lista de videos usando SliverToBoxAdapter
           SliverToBoxAdapter(
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.6,  // Ajusta el tamaño según sea necesario
-              child: PhotosList(), // Asegúrate de que PhotosList tenga un tamaño definido y sea scrollable
+              height: MediaQuery.of(context).size.height * 0.6, // Establecer altura para evitar problemas de desbordamiento
+              child: PhotosList(), // Este widget contiene la lista de videos
             ),
-          )
+          ),
         ],
       ),
     );
