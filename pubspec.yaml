@@ -14,14 +14,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.6
   firebase_core: ^3.0.0
-  cloud_firestore: ^5.0.0 # Especifica una versión compatible con Firebase v9 o superior
+  cloud_firestore: ^5.0.0 
   firebase_auth: ^5.1.2
   firebase_core_web: ^2.3.0
   cloud_firestore_web: ^4.0.0
-  google_sign_in: ^6.2.1
   pdf: ^3.11.1
   printing: ^5.13.1
   firebase_storage: ^12.2.0
@@ -30,7 +28,6 @@ dependencies:
   flutter_image: ^4.1.11
   intl: ^0.19.0
   flutter_colorpicker: ^1.0.0
-  flutter_screen_recording: ^2.0.16
   path_provider: ^2.0.9
   file_picker: ^8.1.2
   url_launcher: ^6.3.0
@@ -39,7 +36,6 @@ dependencies:
   fl_chart: ^0.69.0
   permission_handler: ^11.3.1
   video_player: ^2.9.2
-  google_fonts: ^6.2.1
   firebase_auth_mocks: ^0.14.1
   fake_cloud_firestore: ^3.1.0
 
@@ -57,8 +53,6 @@ flutter:
 
   assets:
     - assets/image/
-    - assets/fonts/Roboto-Regular.ttf
-    - assets/fonts/Roboto-Bold.ttf
 
   # Si deseas agregar fuentes personalizadas, puedes hacerlo aquí.
   # Asegúrate de que las rutas de los archivos de las fuentes sean correctas.

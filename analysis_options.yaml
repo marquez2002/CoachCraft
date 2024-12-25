@@ -1,34 +1,41 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
+# Este archivo configura el analizador, que analiza estáticamente el código Dart para
+# verificar errores, advertencias y lints.
 #
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
+# Los problemas identificados por el analizador se muestran en la interfaz de usuario
+# de los IDEs que soportan Dart (https://dart.dev/tools#ides-and-editors). También puede
+# ejecutarse desde la línea de comandos mediante `flutter analyze`.
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
+# La siguiente línea activa un conjunto de lints recomendados para apps Flutter,
+# paquetes y plugins, diseñados para fomentar buenas prácticas de programación.
 include: package:flutter_lints/flutter.yaml
 
 linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
+  # Las reglas de lint aplicadas a este proyecto pueden ser personalizadas en la
+  # siguiente sección para desactivar reglas del archivo `package:flutter_lints/flutter.yaml`
+  # o para habilitar reglas adicionales. Una lista de todas las lints disponibles
+  # y su documentación está publicada en https://dart.dev/lints.
+  
   rules:
+    # Regla desactivada: se desactiva la recomendación de usar constructores `const` cuando no es necesario.
     prefer_const_constructors: false
-    prefer_final_fields: false
-    use_key_in_widget_constructors: false
-    prefer_const_literals_to_create_immutables: false
-    prefer_const_constructors_in_immutables: false
-    avoid_print: false
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
-# Additional information about this file can be found at
+    # Regla desactivada: se desactiva la recomendación de usar `final` en los campos cuando no se cambian.
+    prefer_final_fields: false
+
+    # Regla desactivada: se desactiva la recomendación de usar `Key` en los constructores de widgets.
+    use_key_in_widget_constructors: false
+
+    # Regla desactivada: se desactiva la recomendación de preferir literales constantes para crear colecciones inmutables.
+    prefer_const_literals_to_create_immutables: false
+
+    # Regla desactivada: se desactiva la recomendación de usar `const` en los parámetros inmutables.
+    prefer_const_constructors_in_immutables: false
+
+    # Regla desactivada: se desactiva la recomendación de evitar el uso de `print()` en el código.
+    avoid_print: false
+
+    # Descomentado para habilitar la recomendación de usar comillas simples en lugar de dobles.
+    prefer_single_quotes: true
+
+# Información adicional sobre este archivo se puede encontrar en:
 # https://dart.dev/guides/language/analysis-options
