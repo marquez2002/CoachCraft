@@ -1,1 +1,66 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"coachcraft","appId":"1:201135652207:android:5da8f43095d4884691fc9a","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"coachcraft","configurations":{"android":"1:201135652207:android:5da8f43095d4884691fc9a","ios":"1:201135652207:ios:0ad8ad990738209891fc9a","macos":"1:201135652207:ios:0ad8ad990738209891fc9a","web":"1:201135652207:web:ae22a721acd15a6b91fc9a","windows":"1:201135652207:web:c2f0afad4c2483c291fc9a"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "coachcraft",
+          "appId": "1:201135652207:android:5da8f43095d4884691fc9a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "coachcraft",
+          "configurations": {
+            "android": "1:201135652207:android:5da8f43095d4884691fc9a",
+            "ios": "1:201135652207:ios:0ad8ad990738209891fc9a",
+            "macos": "1:201135652207:ios:0ad8ad990738209891fc9a",
+            "web": "1:201135652207:web:ae22a721acd15a6b91fc9a",
+            "windows": "1:201135652207:web:c2f0afad4c2483c291fc9a"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "apphosting": {
+      "port": 5002,
+      "rootDirectory": "./"
+    },
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "database": {
+      "port": 9000
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "pubsub": {
+      "port": 8085
+    },
+    "storage": {
+      "port": 9199
+    },
+    "eventarc": {
+      "port": 9299
+    },
+    "dataconnect": {
+      "port": 9399,
+      "dataDir": "dataconnect/.dataconnect/pgliteData"
+    },
+    "tasks": {
+      "port": 9499
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  }
+}
