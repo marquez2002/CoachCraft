@@ -1,9 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 
 /// Función para obtener el ID del equipo (teamId)
 Future<String?> getTeamId() async {
@@ -33,63 +33,102 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
 
   /// Función para seleccionar una foto
   Future<void> _selectPhoto() async {
-    // Solicitar permisos de almacenamiento
-    if (await Permission.storage.request().isGranted) {
-      try {
-        // Abrir selector de archivos
-        FilePickerResult? result = await FilePicker.platform.pickFiles(
-          type: FileType.image,
-        );
+  try {
+    if (kIsWeb) {
+      // Web: Usa FilePicker para seleccionar la foto sin especificar un filtro personalizado
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image, // Usa FileType.image para seleccionar solo imágenes
+      );
 
-        if (result != null && result.files.single.bytes != null) {
-          setState(() {
-            _photoBytes = result.files.single.bytes;
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se seleccionó ninguna foto.')),
-          );
-        }
-      } catch (e) {
+      if (result != null && result.files.single.bytes != null) {
+        setState(() {
+          _photoBytes = result.files.single.bytes;
+        });
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al seleccionar la foto: $e')),
+          const SnackBar(content: Text('No se seleccionó ninguna foto.')),
         );
       }
     } else {
-      // Mostrar mensaje si el permiso es denegado
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Permiso denegado. Actívelo en configuración.')),
-      );
-    }
-  }
+      // Android/iOS: Usa ImagePicker para seleccionar una foto
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-  /// Función para subir la foto a Firebase Storage
-  Future<String?> _uploadPhoto() async {
-    if (_photoBytes != null) {
-      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      Reference storageRef = FirebaseStorage.instance.ref().child('photos/$fileName');
-
-      try {
-        UploadTask uploadTask = storageRef.putData(_photoBytes!);
-        TaskSnapshot snapshot = await uploadTask;
-
-        if (snapshot.state == TaskState.success) {
-          String downloadUrl = await snapshot.ref.getDownloadURL();
-          return downloadUrl;
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error al subir la foto')),
-          );
-          return null;
-        }
-      } catch (e) {
+      if (pickedFile != null) {
+        setState(() async {
+          _photoBytes = await pickedFile.readAsBytes();
+        });
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir la foto: $e')),
+          const SnackBar(content: Text('No se seleccionó ninguna foto.')),
         );
-        return null;
       }
     }
-    return null;
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error al seleccionar la foto: $e')),
+    );
+  }
+}
+
+
+
+  Future<String?> uploadPhoto() async {
+    Uint8List? photoBytes;
+    String? fileName;
+
+    try {
+      // Detecta la plataforma
+      if (kIsWeb) {
+        // Web: Usa el FilePicker para seleccionar la foto
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.image, // Solo permite seleccionar imágenes
+          allowedExtensions: ['jpg', 'png'], // Restricción a JPG y PNG
+        );
+
+        if (result != null && result.files.single.bytes != null) {
+          photoBytes = result.files.single.bytes;
+          fileName = result.files.single.name; // Usa el nombre original del archivo
+        } else {
+          print("No se seleccionó ninguna imagen.");
+          return null;
+        }
+      } else {
+        // Android/iOS: Usa ImagePicker para seleccionar una foto
+        final picker = ImagePicker();
+        final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+        if (pickedFile != null) {
+          photoBytes = await pickedFile.readAsBytes();
+          fileName = '${DateTime.now().millisecondsSinceEpoch}.${pickedFile.path.split('.').last}';
+        } else {
+          print("No se seleccionó ninguna imagen.");
+          return null;
+        }
+      }
+
+      // Asegúrate de que hay datos para subir
+      if (photoBytes == null || fileName == null) {
+        print("No se pudo obtener los datos de la imagen.");
+        return null;
+      }
+
+      // Sube la imagen a Firebase Storage
+      final Reference storageRef = FirebaseStorage.instance.ref().child('photos/$fileName');
+      final UploadTask uploadTask = storageRef.putData(photoBytes);
+
+      final TaskSnapshot snapshot = await uploadTask;
+      if (snapshot.state == TaskState.success) {
+        final String downloadUrl = await snapshot.ref.getDownloadURL();
+        return downloadUrl;
+      } else {
+        print("Error al subir la imagen. Estado: ${snapshot.state}");
+        return null;
+      }
+    } catch (e) {
+      print("Error durante la carga de la imagen: $e");
+      return null;
+    }
   }
 
   /// Función para manejar el envío del formulario
@@ -106,7 +145,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
         _isUploading = true; // Activar estado de carga
       });
 
-      String? photoUrl = await _uploadPhoto();
+      String? photoUrl = await uploadPhoto();
       if (photoUrl != null) {
         try {
           String? teamId = await getTeamId();

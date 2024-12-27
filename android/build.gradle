@@ -6,6 +6,11 @@ allprojects {
     }
 }
 
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"    
+    project.ext.kotlin_version = "1.8.22"
+}
+
 // Configuraciones específicas del proyecto raíz
 rootProject.buildDir = '../build'
 subprojects {
@@ -13,8 +18,4 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(':app')
-}
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
 }

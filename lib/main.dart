@@ -1,7 +1,6 @@
 import 'package:CoachCraft/provider/match_provider.dart';
 import 'package:CoachCraft/provider/team_provider.dart';
-import 'package:CoachCraft/screens/menu/home_screen.dart'; // Pantalla principal
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:CoachCraft/screens/menu/home_screen.dart'; 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +12,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
   
   // Orientación horizontal
