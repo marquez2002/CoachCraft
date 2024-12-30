@@ -138,14 +138,17 @@ class MatchList extends StatelessWidget {
                                     const SizedBox(width: 8.0),
                                     // Usamos Expanded para limitar el texto y aplicar el truncamiento
                                     Expanded(
-                                      child: Text(
-                                        'Rival: ${matchData['rivalTeam']}',
-                                        overflow: TextOverflow.ellipsis, // Agrega "..." si el texto es largo
-                                        maxLines: 1,                     // Limita el texto a una línea
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'Rival: ${matchData['rivalTeam']}',
+                                          overflow: TextOverflow.ellipsis, 
+                                          maxLines: 1,                     
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
                                         ),
                                       ),
                                     ),

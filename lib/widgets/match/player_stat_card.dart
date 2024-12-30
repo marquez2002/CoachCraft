@@ -191,6 +191,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
     }
   }
 
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -378,6 +379,8 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
       ),
     );
   }
+
+
 
   /// Función para obtener el id de un determinado equipo.
   Future<String?> getTeamId(BuildContext context) async {

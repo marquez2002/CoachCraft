@@ -90,7 +90,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
           photoBytes = result.files.single.bytes;
           fileName = result.files.single.name; // Usa el nombre original del archivo
         } else {
-          print("No se seleccionó ninguna imagen.");
+          print('No se seleccionó ninguna imagen.');
           return null;
         }
       } else {
@@ -102,14 +102,14 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
           photoBytes = await pickedFile.readAsBytes();
           fileName = '${DateTime.now().millisecondsSinceEpoch}.${pickedFile.path.split('.').last}';
         } else {
-          print("No se seleccionó ninguna imagen.");
+          print('No se seleccionó ninguna imagen.');
           return null;
         }
       }
 
       // Asegúrate de que hay datos para subir
-      if (photoBytes == null || fileName == null) {
-        print("No se pudo obtener los datos de la imagen.");
+      if (photoBytes == null) {
+        print('No se pudo obtener los datos de la imagen.');
         return null;
       }
 

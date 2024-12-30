@@ -148,7 +148,7 @@ class _StatsScreenState extends State<StatsScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -305,16 +305,9 @@ class _StatsScreenState extends State<StatsScreen> {
               ),
             ],
             const SizedBox(height: 8.0),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SizedBox(
-                    height: 140,
-                    child: PlayerStatTable(),
-                  );
-                },
+              Expanded(
+                child: PlayerStatTable(),
               ),
-            ),
           ],
         ),
       ),

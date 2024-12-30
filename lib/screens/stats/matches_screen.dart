@@ -122,7 +122,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                       ],
                       // Lista de Partidos Filtrados
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.7, // Ajuste dinámico del tamaño
+                        height: MediaQuery.of(context).size.height, // Ajuste dinámico del tamaño
                         child: MatchList(filteredMatches: _filteredMatches),
                       ),
                     ],

@@ -53,6 +53,8 @@ flutter:
 
   assets:
     - assets/image/
+    - assets/fonts/Roboto-Regular.ttf
+    - assets/fonts/Roboto-Bold.ttf
 
   # Si deseas agregar fuentes personalizadas, puedes hacerlo aquí.
   # Asegúrate de que las rutas de los archivos de las fuentes sean correctas.

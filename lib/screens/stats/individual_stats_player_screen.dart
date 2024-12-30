@@ -69,6 +69,9 @@ class _IndividualStatsPlayerScreenState extends State<IndividualStatsPlayerScree
 
   @override
   Widget build(BuildContext context) {
+    // Ordenar la lista de jugadores por dorsal
+    uniquePlayers.sort((a, b) => (a['dorsal'] as int).compareTo(b['dorsal'] as int));
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [

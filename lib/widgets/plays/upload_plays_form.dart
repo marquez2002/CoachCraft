@@ -1,9 +1,3 @@
-/*
- * Archivo: upload_plays_form.dart
- * Descripción: Este archivo contiene un servicio que permite subir las jugadas que se guardan en el sistema.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,48 +30,65 @@ class _UploadFormState extends State<UploadForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   String? _selectedType; 
+  String? _selectedFileName; 
   Uint8List? _videoBytes;
 
   // Función para seleccionar un video
   Future<void> _selectVideo() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.video,
+      type: FileType.video, // Solo permite seleccionar videos
+      withData: true, // Asegura que se lean los bytes
     );
 
-    if (result != null) {
-      _videoBytes = result.files.first.bytes;
-      setState(() {});
+    if (result != null && result.files.isNotEmpty) {
+      PlatformFile file = result.files.first;
+
+      setState(() {
+        _videoBytes = file.bytes; // Obtiene los bytes del archivo
+        _selectedFileName = file.name; // Guarda el nombre del archivo
+      });
+    } else {
+      // El usuario canceló la selección
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se seleccionó ningún video')),
+      );
     }
   }
 
-    Future<String?> _uploadVideo() async {
-      if (_videoBytes != null) {
-        // El nombre del archivo es simplemente un timestamp con la extensión ".mp4"
-        String fileName = '${DateTime.now().millisecondsSinceEpoch}.mp4';
+Future<String?> _uploadVideo() async {
+    if (_videoBytes != null) {
+      try {
+        // Genera un nombre único para el archivo si no hay nombre seleccionado
+        String fileName = _selectedFileName ?? '${DateTime.now().millisecondsSinceEpoch}.mp4';
         Reference storageRef = FirebaseStorage.instance.ref().child('football_plays/$fileName');
 
-        try {
-          UploadTask uploadTask = storageRef.putData(_videoBytes!);
-          TaskSnapshot snapshot = await uploadTask;
+        // Sube el video a Firebase Storage
+        UploadTask uploadTask = storageRef.putData(_videoBytes!);
+        TaskSnapshot snapshot = await uploadTask;
 
-          if (snapshot.state == TaskState.success) {
-            String downloadUrl = await snapshot.ref.getDownloadURL();
-            return downloadUrl;
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Error al subir el video')),
-            );
-            return null;
-          }
-        } catch (e) {
+        if (snapshot.state == TaskState.success) {
+          String downloadUrl = await snapshot.ref.getDownloadURL();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al subir el video: $e')),
+            const SnackBar(content: Text('Video subido correctamente')),
           );
-          return null;
+          return downloadUrl;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error al subir el video')),
+          );
         }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al subir el video: $e')),
+        );
       }
-      return null; 
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay video seleccionado para subir')),
+      );
     }
+    return null; // En caso de error o falta de video
+  }
 
   Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
