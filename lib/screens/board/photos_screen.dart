@@ -55,7 +55,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
           // Lista de videos usando SliverToBoxAdapter
           SliverToBoxAdapter(
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.6, // Establecer altura para evitar problemas de desbordamiento
+              height: MediaQuery.of(context).size.height, // Establecer altura para evitar problemas de desbordamiento
               child: PhotosList(), // Este widget contiene la lista de videos
             ),
           ),

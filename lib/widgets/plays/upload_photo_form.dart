@@ -31,47 +31,45 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
   Uint8List? _photoBytes; // Bytes de la foto seleccionada
   bool _isUploading = false; // Estado de carga
 
-  /// Función para seleccionar una foto
-  Future<void> _selectPhoto() async {
-  try {
-    if (kIsWeb) {
-      // Web: Usa FilePicker para seleccionar la foto sin especificar un filtro personalizado
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.image, // Usa FileType.image para seleccionar solo imágenes
+    /// Función para seleccionar una foto
+    Future<void> _selectPhoto() async {
+    try {
+      if (kIsWeb) {
+        // Web: Usa FilePicker para seleccionar la foto sin especificar un filtro personalizado
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+        );
+
+        if (result != null && result.files.single.bytes != null) {
+          setState(() {
+            _photoBytes = result.files.single.bytes;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se seleccionó ninguna foto.')),
+          );
+        }
+      } else {
+        // Android/iOS: Usa ImagePicker para seleccionar una foto
+        final picker = ImagePicker();
+        final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+        if (pickedFile != null) {
+          setState(() async {
+            _photoBytes = await pickedFile.readAsBytes();
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se seleccionó ninguna foto.')),
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al seleccionar la foto: $e')),
       );
-
-      if (result != null && result.files.single.bytes != null) {
-        setState(() {
-          _photoBytes = result.files.single.bytes;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se seleccionó ninguna foto.')),
-        );
-      }
-    } else {
-      // Android/iOS: Usa ImagePicker para seleccionar una foto
-      final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-      if (pickedFile != null) {
-        setState(() async {
-          _photoBytes = await pickedFile.readAsBytes();
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se seleccionó ninguna foto.')),
-        );
-      }
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error al seleccionar la foto: $e')),
-    );
   }
-}
-
-
 
   Future<String?> uploadPhoto() async {
     Uint8List? photoBytes;
@@ -83,7 +81,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
         // Web: Usa el FilePicker para seleccionar la foto
         final result = await FilePicker.platform.pickFiles(
           type: FileType.image, // Solo permite seleccionar imágenes
-          allowedExtensions: ['jpg', 'png'], // Restricción a JPG y PNG
+          
         );
 
         if (result != null && result.files.single.bytes != null) {
@@ -122,11 +120,11 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
         final String downloadUrl = await snapshot.ref.getDownloadURL();
         return downloadUrl;
       } else {
-        print("Error al subir la imagen. Estado: ${snapshot.state}");
+        print('Error al subir la imagen. Estado: ${snapshot.state}');
         return null;
       }
     } catch (e) {
-      print("Error durante la carga de la imagen: $e");
+      print('Error durante la carga de la imagen: $e');
       return null;
     }
   }
