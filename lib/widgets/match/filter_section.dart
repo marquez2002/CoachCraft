@@ -1,14 +1,8 @@
-/*
- * Archivo: filter_section.dart
- * Descripción: Este archivo contiene la clase correspondiente al filtro de partidos.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:flutter/material.dart';
 
 class FilterSection extends StatefulWidget {
   final String season;
-  final Function(String, String, String) onFilterChanged;
+  final Function(String, String, String, DateTimeRange?) onFilterChanged;
 
   const FilterSection({Key? key, required this.season, required this.onFilterChanged}) : super(key: key);
 
@@ -17,19 +11,48 @@ class FilterSection extends StatefulWidget {
 }
 
 class _FilterSectionState extends State<FilterSection> {
-  String _matchType = 'Todos'; 
+  String _matchType = 'Todos';
   String _rival = '';
+
+  /// Mapa de temporadas a rangos de fechas.
+  final Map<String, DateTimeRange> _seasonDateRanges = {
+    '2025-26': DateTimeRange(
+      start: DateTime(2025, 8, 1),
+      end: DateTime(2026, 7, 31),
+    ),
+    '2024-25': DateTimeRange(
+      start: DateTime(2024, 8, 1),
+      end: DateTime(2025, 7, 31),
+    ),
+    '2023-24': DateTimeRange(
+      start: DateTime(2023, 8, 1),
+      end: DateTime(2024, 7, 31),
+    ),
+    '2022-23': DateTimeRange(
+      start: DateTime(2022, 8, 1),
+      end: DateTime(2023, 7, 31),
+    ),
+    'Todos': DateTimeRange(
+      start: DateTime(2000, 1, 1),
+      end: DateTime(2100, 12, 31),
+    ), 
+  };
+
+  /// Obtiene el rango de fechas para la temporada seleccionada.
+  DateTimeRange? _getDateRangeForSeason(String season) {
+    return _seasonDateRanges[season];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(  
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),  
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Filtrar Partidos', 
+              'Filtrar Partidos',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
@@ -44,7 +67,7 @@ class _FilterSectionState extends State<FilterSection> {
                 setState(() {
                   _rival = value;
                   // Actualiza el filtrado cuando el campo de rival cambia
-                  widget.onFilterChanged(widget.season, _matchType, _rival);
+                  widget.onFilterChanged(widget.season, _matchType, _rival, _getDateRangeForSeason(widget.season));
                 });
               },
             ),
@@ -58,11 +81,15 @@ class _FilterSectionState extends State<FilterSection> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (String? newValue) {
-                setState(() {
-                  widget.onFilterChanged(newValue!, _matchType, _rival);
-                });
+                if (newValue != null && newValue != widget.season) {
+                  setState(() {
+                    // Actualiza la temporada seleccionada
+                    widget.onFilterChanged(newValue, _matchType, _rival, _getDateRangeForSeason(newValue));
+                  });
+                }
               },
-              items: <String>['2024', '2023', '2022', 'Todos'].map<DropdownMenuItem<String>>((String value) {
+              items: <String>['2025-26', '2024-25', '2023-24', '2022-23', 'Todos']
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -79,11 +106,14 @@ class _FilterSectionState extends State<FilterSection> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (String? newValue) {
-                setState(() {
-                  _matchType = newValue!;
-                  // Actualiza el filtrado al cambiar el tipo de partido
-                  widget.onFilterChanged(widget.season, _matchType, _rival);
-                });
+                if (newValue != null && newValue != _matchType) {
+                  setState(() {
+                    // Actualiza el tipo de partido
+                    _matchType = newValue;
+                    // Filtra con el nuevo tipo de partido, temporada, rival y rango de fechas
+                    widget.onFilterChanged(widget.season, _matchType, _rival, _getDateRangeForSeason(widget.season));
+                  });
+                }
               },
               items: <String>[
                 'Todos',
@@ -99,7 +129,7 @@ class _FilterSectionState extends State<FilterSection> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 16.0), 
+            const SizedBox(height: 16.0),
           ],
         ),
       ),

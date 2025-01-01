@@ -85,9 +85,9 @@ class _ParentWidgetState extends State<ParentWidget> {
   }
 }
 
-/// Clase para filtrar las estadisticas de los jugadores.
+/// Clase para filtrar las estadísticas de los jugadores.
 class FilterSectionStats extends StatefulWidget {
-  final String season; 
+  final String season;
   final String matchType;
   final Function(String, String) onFilterChanged;
 
@@ -106,7 +106,30 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
   late String _season;
   late String _matchType;
 
-  /// Función para inicializar el widget padre.
+  /// Map de temporadas a rangos de fechas.
+  final Map<String, DateTimeRange> _seasonDateRanges = {
+    '2025-26': DateTimeRange(
+      start: DateTime(2025, 8, 1),
+      end: DateTime(2026, 7, 31),
+    ),
+    '2024-25': DateTimeRange(
+      start: DateTime(2024, 8, 1),
+      end: DateTime(2025, 7, 31),
+    ),
+    '2023-24': DateTimeRange(
+      start: DateTime(2023, 8, 1),
+      end: DateTime(2024, 7, 31),
+    ),
+    '2022-23': DateTimeRange(
+      start: DateTime(2022, 8, 1),
+      end: DateTime(2023, 7, 31),
+    ),
+    'Todos': DateTimeRange(
+      start: DateTime(2000, 1, 1),
+      end: DateTime(2100, 12, 31),
+    ), 
+  };
+
   @override
   void initState() {
     super.initState();
@@ -114,7 +137,6 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
     _matchType = widget.matchType;
   }
 
-  /// Función para actualizar el estado del widget padre
   @override
   void didUpdateWidget(FilterSectionStats oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -126,31 +148,33 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
     }
   }
 
-  /// Función para cambiar la temporada buscada.
   void _onSeasonChanged(String? newSeason) {
     if (newSeason != null) {
       setState(() {
-        _season = newSeason; 
-        widget.onFilterChanged(_season, _matchType); 
+        _season = newSeason;
+        widget.onFilterChanged(_season, _matchType);
       });
     }
   }
 
-  /// Función para cambiar el tipo de partido buscado.
   void _onMatchTypeChanged(String? newMatchType) {
     if (newMatchType != null) {
       setState(() {
-        _matchType = newMatchType; 
-        widget.onFilterChanged(_season, _matchType); 
+        _matchType = newMatchType;
+        widget.onFilterChanged(_season, _matchType);
       });
     }
+  }
+
+  DateTimeRange? _getDateRangeForSeason(String season) {
+    return _seasonDateRanges[season];
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(  
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),  
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -162,13 +186,13 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
 
             // Dropdown para seleccionar la temporada
             DropdownButtonFormField<String>(
-              value: _season, 
+              value: _season,
               decoration: const InputDecoration(
                 labelText: 'Temporada',
                 border: OutlineInputBorder(),
               ),
-              onChanged: _onSeasonChanged, 
-              items: <String>['2024', '2023', '2022', 'Todos']
+              onChanged: _onSeasonChanged,
+              items: <String>['2025-26', '2024-25', '2023-24', '2022-23', 'Todos']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -180,12 +204,12 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
 
             // Dropdown para seleccionar el tipo de partido
             DropdownButtonFormField<String>(
-              value: _matchType, 
+              value: _matchType,
               decoration: const InputDecoration(
                 labelText: 'Tipo de Partido',
                 border: OutlineInputBorder(),
               ),
-              onChanged: _onMatchTypeChanged, 
+              onChanged: _onMatchTypeChanged,
               items: <String>[
                 'Todos',
                 'Liga',

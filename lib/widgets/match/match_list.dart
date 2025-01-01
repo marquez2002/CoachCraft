@@ -1,6 +1,6 @@
 /*
  * Archivo: match_list.dart
- * Descripción: Este archivo contiene la clase correspondiente a la lista de los partidos que corresponden con las caracteristicas del filtrado.
+ * Descripción: Este archivo contiene la clase correspondiente a la lista de los partidos que corresponden con las características del filtrado.
  * 
  * Autor: Gonzalo Márquez de Torres
  */
@@ -34,6 +34,7 @@ class MatchList extends StatelessWidget {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -41,7 +42,7 @@ class MatchList extends StatelessWidget {
 
     return Scaffold(
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator()) // Spinner de carga
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -55,24 +56,14 @@ class MatchList extends StatelessWidget {
                 const SizedBox(height: 8.0),
 
                 // En caso de que no haya partidos, indica un mensaje avisando de que no hay partidos disponibles.
-                FutureBuilder(
-                  future: Future.delayed(const Duration(seconds: 2)),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(); 
-                    }
-                    if (filteredMatches.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'No hay partidos disponibles',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
-                    return const SizedBox();
-                  },
-                ),
+                if (filteredMatches.isEmpty) 
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'No hay partidos disponibles',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
 
                 Expanded(
                   child: GridView.builder(
@@ -185,3 +176,4 @@ class MatchList extends StatelessWidget {
     );
   }
 }
+
