@@ -28,7 +28,7 @@ class VideoList extends StatelessWidget {
       case 'defensa':
         return 'assets/image/defensa_type.png';
       default:
-        return 'assets/image/ataque_type.png'; 
+        return 'assets/image/default_type.png';
     }
   }
 
@@ -40,11 +40,38 @@ class VideoList extends StatelessWidget {
       case 'defensa':
         return Icons.shield_rounded;
       default:
-        return Icons.help;
+        return Icons.video_library;
     }
   }
 
-  // Función que permite modificar videos.
+  // Función que permite eliminar videos con confirmación.
+  Future<void> _confirmDelete(BuildContext context, String documentId, String videoUrl) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar Video'),
+          content: const Text('¿Estás seguro de que deseas eliminar este video?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      _deleteVideo(context, documentId, videoUrl);
+    }
+  }
+
+  // Función que elimina un video.
   Future<void> _deleteVideo(BuildContext context, String documentId, String videoUrl) async {
     try {
       // Eliminar el video de Firebase Storage
@@ -55,11 +82,12 @@ class VideoList extends StatelessWidget {
       String? teamId = await getTeamId();
 
       // Ahora eliminar el documento de Firestore
-      await FirebaseFirestore.instance.collection('teams')
-        .doc(teamId) // Asegúrate de que 'teamId' es válido
-        .collection('football_plays')
-        .doc(documentId)
-        .delete();
+      await FirebaseFirestore.instance
+          .collection('teams')
+          .doc(teamId) // Asegúrate de que 'teamId' es válido
+          .collection('football_plays')
+          .doc(documentId)
+          .delete();
 
       // Mostrar un mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,75 +139,76 @@ class VideoList extends StatelessWidget {
 
             final videos = snapshot.data!.docs;
 
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final plays = videos[index];
-                      final nombre = plays['name'];
-                      final tipo = plays['type'];
-                      final videoUrl = plays['videoUrl'];
-                      final documentId = plays.id;
+            return ListView.builder(
+              itemCount: videos.length,
+              itemBuilder: (context, index) {
+                final plays = videos[index];
+                final nombre = plays['name'] ?? 'Sin nombre';
+                final tipo = plays['type'] ?? 'desconocido';
+                final videoUrl = plays['videoUrl'] ?? '';
+                final documentId = plays.id;
 
-                      return Card(
-                        child: Container(
-                          height: 120,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(getBackgroundImage(tipo)), 
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(getBackgroundImage(tipo)),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(getIconForType(tipo), size: 20, color: Colors.black),
+                              const SizedBox(width: 12.0),
+                              Text(nombre, style: const TextStyle(fontSize: 14, color: Colors.black)),
+                            ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(getIconForType(tipo), size: 20, color: Colors.black),
-                                    const SizedBox(width: 12.0),
-                                    Text('$nombre', style: const TextStyle(fontSize: 14, color: Colors.black)),
-                                  ],
-                                ),
-                                const SizedBox(height: 4.0),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.play_arrow),
-                                      onPressed: () {
-                                        // Aquí directamente implementamos la lógica para navegar a la pantalla que reproduce el video
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => VideoPlayerScreen(videoUrl: videoUrl),
-                                          ),
-                                        );
-                                      },
-                                      tooltip: 'Ver Video',
+                          const SizedBox(height: 4.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.play_arrow),
+                                onPressed: () {
+                                  if (videoUrl.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('URL del video no disponible')),
+                                    );
+                                    return;
+                                  }
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VideoPlayerScreen(videoUrl: videoUrl),
                                     ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () => _deleteVideo(context, documentId, videoUrl),
-                                      tooltip: 'Eliminar Video',
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  );
+                                },
+                                tooltip: 'Ver Video',
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _confirmDelete(context, documentId, videoUrl),
+                                tooltip: 'Eliminar Video',
+                              ),
+                            ],
                           ),
-                        ),
-                      );
-                    },
-                    childCount: videos.length,
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
             );
           },
         );

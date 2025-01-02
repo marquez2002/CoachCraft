@@ -9,7 +9,7 @@ class RecordingPlayScreen extends StatefulWidget {
 }
 
 class _RecordingPlayScreenState extends State<RecordingPlayScreen> {
-  bool _isExpanded = false; // Controla el estado de expansión
+  bool _isExpanded = false; 
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +56,8 @@ class _RecordingPlayScreenState extends State<RecordingPlayScreen> {
           // Lista de videos usando SliverToBoxAdapter
           SliverToBoxAdapter(
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.6, // Establecer altura para evitar problemas de desbordamiento
-              child: VideoList(), // Este widget contiene la lista de videos
+              height: MediaQuery.of(context).size.height, 
+              child: VideoList(), 
             ),
           ),
         ],

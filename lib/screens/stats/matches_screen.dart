@@ -17,8 +17,11 @@ class _MatchesScreenState extends State<MatchesScreen> {
   List<Map<String, dynamic>> _matches = [];
   List<Map<String, dynamic>> _filteredMatches = [];
   String _season = '2024';
+  // ignore: unused_field
   String _matchType = 'Todos';
+  // ignore: unused_field
   String _rival = '';
+  // ignore: unused_field
   DateTimeRange? _dateRange;
 
   // Controladores de expansión
@@ -67,6 +70,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
       _filteredMatches = _matches.where((match) {
         // Convierte la fecha del partido
         final matchDate = DateTime.parse(match['matchDate']);
+        // ignore: unused_local_variable
         final matchYear = DateFormat('yyyy').format(matchDate);
 
         // Filtros
@@ -144,7 +148,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                       ],
                       // Lista de partidos filtrados
                       SizedBox(
-                        height: MediaQuery.of(context).size.height, // Ajuste dinámico del tamaño
+                        height: MediaQuery.of(context).size.height, 
                         child: MatchList(filteredMatches: _filteredMatches),
                       ),
                     ],
