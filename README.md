@@ -1,10 +1,3 @@
-
-## Instalación
-Tras tener instaladas todas las herramientas necesarias para su ejecucción, se procede a su instalación, para ello, se clona e instala el proyecto en tu máquina local, sigue estos pasos:
-1. **Clonar el repositorio**:   ```bash   git clone https://github.com/marquez2002/CoachCraft.git
-2. **Acceder al proyecto**:   ```bash   cd CoachCraft
-3. **Ejecutar la aplicación**:   ```bash   flutter run
-
 # CoachCraft
 
 CoachCraft es una aplicación centrada en la gestión de un equipo de fútbol sala de manera completa.
@@ -45,5 +38,3 @@ Para clonar e instalar el proyecto en tu máquina local, sigue estos pasos:
 3. **Ejecutar la aplicación**:
    ```bash
    flutter run
-
-
