@@ -1,9 +1,3 @@
-/*
- * Archivo: menu_widget_futsal.dart
- * Descripción: Este archivo contiene la definición de la clase del menú de la aplicación.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
 import 'package:CoachCraft/screens/stats/matches_screen.dart';
@@ -21,21 +15,18 @@ class MenuWidgetFutsal extends StatefulWidget {
 }
 
 class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
-  String _userRole = 'loading'; 
-  User? _currentUser; 
+  String _userRole = 'loading';
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    _getUserData();
+    _currentUser = FirebaseAuth.instance.currentUser;
   }
 
   /// Función para obtener el tipo de usuario desde Firestore
-  Future<void> _getUserData() async {
+  Future<String> _getUserData() async {
     try {
-      // Obtener el usuario autenticado actual
-      _currentUser = FirebaseAuth.instance.currentUser;
-
       if (_currentUser != null) {
         // Obtener todos los equipos
         QuerySnapshot teamsSnapshot = await FirebaseFirestore.instance.collection('teams').get();
@@ -48,36 +39,24 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
             // Si member es un mapa con 'uid' y 'role'
             if (member is Map<String, dynamic>) {
               if (member['uid'] == _currentUser!.uid) {
-                setState(() {
-                  _userRole = member['role'] ?? 'Jugador';
-                });
-                return;
+                return member['role'] ?? 'Jugador';
               }
-            } else if (member is String) {               
+            } else if (member is String) {
               if (member == _currentUser!.uid) {
-                setState(() {
-                  _userRole = 'Jugador';
-                });
-                return;
+                return 'Jugador';
               }
             }
           }
         }
 
         // Si no se encuentra el rol, establecerlo por defecto
-        setState(() {
-          _userRole = 'Jugador';
-        });
+        return 'Jugador';
       } else {
-        setState(() {
-          _userRole = 'Jugador';
-        });
+        return 'Jugador';
       }
     } catch (e) {
-      setState(() {
-        _userRole = 'error';
-      });
       print('Error al obtener el rol del usuario: $e');
+      return 'error';
     }
   }
 
@@ -126,67 +105,80 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
             height: double.infinity,
           ),
           Center(
-            child: _userRole == 'loading'
-                ? const CircularProgressIndicator()
-                : SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: buttonData.map((data) {
-                            // Determina si el botón está habilitado para el rol actual
-                            bool isEnabled = data['enabledFor'].contains(_userRole);
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: SizedBox(
-                                width: screenSize.width * 0.7, 
-                                child: ElevatedButton(
-                                  onPressed: isEnabled
-                                      ? () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => data['route']),
-                                          );
-                                        }
-                                      : null, 
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.black,
-                                    backgroundColor: Colors.white, 
-                                    disabledBackgroundColor: Colors.white, 
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.02, 
-                                    ),
+            child: FutureBuilder<String>(
+              future: _getUserData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+
+                if (snapshot.hasError) {
+                  return const Text('Error al obtener el rol');
+                }
+
+                _userRole = snapshot.data ?? 'Jugador'; // Asignamos el rol cargado
+
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: buttonData.map((data) {
+                          // Determina si el botón está habilitado para el rol actual
+                          bool isEnabled = data['enabledFor'].contains(_userRole);
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: SizedBox(
+                              width: screenSize.width * 0.7,
+                              child: ElevatedButton(
+                                onPressed: isEnabled
+                                    ? () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => data['route']),
+                                        );
+                                      }
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.black,
+                                  backgroundColor: Colors.white,
+                                  disabledBackgroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenSize.height * 0.02,
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        data['label'],
-                                        style: TextStyle(
-                                          fontSize: 20,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      data['label'],
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    if (!isEnabled)
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: Icon(
+                                          Icons.lock,
                                           color: Colors.black,
                                         ),
                                       ),
-                                      if (!isEnabled) // Muestra el icono de candado si el botón está deshabilitado
-                                        const Padding(
-                                          padding: EdgeInsets.only(left: 8.0), 
-                                          child: Icon(
-                                            Icons.lock,
-                                            color: Colors.black, 
-                                          ),
-                                        ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),

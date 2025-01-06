@@ -20,6 +20,9 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
     
+  // Pantalla completa inmersiva  
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); 
+
   runApp(const MyApp());
 }
 

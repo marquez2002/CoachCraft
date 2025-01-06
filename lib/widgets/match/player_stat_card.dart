@@ -300,8 +300,7 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
                               'Jugadores de Campo',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
-                            SizedBox(
-                              height: 400, 
+                            Expanded(                              
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal, 
                                 child: DataTable(
