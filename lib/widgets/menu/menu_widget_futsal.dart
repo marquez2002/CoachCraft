@@ -28,83 +28,82 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
     _getUserData(); // Obtén los datos del usuario
   }
 
-/// Método para obtener el tipo de usuario desde Firestore
-/// Método para obtener el rol del usuario utilizando el nombre del equipo desde el Provider
-Future<void> _getUserData() async {
-  try {
-    // Obtener el usuario autenticado actual
-    _currentUser = FirebaseAuth.instance.currentUser;
+  /// Método para obtener el rol del usuario utilizando el nombre del equipo desde el Provider
+  Future<void> _getUserData() async {
+    try {
+      // Obtener el usuario autenticado actual
+      _currentUser = FirebaseAuth.instance.currentUser;
 
-    if (_currentUser != null) {
-      print('Usuario autenticado: ${_currentUser!.uid}');
+      if (_currentUser != null) {
+        print('Usuario autenticado: ${_currentUser!.uid}');
 
-      // Obtener el nombre del equipo seleccionado desde el Provider
-      final teamProvider = Provider.of<TeamProvider>(context, listen: false);
-      String teamName = teamProvider.selectedTeamName;
+        // Obtener el nombre del equipo seleccionado desde el Provider
+        final teamProvider = Provider.of<TeamProvider>(context, listen: false);
+        String teamName = teamProvider.selectedTeamName;
 
-      if (teamName.isEmpty) {
-        print('No se ha seleccionado un equipo.');
-        setState(() {
-          _userRole = 'Jugador'; // Rol por defecto
-        });
-        return;
-      }
-
-      print('Equipo seleccionado: $teamName');
-
-      // Buscar el equipo en Firestore utilizando el nombre
-      QuerySnapshot teamQuery = await FirebaseFirestore.instance
-          .collection('teams')
-          .where('name', isEqualTo: teamName)
-          .get();
-
-      if (teamQuery.docs.isEmpty) {
-        print('No se encontró ningún equipo con el nombre: $teamName');
-        setState(() {
-          _userRole = 'Jugador'; // Rol por defecto si no se encuentra el equipo
-        });
-        return;
-      }
-
-      // Asumimos que el nombre del equipo es único y tomamos el primer resultado
-      DocumentSnapshot teamDoc = teamQuery.docs.first;
-
-      // Obtener los miembros del equipo
-      List<dynamic> members = teamDoc['members'];
-      print('Miembros del equipo ${teamDoc.id}: $members');
-
-      String userRole = 'Jugador'; // Valor por defecto
-
-      for (var member in members) {
-        if (member is Map<String, dynamic> && member['uid'] == _currentUser!.uid) {
-          print('Rol encontrado para el usuario ${_currentUser!.uid}: ${member['role']}');
-          userRole = member['role'] ?? 'Jugador';
-          break;
-        } else if (member is String && member == _currentUser!.uid) {
-          print('Usuario ${_currentUser!.uid} encontrado sin rol explícito, asignando "Jugador"');
-          userRole = 'Jugador';
-          break;
+        if (teamName.isEmpty) {
+          print('No se ha seleccionado un equipo.');
+          setState(() {
+            _userRole = 'Jugador'; // Rol por defecto
+          });
+          return;
         }
+
+        print('Equipo seleccionado: $teamName');
+
+        // Buscar el equipo en Firestore utilizando el nombre
+        QuerySnapshot teamQuery = await FirebaseFirestore.instance
+            .collection('teams')
+            .where('name', isEqualTo: teamName)
+            .get();
+
+        if (teamQuery.docs.isEmpty) {
+          print('No se encontró ningún equipo con el nombre: $teamName');
+          setState(() {
+            _userRole = 'Jugador'; // Rol por defecto si no se encuentra el equipo
+          });
+          return;
+        }
+
+        // Asumimos que el nombre del equipo es único y tomamos el primer resultado
+        DocumentSnapshot teamDoc = teamQuery.docs.first;
+
+        // Obtener los miembros del equipo
+        List<dynamic> members = teamDoc['members'];
+        print('Miembros del equipo ${teamDoc.id}: $members');
+
+        String userRole = 'Jugador'; // Valor por defecto
+
+        for (var member in members) {
+          if (member is Map<String, dynamic> && member['uid'] == _currentUser!.uid) {
+            print('Rol encontrado para el usuario ${_currentUser!.uid}: ${member['role']}');
+            userRole = member['role'] ?? 'Jugador';
+            break;
+          } else if (member is String && member == _currentUser!.uid) {
+            print('Usuario ${_currentUser!.uid} encontrado sin rol explícito, asignando "Jugador"');
+            userRole = 'Jugador';
+            break;
+          }
+        }
+
+        print('Rol final asignado al usuario: $userRole');
+
+        setState(() {
+          _userRole = userRole;
+        });
+      } else {
+        print('No hay usuario autenticado.');
+        setState(() {
+          _userRole = 'Jugador'; // Rol por defecto si no hay usuario autenticado
+        });
       }
-
-      print('Rol final asignado al usuario: $userRole');
-
+    } catch (e) {
+      print('Error al obtener el rol del usuario: $e');
       setState(() {
-        _userRole = userRole;
-      });
-    } else {
-      print('No hay usuario autenticado.');
-      setState(() {
-        _userRole = 'Jugador'; // Rol por defecto si no hay usuario autenticado
+        _userRole = 'error';
       });
     }
-  } catch (e) {
-    print('Error al obtener el rol del usuario: $e');
-    setState(() {
-      _userRole = 'error';
-    });
   }
-}
 
 
   
