@@ -105,8 +105,6 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
     }
   }
 
-
-  
   void _resetUserData() {
     setState(() {
       _userRole = 'loading';
