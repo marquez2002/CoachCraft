@@ -84,8 +84,8 @@ class PlayerDataTable extends StatelessWidget {
           DataColumn(label: Text('Edad')),
           DataColumn(label: Text('Altura')),
           DataColumn(label: Text('Peso')),
-          DataColumn(label: Text('Modificar')),
-          DataColumn(label: Text('Eliminar')),
+          DataColumn(label: Text(' ')),
+          DataColumn(label: Text(' ')),
         ],
         rows: players.map((player) {
           final dorsal = player['dorsal'];

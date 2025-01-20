@@ -19,7 +19,7 @@ class FootballConvPlayer extends StatefulWidget {
 }
 
 class _FootballConvPlayerState extends State<FootballConvPlayer> {
-  Map<String, bool> selectedPlayers = {};
+  final Map<String, ValueNotifier<bool>> selectedPlayers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +43,11 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
                   return const Center(child: Text('No hay jugadores disponibles.'));
                 } else {
                   final players = snapshot.data!;
+                  // Inicializar los ValueNotifiers si no existen
+                  for (var player in players) {
+                    final playerName = player['nombre'] ?? 'Desconocido';
+                    selectedPlayers.putIfAbsent(playerName, () => ValueNotifier(false));
+                  }
                   return buildPlayerSelection(players);
                 }
               },
@@ -65,26 +70,7 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
               DataColumn(label: Text('Posición')),
             ],
             rows: players.map((player) {
-              final playerDorsal = player['dorsal']?.toString() ?? 'Dorsal no disponible';
-              final playerName = player['nombre'] ?? 'Nombre no disponible';
-              final playerPosition = player['posicion'] ?? 'Posición no disponible';
-              final isSelected = selectedPlayers[player['nombre']] ?? false;
-
-              return DataRow(cells: [
-                DataCell(
-                  Checkbox(
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        selectedPlayers[player['nombre']] = value ?? false;
-                      });
-                    },
-                  ),
-                ),
-                DataCell(Text(playerDorsal)),
-                DataCell(Text(playerName)),
-                DataCell(Text(playerPosition)),
-              ]);
+              return buildPlayerRow(player);
             }).toList(),
           ),
         ),
@@ -99,8 +85,42 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
     );
   }
 
+  DataRow buildPlayerRow(Map<String, dynamic> player) {
+    final playerName = player['nombre'] ?? 'Nombre no disponible';
+    final playerDorsal = player['dorsal']?.toString() ?? 'Dorsal no disponible';
+    final playerPosition = player['posicion'] ?? 'Posición no disponible';
+    final notifier = selectedPlayers[playerName]!;
+
+    return DataRow(
+      cells: [
+        DataCell(
+          ValueListenableBuilder<bool>(
+            valueListenable: notifier,
+            builder: (context, isSelected, _) {
+              return Checkbox(
+                value: isSelected,
+                onChanged: (bool? value) {
+                  if (value != null) {
+                    notifier.value = value;
+                  }
+                },
+              );
+            },
+          ),
+        ),
+        DataCell(Text(playerDorsal)),
+        DataCell(Text(playerName)),
+        DataCell(Text(playerPosition)),
+      ],
+    );
+  }
+
   Future<void> handleGeneratePdf(List<Map<String, dynamic>> players) async {
-    final selectedPlayersData = players.where((player) => selectedPlayers[player['nombre']] == true).toList();
+    final selectedPlayersData = players.where((player) {
+      final playerName = player['nombre'];
+      return selectedPlayers[playerName]?.value == true;
+    }).toList();
+
     if (selectedPlayersData.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No se seleccionaron jugadores.')),
@@ -165,7 +185,6 @@ class _FootballConvPlayerState extends State<FootballConvPlayer> {
         },
       ),
     );
-
     return pdf.save();
   }
 }
