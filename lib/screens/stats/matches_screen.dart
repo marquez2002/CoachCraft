@@ -16,7 +16,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
   final MatchService _matchService = MatchService();
   List<Map<String, dynamic>> _matches = [];
   List<Map<String, dynamic>> _filteredMatches = [];
-  String _season = '2024';
+  String _season = 'Todos';
   // ignore: unused_field
   String _matchType = 'Todos';
   // ignore: unused_field
@@ -132,14 +132,14 @@ class _MatchesScreenState extends State<MatchesScreen> {
                       ],
                       // Formulario para buscar partidos
                       if (_isSearchingMatchExpanded) ...[
-                        FilterSection(
+                        FilterSection(                          
                           season: _season,
                           onFilterChanged: (String season, String matchType, String rival, DateTimeRange? dateRange) {
                             setState(() {
                               _season = season;
                               _matchType = matchType;
                               _rival = rival;
-                              _dateRange = dateRange; // Asigna el rango de fechas
+                              _dateRange = dateRange; 
                               _filterMatches(matchType, season, rival, dateRange); // Aplica los filtros
                             });
                           },

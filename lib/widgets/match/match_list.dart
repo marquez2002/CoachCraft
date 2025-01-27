@@ -119,15 +119,14 @@ class MatchList extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center, // Centra el contenido verticalmente
-                              crossAxisAlignment: CrossAxisAlignment.center, // Centra el contenido horizontalmente
+                              mainAxisAlignment: MainAxisAlignment.center, 
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Centra los elementos del Row
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(locationIcon, size: 16),
                                     const SizedBox(width: 8.0),
-                                    // Usamos Expanded para limitar el texto y aplicar el truncamiento
                                     Expanded(
                                       child: Align(
                                         alignment: Alignment.center,
@@ -155,13 +154,24 @@ class MatchList extends StatelessWidget {
                                   style: const TextStyle(fontSize: 14, color: Colors.black),
                                 ),
                                 const SizedBox(height: 8.0),
-                                Text(
-                                  matchData['matchType'],
-                                  style: const TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      matchData['location'] == 'Casa' ? Icons.house : Icons.flight, 
+                                      size: 18,
+                                      color: Colors.black, 
+                                    ),
+                                    const SizedBox(width: 8.0),
+                                    Text(
+                                      matchData['matchType'],
+                                      style: const TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

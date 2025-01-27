@@ -20,6 +20,9 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
 
+  // Ocultar barras de navegación y estado
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   runApp(const MyApp());
 }
 

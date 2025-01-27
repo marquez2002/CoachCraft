@@ -35,13 +35,14 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
 
   // Nuevas variables
   String _season = 'Todos'; // Almacenar la temporada seleccionada
-  String _matchType = 'Todos'; // Almacenar el tipo 
+  String _matchType = 'Todos'; // Almacenar el tipo
+  DateTimeRange? _dateRange;
   int matchesCount = 0; // Contador de partidos
 
   @override
   void initState() {
     super.initState();
-    fetchGeneralStats(_season, _matchType); // Carga inicial de estadísticas
+    fetchGeneralStats(_season, _matchType, _dateRange); // Carga inicial de estadísticas
   }
 
   DateTime getStartDate(String period) {
@@ -63,7 +64,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
   }
 
   // Fetch general stats from Firestore con filtrado de temporada y tipo de partido
-  Future<void> fetchGeneralStats(String season, String matchType) async {
+  Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
     setState(() => isLoading = true); // Inicia el estado de carga
     try {
       // Obtener ID del equipo seleccionado
@@ -220,6 +221,13 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
       }
     }
 
+      // Función para obtener el rango de fechas según la temporada
+    DateTimeRange _getDateRangeForSeason(String season) {
+      final startDate = DateTime(int.parse(season.split('-')[0]), 8, 1); // Inicio: 1 de agosto
+      final endDate = DateTime(int.parse(season.split('-')[1]), 7, 31); // Fin: 31 de julio del siguiente año
+      return DateTimeRange(start: startDate, end: endDate);
+    }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -282,16 +290,17 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                           FilterSectionStats(
                             season: _season,
                             matchType: _matchType,
-                            onFilterChanged: (String season, String matchType) {
+                            onFilterChanged: (String season, String matchType, DateTimeRange? dateRange) {
                               setState(() {
                                 _season = season;
                                 _matchType = matchType;
-                                fetchGeneralStats(_season, _matchType);
+                                // Aquí estamos pasando también el dateRange
+                                fetchGeneralStats(_season, _matchType, dateRange);
                               });
                             },
                           ),
-                          const SizedBox(height: 16.0),
                         ],
+
                         if (_isInfoExpanded) ...[
                           Wrap(
                             spacing: 20.0,
@@ -409,7 +418,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 30),
                         Text(
                           'Estadísticas Generales',
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -420,11 +429,11 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                         const SizedBox(height: 6),
                         // Agregar el gráfico
                         Wrap(
-                          spacing: 6.0,
-                          runSpacing: 6.0,
+                          spacing: 8.0,
+                          runSpacing: 8.0,
                           alignment: WrapAlignment.center,
                           children: [
-                            // Gráfico: Paradas Vs Tiros Recibidos
+                            // Gráfico: Paradas vs Goles Recibidos
                             if ((generalStats['shotsReceived']?.toDouble() ?? 0) > 0 || 
                                 (generalStats['saves']?.toDouble() ?? 0) > 0)
                               _buildPieChart(
@@ -447,7 +456,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                             if ((generalStats['shotsOnGoal']?.toDouble() ?? 0) > 0 || 
                                 (generalStats['shots']?.toDouble() ?? 0) > 0)
                               _buildPieChart(
-                                title: 'Tiros vs Tiros a Puerta',
+                                title: 'Tiros vs A Puerta',
                                 sectionData: [
                                   PieChartSectionData(
                                     value: generalStats['shotsOnGoal']?.toDouble() ?? 0,
@@ -466,7 +475,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                             if ((generalStats['goals']?.toDouble() ?? 0) > 0 || 
                                 (generalStats['shots']?.toDouble() ?? 0) > 0)
                               _buildPieChart(
-                                title: 'Goles vs Tiros',
+                                title: 'Tiros vs Goles',
                                 sectionData: [
                                   PieChartSectionData(
                                     value: generalStats['goals']?.toDouble() ?? 0,
@@ -481,40 +490,42 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                                 ],
                               ),
 
-                            // Gráfico: Tarjetas Amarilla vs Rojas
+                            // Gráfico: Estadísticas combinadas (Faltas, Tarjetas Amarillas y Rojas) en barras
                             if ((generalStats['yellowCards']?.toDouble() ?? 0) > 0 || 
-                                (generalStats['redCards']?.toDouble() ?? 0) > 0)
-                              _buildPieChart(
-                                title: 'Tarjetas Amarilla vs Rojas',
-                                sectionData: [
-                                  PieChartSectionData(
-                                    value: generalStats['yellowCards']?.toDouble() ?? 0,
-                                    title: '${generalStats['yellowCards']?.toString() ?? 0}',
-                                    color: Colors.yellow,
-                                  ),
-                                  PieChartSectionData(
-                                    value: generalStats['redCards']?.toDouble() ?? 0,
-                                    title: '${generalStats['redCards']?.toString() ?? 0}',
-                                    color: Colors.red,
-                                  ),
-                                ],
-                              ),
-
-                            // Gráfico: Faltas vs Tarjetas Amarilla
-                            if ((generalStats['yellowCards']?.toDouble() ?? 0) > 0 || 
+                                (generalStats['redCards']?.toDouble() ?? 0) > 0 || 
                                 (generalStats['foul']?.toDouble() ?? 0) > 0)
-                              _buildPieChart(
-                                title: 'Faltas vs Tarjetas Amarilla',
-                                sectionData: [
-                                  PieChartSectionData(
-                                    value: generalStats['yellowCards']?.toDouble() ?? 0,
-                                    title: '${generalStats['yellowCards']?.toString() ?? 0}',
-                                    color: Colors.yellow,
+                              _buildSimpleBarChart(
+                                title: 'Tarjetas amarillas, rojas y faltas',
+                                data: [
+                                  BarChartGroupData(
+                                    x: 0, // Identificador del eje X para esta barra
+                                    barRods: [
+                                      BarChartRodData(
+                                        toY: generalStats['yellowCards']?.toDouble() ?? 0,
+                                        color: Colors.yellow,
+                                        width: 30,
+                                      ),
+                                    ],
                                   ),
-                                  PieChartSectionData(
-                                    value: generalStats['foul']?.toDouble() ?? 0,
-                                    title: '${generalStats['foul']?.toString() ?? 0}',
-                                    color: Colors.teal,
+                                  BarChartGroupData(
+                                    x: 1, // Identificador del eje X para esta barra
+                                    barRods: [
+                                      BarChartRodData(
+                                        toY: generalStats['redCards']?.toDouble() ?? 0,
+                                        color: Colors.red,
+                                        width: 30,
+                                      ),
+                                    ],
+                                  ),
+                                  BarChartGroupData(
+                                    x: 2, // Identificador del eje X para esta barra
+                                    barRods: [
+                                      BarChartRodData(
+                                        toY: generalStats['foul']?.toDouble() ?? 0,
+                                        color: Colors.teal,
+                                        width: 30,
+                                      ),
+                                    ],                                    
                                   ),
                                 ],
                               ),
@@ -572,7 +583,6 @@ Widget _buildPieChart({required String title, required List<PieChartSectionData>
   if (sectionData.isEmpty) {
     return Container(); 
   }
-
   return Column(
     children: [
       Text(
@@ -595,3 +605,43 @@ Widget _buildPieChart({required String title, required List<PieChartSectionData>
     ],
   );
 }
+
+Widget _buildSimpleBarChart({
+  required List<BarChartGroupData> data, required String title, // Controlar si se muestran los títulos numéricos del eje X
+}) {
+  return SizedBox(
+    height: 400,
+    child: BarChart(
+      BarChartData(
+        barGroups: data,
+        borderData: FlBorderData(show: false),
+        gridData: FlGridData(show: true),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 10,
+              getTitlesWidget: (double value, TitleMeta meta) {
+                switch (value.toInt()) {
+                  case 0:
+                    return const Text('Amarillas');
+                  case 1:
+                    return const Text('Rojas');
+                  case 2:
+                    return const Text('Faltas');
+                  default:
+                    return const Text('');
+                }
+              },
+            ),
+          ),
+        ),
+        barTouchData: BarTouchData(enabled: false),
+      ),
+    ),
+  );
+}
+

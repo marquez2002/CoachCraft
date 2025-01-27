@@ -4,15 +4,19 @@ class FilterSection extends StatefulWidget {
   final String season;
   final Function(String, String, String, DateTimeRange?) onFilterChanged;
 
-  const FilterSection({Key? key, required this.season, required this.onFilterChanged}) : super(key: key);
+  const FilterSection({
+    Key? key,
+    required this.season,
+    required this.onFilterChanged,
+  }) : super(key: key);
 
   @override
   _FilterSectionState createState() => _FilterSectionState();
 }
 
 class _FilterSectionState extends State<FilterSection> {
-  String _matchType = 'Todos';
-  String _rival = '';
+  String _matchType = 'Todos'; // Tipo de partido predeterminado
+  String _rival = ''; // Valor del filtro por rival
 
   /// Mapa de temporadas a rangos de fechas.
   final Map<String, DateTimeRange> _seasonDateRanges = {
@@ -35,12 +39,22 @@ class _FilterSectionState extends State<FilterSection> {
     'Todos': DateTimeRange(
       start: DateTime(2000, 1, 1),
       end: DateTime(2100, 12, 31),
-    ), 
+    ),
   };
 
   /// Obtiene el rango de fechas para la temporada seleccionada.
   DateTimeRange? _getDateRangeForSeason(String season) {
     return _seasonDateRanges[season];
+  }
+
+  /// Notifica a través del callback los cambios en los filtros.
+  void _notifyFilterChange() {
+    widget.onFilterChanged(
+      widget.season,
+      _matchType,
+      _rival,
+      _getDateRangeForSeason(widget.season),
+    );
   }
 
   @override
@@ -66,30 +80,30 @@ class _FilterSectionState extends State<FilterSection> {
               onChanged: (String value) {
                 setState(() {
                   _rival = value;
-                  // Actualiza el filtrado cuando el campo de rival cambia
-                  widget.onFilterChanged(widget.season, _matchType, _rival, _getDateRangeForSeason(widget.season));
                 });
+                _notifyFilterChange();
               },
             ),
             const SizedBox(height: 8.0),
 
             // Dropdown para seleccionar la temporada
             DropdownButtonFormField<String>(
-              value: widget.season,
+              value: widget.season, // Debe coincidir con las claves de _seasonDateRanges
               decoration: const InputDecoration(
                 labelText: 'Temporada',
                 border: OutlineInputBorder(),
               ),
               onChanged: (String? newValue) {
                 if (newValue != null && newValue != widget.season) {
-                  setState(() {
-                    // Actualiza la temporada seleccionada
-                    widget.onFilterChanged(newValue, _matchType, _rival, _getDateRangeForSeason(newValue));
-                  });
+                  widget.onFilterChanged(
+                    newValue,
+                    _matchType,
+                    _rival,
+                    _getDateRangeForSeason(newValue),
+                  );
                 }
               },
-              items: <String>['2025-26', '2024-25', '2023-24', '2022-23', 'Todos']
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: _seasonDateRanges.keys.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -108,14 +122,12 @@ class _FilterSectionState extends State<FilterSection> {
               onChanged: (String? newValue) {
                 if (newValue != null && newValue != _matchType) {
                   setState(() {
-                    // Actualiza el tipo de partido
                     _matchType = newValue;
-                    // Filtra con el nuevo tipo de partido, temporada, rival y rango de fechas
-                    widget.onFilterChanged(widget.season, _matchType, _rival, _getDateRangeForSeason(widget.season));
                   });
+                  _notifyFilterChange();
                 }
               },
-              items: <String>[
+              items: const [
                 'Todos',
                 'Liga',
                 'Copa',

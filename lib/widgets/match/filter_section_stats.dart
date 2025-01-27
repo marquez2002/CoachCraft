@@ -1,101 +1,13 @@
-/*
- * Archivo: filter_section_widget.dart
- * Descripción: Este archivo contiene la clase correspondiente al filtro de las estadisticas de los jugadores.
- * 
- * Autor: Gonzalo Márquez de Torres
- */
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Filtrado de Partidos',
-      home: ParentWidget(),
-    );
-  }
-}
-
-class ParentWidget extends StatefulWidget {
-  @override
-  _ParentWidgetState createState() => _ParentWidgetState();
-}
-
-class _ParentWidgetState extends State<ParentWidget> {
-  String _season = '2024'; 
-  String _matchType = 'Todos';
-  bool _isSearchingExpanded = false;
-
-  /// Función que permite actualizar los filtros correspondientes.
-  void _onFilterChanged(String season, String matchType) {
-    setState(() {
-      _season = season; 
-      _matchType = matchType;
-      fetchGeneralStats(_season, _matchType);
-    });
-  }
-
-  /// Función que permite buscar una serie determinada de partidos.
-  void fetchGeneralStats(String season, String matchType) {
-    print('Fetching stats for season: $season and match type: $matchType');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Filtrado de Partidos'),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearchingExpanded ? Icons.arrow_upward : Icons.arrow_downward),
-            onPressed: () {
-              setState(() {
-                _isSearchingExpanded = !_isSearchingExpanded; 
-              });
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_isSearchingExpanded) ...[
-              FilterSectionStats(
-                season: _season, 
-                matchType: _matchType,
-                onFilterChanged: _onFilterChanged, 
-              ),
-              const SizedBox(height: 16.0),
-            ],
-            // Muestra el estado actual de los filtros
-            Text('Temporada seleccionada: $_season'),
-            Text('Tipo de partido seleccionado: $_matchType'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Clase para filtrar las estadísticas de los jugadores.
 class FilterSectionStats extends StatefulWidget {
   final String season;
-  final String matchType;
-  final Function(String, String) onFilterChanged;
+  final Function(String, String, DateTimeRange?) onFilterChanged;
 
   const FilterSectionStats({
     Key? key,
     required this.season,
-    required this.matchType,
-    required this.onFilterChanged,
+    required this.onFilterChanged, required String matchType,
   }) : super(key: key);
 
   @override
@@ -103,10 +15,11 @@ class FilterSectionStats extends StatefulWidget {
 }
 
 class _FilterSectionStatsState extends State<FilterSectionStats> {
-  late String _season;
-  late String _matchType;
+  String _matchType = 'Todos'; // Tipo de partido predeterminado
+  // ignore: unused_field
+  String _rival = ''; // Valor del filtro por rival
 
-  /// Map de temporadas a rangos de fechas.
+  /// Mapa de temporadas a rangos de fechas.
   final Map<String, DateTimeRange> _seasonDateRanges = {
     '2025-26': DateTimeRange(
       start: DateTime(2025, 8, 1),
@@ -127,47 +40,21 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
     'Todos': DateTimeRange(
       start: DateTime(2000, 1, 1),
       end: DateTime(2100, 12, 31),
-    ), 
+    ),
   };
 
-  @override
-  void initState() {
-    super.initState();
-    _season = widget.season;
-    _matchType = widget.matchType;
-  }
-
-  @override
-  void didUpdateWidget(FilterSectionStats oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.season != widget.season || oldWidget.matchType != widget.matchType) {
-      setState(() {
-        _season = widget.season;
-        _matchType = widget.matchType;
-      });
-    }
-  }
-
-  void _onSeasonChanged(String? newSeason) {
-    if (newSeason != null) {
-      setState(() {
-        _season = newSeason;
-        widget.onFilterChanged(_season, _matchType);
-      });
-    }
-  }
-
-  void _onMatchTypeChanged(String? newMatchType) {
-    if (newMatchType != null) {
-      setState(() {
-        _matchType = newMatchType;
-        widget.onFilterChanged(_season, _matchType);
-      });
-    }
-  }
-
+  /// Obtiene el rango de fechas para la temporada seleccionada.
   DateTimeRange? _getDateRangeForSeason(String season) {
     return _seasonDateRanges[season];
+  }
+
+  /// Notifica a través del callback los cambios en los filtros.
+  void _notifyFilterChange() {
+    widget.onFilterChanged(
+      widget.season,
+      _matchType,
+      _getDateRangeForSeason(widget.season)
+    );
   }
 
   @override
@@ -186,14 +73,21 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
 
             // Dropdown para seleccionar la temporada
             DropdownButtonFormField<String>(
-              value: _season,
+              value: widget.season, // Debe coincidir con las claves de _seasonDateRanges
               decoration: const InputDecoration(
                 labelText: 'Temporada',
                 border: OutlineInputBorder(),
               ),
-              onChanged: _onSeasonChanged,
-              items: <String>['2025-26', '2024-25', '2023-24', '2022-23', 'Todos']
-                  .map<DropdownMenuItem<String>>((String value) {
+              onChanged: (String? newValue) {
+                if (newValue != null && newValue != widget.season) {
+                  widget.onFilterChanged(
+                    newValue,
+                    _matchType,
+                    _getDateRangeForSeason(newValue),
+                  );
+                }
+              },
+              items: _seasonDateRanges.keys.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -209,8 +103,15 @@ class _FilterSectionStatsState extends State<FilterSectionStats> {
                 labelText: 'Tipo de Partido',
                 border: OutlineInputBorder(),
               ),
-              onChanged: _onMatchTypeChanged,
-              items: <String>[
+              onChanged: (String? newValue) {
+                if (newValue != null && newValue != _matchType) {
+                  setState(() {
+                    _matchType = newValue;
+                  });
+                  _notifyFilterChange();
+                }
+              },
+              items: const [
                 'Todos',
                 'Liga',
                 'Copa',
