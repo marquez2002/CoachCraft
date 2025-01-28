@@ -1,3 +1,10 @@
+/*
+ * Archivo: filter_section_stats.dart
+ * Descripción: Este archivo contiene las distintas funciones para el filtro de estadísticas generales
+ *              en función de distintos parámetros.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 
 class FilterSectionStats extends StatefulWidget {
@@ -15,9 +22,9 @@ class FilterSectionStats extends StatefulWidget {
 }
 
 class _FilterSectionStatsState extends State<FilterSectionStats> {
-  String _matchType = 'Todos'; // Tipo de partido predeterminado
+  String _matchType = 'Todos'; 
   // ignore: unused_field
-  String _rival = ''; // Valor del filtro por rival
+  String _rival = ''; 
 
   /// Mapa de temporadas a rangos de fechas.
   final Map<String, DateTimeRange> _seasonDateRanges = {

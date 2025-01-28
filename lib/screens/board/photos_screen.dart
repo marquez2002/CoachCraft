@@ -8,14 +8,13 @@ class PhotosScreen extends StatefulWidget {
 }
 
 class _PhotosScreenState extends State<PhotosScreen> {
-  bool _isExpanded = false; // Controla el estado de expansión
+  bool _isExpanded = false; 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // SliverAppBar con botón de acción
           SliverAppBar(
             floating: true,
             snap: true,
@@ -55,8 +54,8 @@ class _PhotosScreenState extends State<PhotosScreen> {
           // Lista de videos usando SliverToBoxAdapter
           SliverToBoxAdapter(
             child: SizedBox(
-              height: MediaQuery.of(context).size.height, // Establecer altura para evitar problemas de desbordamiento
-              child: PhotosList(), // Este widget contiene la lista de videos
+              height: MediaQuery.of(context).size.height, 
+              child: PhotosList(), 
             ),
           ),
         ],

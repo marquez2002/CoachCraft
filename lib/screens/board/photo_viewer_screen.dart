@@ -4,7 +4,6 @@
  *              para visualizar las fotos subidas a Firebase.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
  */
 import 'package:flutter/material.dart';
 
@@ -21,7 +20,7 @@ class PhotoViewerScreen extends StatelessWidget {
       ),
       body: Center(
         child: InteractiveViewer(
-          child: Image.network(photoUrl), // Cargar la foto desde la URL
+          child: Image.network(photoUrl), 
         ),
       ),
     );

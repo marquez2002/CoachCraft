@@ -1,3 +1,9 @@
+/*
+ * Archivo: main.dart
+ * Descripción: Archivo de main de CoachCraft.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/match_provider.dart';
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:CoachCraft/screens/menu/home_screen.dart'; 

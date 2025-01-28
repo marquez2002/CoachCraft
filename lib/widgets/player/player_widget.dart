@@ -67,7 +67,6 @@ Widget buildPlayerFormField(
 /// Clase correspondiente a los datos del jugador
 class PlayerDataTable extends StatelessWidget {
   final List<Map<String, dynamic>> players;
-
   const PlayerDataTable({super.key, required this.players});
 
   @override
@@ -76,7 +75,7 @@ class PlayerDataTable extends StatelessWidget {
       scrollDirection: Axis.horizontal, 
       child: DataTable(
         // ignore: deprecated_member_use
-        dataRowHeight: 40, // Ajustar la altura de las filas
+        dataRowHeight: 40, 
         columns: const [
           DataColumn(label: Text('Nombre')),
           DataColumn(label: Text('Dorsal')),
@@ -153,7 +152,6 @@ class PlayerDataTable extends StatelessWidget {
 
                       if (confirmDelete) {
                         await deletePlayerByDorsal(context, dorsal);
-
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => MenuScreenFutsalTeam()),
@@ -205,7 +203,7 @@ class _FootballListPlayerState extends State<FootballListPlayer> {
               children: [
                 Expanded(
                   child: SingleChildScrollView( 
-                    child: PlayerDataTable(players: snapshot.data!), // Tabla de jugadores
+                    child: PlayerDataTable(players: snapshot.data!), 
                   ),
                 ),
                 Padding(

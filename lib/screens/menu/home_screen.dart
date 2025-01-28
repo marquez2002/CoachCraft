@@ -4,12 +4,6 @@
  *              que representa la pantalla principal de la aplicación CoachCraft.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Dependencias: 
- * - main_widget.dart: Proporciona el widget principal que se utiliza en el cuerpo.
- * 
- * Notas adicionales:
- * - Este archivo usa Material 3 para el diseño de la interfaz.
  */
 import 'package:CoachCraft/widgets/menu/home_widget.dart';
 import 'package:flutter/material.dart';

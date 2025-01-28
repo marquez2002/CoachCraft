@@ -26,6 +26,7 @@ Future<String?> getTeamId() async {
   }
 }
 
+/// Clase para el listado de fotos
 class PhotosList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -41,8 +42,8 @@ class PhotosList extends StatelessWidget {
 
       // Ahora eliminar el documento de Firestore
       await FirebaseFirestore.instance.collection('teams')
-        .doc(teamId) // Asegúrate de que 'teamId' es válido
-        .collection('photos') // Cambia 'football_plays' por 'photos'
+        .doc(teamId) 
+        .collection('photos') 
         .doc(documentId)
         .delete();
 
@@ -123,7 +124,7 @@ class PhotosList extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final photo = photos[index];
                       final name = photo['name'];
-                      final photoUrl = photo['photoUrl']; // Asegúrate de que esta clave coincide con tu Firestore
+                      final photoUrl = photo['photoUrl']; 
                       final documentId = photo.id; 
 
                       return Card(
@@ -140,7 +141,7 @@ class PhotosList extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: NetworkImage(photoUrl), // Cargar la foto desde la URL
+                                image: NetworkImage(photoUrl), 
                                 fit: BoxFit.cover,
                               ),
                               borderRadius: BorderRadius.circular(8.0),

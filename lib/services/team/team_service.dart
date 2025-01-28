@@ -68,7 +68,6 @@ class TeamService {
   /// Agregar un nuevo equipo
   Future<void> addTeam(String teamName) async {
     final String? uid = user?.uid; 
-    // Si no hay usuario autenticado, lanza una excepción
     if (uid == null) throw Exception('Usuario no autenticado');
 
     // Verifica que el nombre del equipo no esté vacío
@@ -92,7 +91,6 @@ class TeamService {
   /// Unirse a un equipo existente
   Future<void> joinTeam(String teamId, String role) async {
     final String? uid = user?.uid; 
-    // Si no hay usuario autenticado, lanza una excepción
     if (uid == null) throw Exception('Usuario no autenticado');
 
     try {

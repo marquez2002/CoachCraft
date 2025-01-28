@@ -209,7 +209,7 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                         Text('Número de miembros: ${team.members.length}'),
                         if (team.role == 'Entrenador') // Solo mostrar los botones si el rol es "Entrenador"
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // Centra los botones horizontalmente
+                            mainAxisAlignment: MainAxisAlignment.center, 
                             children: [
                               // Botón para copiar el código del entrenador
                               ElevatedButton.icon(
@@ -235,16 +235,16 @@ class _TeamListWidgetState extends State<TeamListWidget> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Text("Confirmar salida"),
-                              content: const Text("¿Estás seguro que quieres salir del equipo?"),
+                              title: const Text('Confirmar salida'),
+                              content: const Text('¿Estás seguro que quieres salir del equipo?'),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(context).pop(false),
-                                  child: const Text("Cancelar"),
+                                  child: const Text('Cancelar'),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.of(context).pop(true),
-                                  child: const Text("Salir"),
+                                  child: const Text('Salir'),
                                 ),
                               ],
                             );

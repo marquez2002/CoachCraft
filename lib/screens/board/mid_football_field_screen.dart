@@ -12,8 +12,7 @@ import 'package:CoachCraft/widgets/board/ball_widget.dart';
 import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
-/*import 'package:flutter_screen_recording/flutter_screen_recording.dart';
-import 'package:permission_handler/permission_handler.dart';*/
+
 
 class MidFootballFieldScreen extends StatefulWidget {
   const MidFootballFieldScreen({Key? key}) : super(key: key);
@@ -28,7 +27,6 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
   GlobalKey _imageKey = GlobalKey();
   Size? _imageSize;
   Color drawColor = Colors.red;
-  //bool _isRecording = false;
   String? videoPath;
 
   // Inicializa posiciones proporcionales al tamaño de la imagen (0.0 - 1.0)  
@@ -190,8 +188,8 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
                                   ),
                                   child: const Icon(
-                                    Icons.edit, // Ícono de lápiz
-                                    color: Colors.white, // Color del ícono (opcional, ajustado para contrastar)
+                                    Icons.edit, 
+                                    color: Colors.white, 
                                   ),
                                 ),
                                 const SizedBox(height: 10), 
@@ -202,8 +200,8 @@ class _MidFootballFieldScreenState extends State<MidFootballFieldScreen> {
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
                                   ),
                                   child: const Icon(
-                                    Icons.edit, // Ícono de lápiz
-                                    color: Colors.white, // Color del ícono (opcional)
+                                    Icons.edit, 
+                                    color: Colors.white, 
                                   ),
                                 ),
                               ],

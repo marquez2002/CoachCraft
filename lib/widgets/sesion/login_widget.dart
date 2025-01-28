@@ -21,14 +21,9 @@ class LoginWidget extends StatefulWidget {
 
 /// Estado asociado al LoginWidget, que maneja el estado del formulario de inicio de sesión.
 class _LoginWidgetState extends State<LoginWidget> {
-  // Controladores para los campos de texto
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  // Llave global para validar el formulario
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  // Instancia del servicio de autenticación
   final LoginService _loginService = LoginService();
 
   @override
@@ -120,7 +115,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const TeamsScreen()),
+                                  builder: (context) => const TeamsScreen()),
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -138,7 +133,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const RegisterScreen()),
+                              builder: (context) => const RegisterScreen()),
                           );
                         },
                         child: const Text(
@@ -155,8 +150,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const PasswordRecoveryScreen()),
+                              builder: (context) => const PasswordRecoveryScreen()),
                           );
                         },
                         child: const Text(

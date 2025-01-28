@@ -9,6 +9,7 @@ import 'package:CoachCraft/services/player/player_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+/// Clase para el formulario de los partidos.
 class MatchForm extends StatefulWidget {
   final Function onMatchCreated;
 

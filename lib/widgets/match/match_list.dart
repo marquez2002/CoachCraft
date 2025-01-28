@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:CoachCraft/provider/match_provider.dart';
 import 'package:CoachCraft/screens/stats/stats_screen.dart';
 
+/// Clase para el listado de partidos
 class MatchList extends StatelessWidget {
   final List<Map<String, dynamic>> filteredMatches;
   final bool isLoading;
@@ -33,7 +34,6 @@ class MatchList extends StatelessWidget {
         return 'assets/image/amistoso.png';
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

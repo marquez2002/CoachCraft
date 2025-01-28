@@ -4,7 +4,6 @@
  *              que permite conocer los datos del equipo que estamos visualizando.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
  */
 import 'package:flutter/material.dart';
 

@@ -46,14 +46,13 @@ class _RecordingPlayScreenState extends State<RecordingPlayScreen> {
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8.0),
-                    UploadForm(), // Widget de formulario para subir jugadas
+                    UploadForm(), 
                     const SizedBox(height: 16.0),
                   ],
                 ),
               ),
             ),
 
-          // Lista de videos usando SliverToBoxAdapter
           SliverToBoxAdapter(
             child: SizedBox(
               height: MediaQuery.of(context).size.height, 

@@ -1,8 +1,16 @@
+/*
+ * Archivo: football_plays_list.dart
+ * Descripción: Este archivo contiene un servicio que permite realizar diferentes operaciones sobre
+ *              la base de datos a nivel de jugadores, como añadir jugador, listar jugadores, etc.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/screens/board/video_player_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
+/// Funcion para obtener el id del equipo concreto.
 Future<String?> getTeamId() async {
   try {
     QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('teams').limit(1).get();
@@ -17,6 +25,7 @@ Future<String?> getTeamId() async {
   }
 }
 
+/// Clase de la lista de videos
 class VideoList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -84,7 +93,7 @@ class VideoList extends StatelessWidget {
       // Ahora eliminar el documento de Firestore
       await FirebaseFirestore.instance
           .collection('teams')
-          .doc(teamId) // Asegúrate de que 'teamId' es válido
+          .doc(teamId) 
           .collection('football_plays')
           .doc(documentId)
           .delete();

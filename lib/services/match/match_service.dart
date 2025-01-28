@@ -176,9 +176,7 @@ class MatchService {
 
     for (var match in matches.docs) {
       var matchRef = match.reference;
-
       await _deletePlayers(matchRef);
-
       await matchRef.delete();
     }
   }

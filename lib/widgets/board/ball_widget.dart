@@ -6,6 +6,7 @@
  */
 import 'package:flutter/material.dart';
 
+/// Clase de la bola en la pizarra táctica
 class Ball extends StatefulWidget {
   final Offset initialPosition; 
   final String image;
@@ -20,6 +21,7 @@ class Ball extends StatefulWidget {
   _BallState createState() => _BallState();
 }
 
+/// Clase del estado de la bola en la pizarra táctica
 class _BallState extends State<Ball> {
   late Offset _position;
 

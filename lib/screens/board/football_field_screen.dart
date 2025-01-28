@@ -1,5 +1,5 @@
 /*
- * Archivo: mid_football_field_screen.dart
+ * Archivo: football_field_screen.dart
  * Descripción: Este archivo contiene la pantalla correspondiente a la pizarra táctica de pista completa.
  * 
  * Autor: Gonzalo Márquez de Torres
@@ -12,8 +12,6 @@ import 'package:CoachCraft/widgets/board/ball_widget.dart';
 import 'package:CoachCraft/widgets/board/field_painter_widget.dart';
 import 'package:CoachCraft/widgets/board/football_piece_widget.dart';
 import 'package:flutter/material.dart';
-/*import 'package:flutter_screen_recording/flutter_screen_recording.dart';
-import 'package:permission_handler/permission_handler.dart';*/
 
 class FootballFieldScreen extends StatefulWidget {
   const FootballFieldScreen({Key? key}) : super(key: key);
@@ -51,8 +49,6 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
   void initState() {
     super.initState();
     _currentPositions = _initialPositions.map((e) => e['position'] as Offset).toList();
-    //_checkPermissions();
-
   }
 
   void _toggleDrawing() {
@@ -190,8 +186,8 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
                                   ),
                                   child: const Icon(
-                                    Icons.edit, // Ícono de lápiz
-                                    color: Colors.white, // Color del ícono (opcional, ajustado para contrastar)
+                                    Icons.edit, 
+                                    color: Colors.white, 
                                   ),
                                 ),
                                 const SizedBox(height: 10), 
@@ -202,8 +198,8 @@ class _FootballFieldScreenState extends State<FootballFieldScreen> {
                                     minimumSize: Size(MediaQuery.of(context).size.width * 0.02, 30),
                                   ),
                                   child: const Icon(
-                                    Icons.edit, // Ícono de lápiz
-                                    color: Colors.white, // Color del ícono (opcional)
+                                    Icons.edit, 
+                                    color: Colors.white, 
                                   ),
                                 ),
                               ],

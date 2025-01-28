@@ -1,3 +1,9 @@
+/*
+ * Archivo: upload_photo_form.dart
+ * Descripción: Este archivo contiene el formulario para subir una foto
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -19,6 +25,7 @@ Future<String?> getTeamId() async {
   }
 }
 
+/// Clase del formulario para subir una foto 
 class UploadPhotosForm extends StatefulWidget {
   @override
   _UploadPhotosFormState createState() => _UploadPhotosFormState();
@@ -27,9 +34,9 @@ class UploadPhotosForm extends StatefulWidget {
 class _UploadPhotosFormState extends State<UploadPhotosForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  String? _selectedType; // Tipo de foto
-  Uint8List? _photoBytes; // Bytes de la foto seleccionada
-  bool _isUploading = false; // Estado de carga
+  String? _selectedType; 
+  Uint8List? _photoBytes;
+  bool _isUploading = false;
 
     /// Función para seleccionar una foto
     Future<void> _selectPhoto() async {
@@ -71,6 +78,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
     }
   }
 
+  /// Funcion para subir la foto
   Future<String?> uploadPhoto() async {
     Uint8List? photoBytes;
     String? fileName;
@@ -80,13 +88,13 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
       if (kIsWeb) {
         // Web: Usa el FilePicker para seleccionar la foto
         final result = await FilePicker.platform.pickFiles(
-          type: FileType.image, // Solo permite seleccionar imágenes
+          type: FileType.image, 
           
         );
 
         if (result != null && result.files.single.bytes != null) {
           photoBytes = result.files.single.bytes;
-          fileName = result.files.single.name; // Usa el nombre original del archivo
+          fileName = result.files.single.name; 
         } else {
           print('No se seleccionó ninguna imagen.');
           return null;
@@ -140,7 +148,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
       }
 
       setState(() {
-        _isUploading = true; // Activar estado de carga
+        _isUploading = true; 
       });
 
       String? photoUrl = await uploadPhoto();
@@ -181,7 +189,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
       }
 
       setState(() {
-        _isUploading = false; // Desactivar estado de carga
+        _isUploading = false; 
       });
     }
   }
@@ -241,7 +249,7 @@ class _UploadPhotosFormState extends State<UploadPhotosForm> {
               Container(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isUploading ? null : _handleSubmit, // Deshabilitar mientras se sube
+                  onPressed: _isUploading ? null : _handleSubmit, 
                   child: _isUploading
                       ? const CircularProgressIndicator()
                       : const Text('Subir Foto'),

@@ -1,3 +1,10 @@
+/*
+ * Archivo: filter_section.dart
+ * Descripción: Este archivo contiene las distintas funciones para el filtro de partidos en función
+ *              de distintos parámetros.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 
 class FilterSection extends StatefulWidget {
@@ -15,8 +22,8 @@ class FilterSection extends StatefulWidget {
 }
 
 class _FilterSectionState extends State<FilterSection> {
-  String _matchType = 'Todos'; // Tipo de partido predeterminado
-  String _rival = ''; // Valor del filtro por rival
+  String _matchType = 'Todos'; 
+  String _rival = ''; 
 
   /// Mapa de temporadas a rangos de fechas.
   final Map<String, DateTimeRange> _seasonDateRanges = {
@@ -88,7 +95,7 @@ class _FilterSectionState extends State<FilterSection> {
 
             // Dropdown para seleccionar la temporada
             DropdownButtonFormField<String>(
-              value: widget.season, // Debe coincidir con las claves de _seasonDateRanges
+              value: widget.season, 
               decoration: const InputDecoration(
                 labelText: 'Temporada',
                 border: OutlineInputBorder(),

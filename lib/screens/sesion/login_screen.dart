@@ -4,14 +4,7 @@
  *              que representa la pantalla de inicio de sesión de la aplicación CoachCraft.
  * 
  * Autor: : Gonzalo Márquez de Torres
- * 
- * Dependencias: 
- * - login_widget.dart: Proporciona el widget que contiene el formulario y la lógica para el inicio de sesión.
- * 
- * Notas adicionales:
- * - Este archivo utiliza Material 3 para el diseño de la interfaz.
  */
-
 import 'package:CoachCraft/widgets/sesion/login_widget.dart'; // Importa el widget de inicio de sesión.
 import 'package:flutter/material.dart';
 

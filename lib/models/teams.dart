@@ -4,7 +4,6 @@
  *              con la información relativa a los equipos.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
  */
 class Teams {
   final String id; 

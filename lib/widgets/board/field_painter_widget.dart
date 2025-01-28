@@ -6,6 +6,7 @@
  */
 import 'package:flutter/material.dart';
 
+/// Clase con funciones relacionadas para el dibujo en la pizarra táctica.
 class FieldPainter extends CustomPainter {
   final List<Offset> points;
   final Color drawColor;

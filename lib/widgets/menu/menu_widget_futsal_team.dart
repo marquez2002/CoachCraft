@@ -41,7 +41,6 @@ class MenuWidgetFutsalTeam extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Column to hold the buttons vertically
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: buttonData.map((data) {

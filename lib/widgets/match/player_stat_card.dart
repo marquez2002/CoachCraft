@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// Clase correspondiente a la estadísticas de un jugador concreto
 class PlayerStatTable extends StatefulWidget {
   const PlayerStatTable({Key? key}) : super(key: key);
 
@@ -202,7 +203,6 @@ class _PlayerStatTableState extends State<PlayerStatTable> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-
                       // Tabla para porteros
                       Center(
                         child: Column(

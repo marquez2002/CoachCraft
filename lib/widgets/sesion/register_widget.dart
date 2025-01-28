@@ -20,7 +20,6 @@ class RegisterWidget extends StatefulWidget {
 
 /// Estado asociado al RegisterWidget, que maneja el estado del formulario de registro.
 class _RegisterWidgetState extends State<RegisterWidget> {
-  // Controladores para los campos de texto del formulario
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -76,7 +75,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 20),
                       // Campo de texto para ingresar el correo electrónico
                       TextFormField(
-                        key: const Key('emailField'), // Agregamos la clave aquí
+                        key: const Key('emailField'), 
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
@@ -93,7 +92,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 20),
                       // Campo de texto para ingresar la contraseña
                       TextFormField(
-                        key: const Key('passwordField'), // Agregamos la clave aquí
+                        key: const Key('passwordField'), 
                         controller: _passwordController,
                         obscureText: true,
                         decoration: const InputDecoration(
@@ -110,7 +109,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 20),
                       // Campo de texto para confirmar la contraseña
                       TextFormField(
-                        key: const Key('confirmPasswordField'), // Agregamos la clave aquí
+                        key: const Key('confirmPasswordField'), 
                         controller: _confirmPasswordController,
                         obscureText: true,
                         decoration: const InputDecoration(
@@ -129,7 +128,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(height: 30),
                       // Botón para registrar un nuevo usuario
                       ElevatedButton(
-                        key: const Key('registerButton'), // Agregamos la clave aquí
+                        key: const Key('registerButton'), 
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             try {
@@ -160,7 +159,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const LoginWidget()),
+                              builder: (context) => const LoginWidget()),
                           );
                         },
                         child: const Text(

@@ -1,3 +1,10 @@
+/*
+ * Archivo: individual_stats_screen.dart
+ * Descripción: Este archivo contiene la definición de la pantalla de estadísticas 
+ *              individuales de los jugadores.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

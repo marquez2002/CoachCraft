@@ -1,3 +1,9 @@
+/*
+ * Archivo: stats_screen.dart
+ * Descripción: Este archivo contiene la pantalla de estadísticas de un partido concreto.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/widgets/match/player_stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal.dart';

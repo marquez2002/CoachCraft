@@ -7,11 +7,9 @@ import 'dart:typed_data';
 // Función para obtener el teamId basado en un criterio (por ejemplo, el primer equipo)
 Future<String?> getTeamId() async {
   try {
-    // Obtener el primer documento de la colección 'teams'
     QuerySnapshot teamSnapshot = await FirebaseFirestore.instance.collection('teams').limit(1).get();
     
     if (teamSnapshot.docs.isNotEmpty) {
-      // Retornar el ID del primer equipo encontrado
       return teamSnapshot.docs.first.id;
     } else {
       throw Exception('No se encontraron equipos'); 
@@ -21,6 +19,7 @@ Future<String?> getTeamId() async {
   }
 }
 
+/// Clase del formulario del video
 class UploadForm extends StatefulWidget {
   @override
   _UploadFormState createState() => _UploadFormState();
@@ -36,8 +35,8 @@ class _UploadFormState extends State<UploadForm> {
   // Función para seleccionar un video
   Future<void> _selectVideo() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.video, // Solo permite seleccionar videos
-      withData: true, // Asegura que se lean los bytes
+      type: FileType.video, 
+      withData: true, 
     );
 
     if (result != null && result.files.isNotEmpty) {
@@ -87,7 +86,7 @@ Future<String?> _uploadVideo() async {
         const SnackBar(content: Text('No hay video seleccionado para subir')),
       );
     }
-    return null; // En caso de error o falta de video
+    return null; 
   }
 
   Future<void> _handleSubmit() async {
@@ -165,7 +164,7 @@ Future<String?> _uploadVideo() async {
                   return null;
                 },
               ),
-              SizedBox(height: 20),  // Agrega espaciado entre los elementos
+              SizedBox(height: 20),  
               DropdownButtonFormField<String>(
                 value: _selectedType,
                 hint: const Text('Seleccionar tipo'),
@@ -175,7 +174,7 @@ Future<String?> _uploadVideo() async {
                 ],
                 onChanged: (value) {
                   setState(() {
-                    _selectedType = value; // Actualiza el tipo seleccionado
+                    _selectedType = value;
                   });
                 },
                 validator: (value) {
@@ -196,7 +195,7 @@ Future<String?> _uploadVideo() async {
                   ),
                 ),
               ),
-              SizedBox(height: 20),  // Espaciado entre botones
+              SizedBox(height: 20),  
               // Botón para subir jugada
               Container(
                 width: double.infinity,

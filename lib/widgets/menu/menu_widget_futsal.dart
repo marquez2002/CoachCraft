@@ -1,4 +1,9 @@
-
+/*
+ * Archivo: menu_widget_futsal.dart
+ * Descripción: Este archivo contiene la definición de la clase del menú del equipo.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:CoachCraft/screens/board/football_field_screen.dart';
 import 'package:CoachCraft/screens/menu/menu_screen_futsal_team.dart';
@@ -18,14 +23,14 @@ class MenuWidgetFutsal extends StatefulWidget {
 }
 
 class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
-  String _userRole = 'loading'; // Estado para el tipo de usuario
-  User? _currentUser; // Estado para almacenar el usuario autenticado
+  String _userRole = 'loading'; 
+  User? _currentUser; 
 
   @override
   void initState() {
     super.initState();
-    _resetUserData(); // Limpia y reinicia los datos cada vez que se inicia el widget
-    _getUserData(); // Obtén los datos del usuario
+    _resetUserData(); 
+    _getUserData(); 
   }
 
   /// Método para obtener el rol del usuario utilizando el nombre del equipo desde el Provider
@@ -44,7 +49,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         if (teamName.isEmpty) {
           print('No se ha seleccionado un equipo.');
           setState(() {
-            _userRole = 'Jugador'; // Rol por defecto
+            _userRole = 'Jugador'; 
           });
           return;
         }
@@ -60,7 +65,8 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         if (teamQuery.docs.isEmpty) {
           print('No se encontró ningún equipo con el nombre: $teamName');
           setState(() {
-            _userRole = 'Jugador'; // Rol por defecto si no se encuentra el equipo
+            // Rol por defecto si no se encuentra el equipo
+            _userRole = 'Jugador'; 
           });
           return;
         }
@@ -72,7 +78,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
         List<dynamic> members = teamDoc['members'];
         print('Miembros del equipo ${teamDoc.id}: $members');
 
-        String userRole = 'Jugador'; // Valor por defecto
+        String userRole = 'Jugador'; 
 
         for (var member in members) {
           if (member is Map<String, dynamic> && member['uid'] == _currentUser!.uid) {
@@ -94,7 +100,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
       } else {
         print('No hay usuario autenticado.');
         setState(() {
-          _userRole = 'Jugador'; // Rol por defecto si no hay usuario autenticado
+          _userRole = 'Jugador'; 
         });
       }
     } catch (e) {
@@ -105,6 +111,7 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
     }
   }
 
+  /// Función para resetear los datos de un usuario
   void _resetUserData() {
     setState(() {
       _userRole = 'loading';
@@ -163,7 +170,6 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Column to hold the buttons vertically
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buttonData.map((data) {
@@ -187,9 +193,9 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                                   style: ElevatedButton.styleFrom(
                                     foregroundColor: isEnabled ? Colors.black : Colors.grey,
                                     backgroundColor: Colors.white,
-                                    disabledBackgroundColor: Colors.white, // Fondo al estar deshabilitado
+                                    disabledBackgroundColor: Colors.white, 
                                     padding: EdgeInsets.symmetric(
-                                      vertical: screenSize.height * 0.02, // Ajustar el padding vertical
+                                      vertical: screenSize.height * 0.02, 
                                     ),
                                   ),
                                   child: Row(
@@ -199,15 +205,15 @@ class _MenuWidgetFutsalState extends State<MenuWidgetFutsal> {
                                         data['label'],
                                         style: TextStyle(
                                           fontSize: 20,
-                                          color: isEnabled ? Colors.black : Colors.grey, // Color dinámico
+                                          color: isEnabled ? Colors.black : Colors.grey, 
                                         ),
                                       ),
-                                      if (!isEnabled) // Mostrar candado si está deshabilitado
+                                      if (!isEnabled) 
                                         const Padding(
-                                          padding: EdgeInsets.only(left: 8.0), // Espaciado entre texto e icono
+                                          padding: EdgeInsets.only(left: 8.0), 
                                           child: Icon(
-                                            Icons.lock, // Icono de candado
-                                            color: Colors.black, // Color del candado
+                                            Icons.lock, 
+                                            color: Colors.black, 
                                           ),
                                         ),
                                     ],

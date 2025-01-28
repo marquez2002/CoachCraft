@@ -4,7 +4,6 @@
  *              para visualizar los videos de jugadas subidas a Firebase.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
  */
 import 'dart:io';
 import 'package:flutter/material.dart';

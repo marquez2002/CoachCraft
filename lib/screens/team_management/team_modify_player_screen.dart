@@ -165,8 +165,7 @@ class _FootballModifyPlayerState extends State<FootballModifyPlayer> {
                   onPressed: () async {
                     // Solo procede si el formulario es válido
                     if (_formKey.currentState!.validate()) {
-                      await _modifyPlayer(); // Modifica el jugador
-                      // Si se modifica correctamente, navega al MenuScreenFutsalTeam
+                      await _modifyPlayer(); 
                       Navigator.push(
                         context,
                         MaterialPageRoute(

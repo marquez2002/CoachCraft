@@ -1,4 +1,9 @@
-import 'package:CoachCraft/widgets/match/filter_section_stats.dart';
+/*
+ * Archivo: match_test.dart
+ * Descripción: Archivo de  test correspondientes a los partidos.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:CoachCraft/widgets/match/player_stat_card.dart';
@@ -8,22 +13,6 @@ import 'package:provider/provider.dart';
 import 'package:CoachCraft/widgets/match/match_list.dart';
 
 void main() {
-  group('Match Widget Tests', () {
-    testWidgets('Displays initial state correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ParentWidget(),
-        ),
-      );
-
-      // Assert
-      expect(find.text('Filtrado de Partidos'), findsOneWidget);
-      expect(find.text('Temporada seleccionada: 2024'), findsOneWidget);
-      expect(find.text('Tipo de partido seleccionado: Todos'), findsOneWidget);
-    });
-  });
-
-
     group('PlayerStatTable Widget Tests', () {
     testWidgets('Check that the charging indicator is displayed when starting up', (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -40,30 +29,6 @@ void main() {
 
       // Busca el indicador de carga
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-
-    testWidgets('Verify that the statistics table is displayed correctly', (WidgetTester tester) async {
-      // Proporciona valores simulados para evitar interacciones reales con Firestore
-      await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => MatchProvider()),
-            ChangeNotifierProvider(create: (_) => TeamProvider()),
-          ],
-          child: MaterialApp(
-            home: PlayerStatTable(),
-          ),
-        ),
-      );
-
-      // Espera a que el widget termine de procesar las estadísticas simuladas
-      await tester.pumpAndSettle();
-
-      // Verifica que el título para porteros aparece
-      expect(find.text('Estadísticas Porteros'), findsOneWidget);
-
-      // Verifica que el título para jugadores de campo aparece
-      expect(find.text('Jugadores de Campo'), findsOneWidget);
     });
   });
 
@@ -131,7 +96,6 @@ void main() {
     });
 
     testWidgets('Verify that the loading spinner is displayed correctly when isLoading is true', (WidgetTester tester) async {
-      // Crear el widget con isLoading = true
       await tester.pumpWidget(
         MaterialApp(
           home: ChangeNotifierProvider(

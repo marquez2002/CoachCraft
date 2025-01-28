@@ -1,3 +1,10 @@
+/*
+ * Archivo: general_stats_screen.dart
+ * Descripción: Este archivo contiene la definición de la pantalla de estadísticas  
+ *              generales.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:CoachCraft/widgets/match/filter_section_stats.dart';
 import 'package:CoachCraft/screens/stats/individual_stats_player_screen.dart';
@@ -44,156 +51,144 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
     fetchGeneralStats(_season, _matchType, null); // Usa las variables de clase directamente
   }
 
-  
+  DateTimeRange _getDateRangeForSeason(String season) {
+    if (season == 'Todos') {
+      return DateTimeRange(
+        start: DateTime(1900, 1, 1),  
+        end: DateTime(2100, 12, 31),
+      );
+    } else {
+      final yearStart = int.parse(season.split('-')[0]); 
+      final yearEnd = int.parse(season.split('-')[1]);   
 
-DateTimeRange _getDateRangeForSeason(String season) {
-  if (season == 'Todos') {
-    // Si la temporada es 'Todos', devolvemos un rango de fechas muy amplio
-    return DateTimeRange(
-      start: DateTime(1900, 1, 1),  
-      end: DateTime(2100, 12, 31),
-    );
-  } else {
-    // La temporada está en el formato "2022-23"
-    final yearStart = int.parse(season.split('-')[0]); // Año de inicio
-    final yearEnd = int.parse(season.split('-')[1]);   // Año de fin
+      final startDate = DateTime(yearStart, 8, 1); 
+      final endDate = DateTime(2000+yearEnd, 7, 31); 
 
-    // El inicio de la temporada es el 1 de agosto del año de inicio
-    final startDate = DateTime(yearStart, 8, 1); // Inicio: 1 de agosto
-
-    // El final de la temporada es el 31 de julio del año siguiente al de inicio
-    final endDate = DateTime(2000+yearEnd, 7, 31); // Fin: 31 de julio del siguiente año
-
-    return DateTimeRange(start: startDate, end: endDate);
+      return DateTimeRange(start: startDate, end: endDate);
+    }
   }
-}
 
-Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
-  setState(() => isLoading = true); // Inicia el estado de carga
-  try {
-    // Obtener ID del equipo seleccionado
-    String? teamId = await getTeamId(context);
-    if (teamId == null) {
-      throw Exception('El ID del equipo es null');
-    }
-
-    // Obtener el rango de fechas para la temporada
-    DateTimeRange seasonDateRange = _getDateRangeForSeason(season);
-    
-    print('Buscando partidos desde: ${seasonDateRange.start} hasta ${seasonDateRange.end} para el equipo: $teamId');
-
-    // Construir la consulta inicial con filtro de fechas
-    Query matchesQuery = FirebaseFirestore.instance
-        .collection('teams')
-        .doc(teamId)
-        .collection('matches')
-        .where('matchDate', isGreaterThanOrEqualTo: seasonDateRange.start.toIso8601String())
-        .where('matchDate', isLessThanOrEqualTo: seasonDateRange.end.toIso8601String());
-
-    // Aplicar filtro de tipo de partido si corresponde
-    if (matchType != 'Todos') {
-      matchesQuery = matchesQuery.where('matchType', isEqualTo: matchType);
-    }
-
-    // Ejecutar la consulta y obtener los partidos
-    QuerySnapshot matchesSnapshot = await matchesQuery.get();
-    print('Partidos encontrados: ${matchesSnapshot.docs.length}');
-    matchesCount = matchesSnapshot.docs.length;
-
-    // Reiniciar las estadísticas acumuladas
-    matchesStats.clear();
-    Map<String, dynamic> statsAccumulated = {
-      'goals': 0,
-      'assists': 0,
-      'saves': 0,
-      'shotsReceived': 0,
-      'goalsReceived': 0,
-      'shots': 0,
-      'shotsOnGoal': 0,
-      'yellowCards': 0,
-      'redCards': 0,
-      'foul': 0,
-    };
-
-    final statKeys = statsAccumulated.keys.toList(); // Lista de claves para estadísticas
-
-    // Iterar sobre los partidos encontrados
-    for (var match in matchesSnapshot.docs) {
-      print("Procesando partido con ID: ${match.id}");
-
-      // Extraer datos del partido
-      String matchName = match['rivalTeam'] ?? 'Partido sin nombre';
-      DateTime matchDate = DateTime.parse(match['matchDate']);
-      String formattedDate = DateFormat('dd-MM-yyyy').format(matchDate);
-
-      // Inicializar estadísticas para el partido
-      Map<String, dynamic> matchStats = {
-        'matchName': matchName,
-        'matchDate': formattedDate,
-        ...statsAccumulated.map((key, _) => MapEntry(key, 0)),
-      };
-
-      // Consultar los jugadores del partido
-      QuerySnapshot playerSnapshot = await match.reference.collection('players').get();
-      print('Jugadores encontrados en el partido: ${playerSnapshot.docs.length}');
-
-      // Sumar estadísticas de cada jugador
-      for (var player in playerSnapshot.docs) {
-        Map<String, dynamic> playerData = player.data() as Map<String, dynamic>;
-
-        // Sumar cada estadística con un helper
-        _addStats(matchStats, playerData, statKeys);
+  Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
+    setState(() => isLoading = true); 
+    try {
+      // Obtener ID del equipo seleccionado
+      String? teamId = await getTeamId(context);
+      if (teamId == null) {
+        throw Exception('El ID del equipo es null');
       }
 
-      // Acumular estadísticas generales
-      _addStats(statsAccumulated, matchStats, statKeys);
+      // Obtener el rango de fechas para la temporada
+      DateTimeRange seasonDateRange = _getDateRangeForSeason(season);
+      
+      print('Buscando partidos desde: ${seasonDateRange.start} hasta ${seasonDateRange.end} para el equipo: $teamId');
 
-      // Agregar estadísticas del partido a la lista
-      matchesStats.add(matchStats);
+      // Construir la consulta inicial con filtro de fechas
+      Query matchesQuery = FirebaseFirestore.instance
+          .collection('teams')
+          .doc(teamId)
+          .collection('matches')
+          .where('matchDate', isGreaterThanOrEqualTo: seasonDateRange.start.toIso8601String())
+          .where('matchDate', isLessThanOrEqualTo: seasonDateRange.end.toIso8601String());
+
+      // Aplicar filtro de tipo de partido si corresponde
+      if (matchType != 'Todos') {
+        matchesQuery = matchesQuery.where('matchType', isEqualTo: matchType);
+      }
+
+      // Ejecutar la consulta y obtener los partidos
+      QuerySnapshot matchesSnapshot = await matchesQuery.get();
+      print('Partidos encontrados: ${matchesSnapshot.docs.length}');
+      matchesCount = matchesSnapshot.docs.length;
+
+      // Reiniciar las estadísticas acumuladas
+      matchesStats.clear();
+      Map<String, dynamic> statsAccumulated = {
+        'goals': 0,
+        'assists': 0,
+        'saves': 0,
+        'shotsReceived': 0,
+        'goalsReceived': 0,
+        'shots': 0,
+        'shotsOnGoal': 0,
+        'yellowCards': 0,
+        'redCards': 0,
+        'foul': 0,
+      };
+
+      final statKeys = statsAccumulated.keys.toList(); 
+
+      // Iterar sobre los partidos encontrados
+      for (var match in matchesSnapshot.docs) {
+        print('Procesando partido con ID: ${match.id}');
+
+        // Extraer datos del partido
+        String matchName = match['rivalTeam'] ?? 'Partido sin nombre';
+        DateTime matchDate = DateTime.parse(match['matchDate']);
+        String formattedDate = DateFormat('dd-MM-yyyy').format(matchDate);
+
+        // Inicializar estadísticas para el partido
+        Map<String, dynamic> matchStats = {
+          'matchName': matchName,
+          'matchDate': formattedDate,
+          ...statsAccumulated.map((key, _) => MapEntry(key, 0)),
+        };
+
+        // Consultar los jugadores del partido
+        QuerySnapshot playerSnapshot = await match.reference.collection('players').get();
+        print('Jugadores encontrados en el partido: ${playerSnapshot.docs.length}');
+
+        // Sumar estadísticas de cada jugador
+        for (var player in playerSnapshot.docs) {
+          Map<String, dynamic> playerData = player.data() as Map<String, dynamic>;
+          
+          // Sumar cada estadística con un helper
+          _addStats(matchStats, playerData, statKeys);
+        }
+
+        // Acumular estadísticas generales
+        _addStats(statsAccumulated, matchStats, statKeys);
+
+        // Agregar estadísticas del partido a la lista
+        matchesStats.add(matchStats);
+      }
+
+      // Imprimir estadísticas acumuladas para depuración
+      print('Estadísticas acumuladas: $statsAccumulated');
+    } catch (e) {
+      print('[ERROR] Ocurrió un error al obtener las estadísticas: $e');
+    } finally {
+      setState(() => isLoading = false);
     }
-
-    // Imprimir estadísticas acumuladas para depuración
-    print('Estadísticas acumuladas: $statsAccumulated');
-  } catch (e) {
-    print('[ERROR] Ocurrió un error al obtener las estadísticas: $e');
-  } finally {
-    setState(() => isLoading = false); // Detener el indicador de carga
   }
-}
 
-// Helper para acumular estadísticas
-void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<String> keys) {
-  for (var key in keys) {
-    target[key] = (target[key] ?? 0) + (source[key] ?? 0);
+  void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<String> keys) {
+    for (var key in keys) {
+      target[key] = (target[key] ?? 0) + (source[key] ?? 0);
+    }
   }
-}
-
-
 
   Future<String?> getTeamId(BuildContext context) async {
     try {
       String selectedTeam = Provider.of<TeamProvider>(context, listen: false).selectedTeamName;
-
       if (selectedTeam.isEmpty) {
         throw Exception('No hay equipo seleccionado');
       }
 
-      QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
-          .collection('teams')
-          .where('name', isEqualTo: selectedTeam)
-          .limit(1)
-          .get();
+    QuerySnapshot teamSnapshot = await FirebaseFirestore.instance
+        .collection('teams')
+        .where('name', isEqualTo: selectedTeam)
+        .limit(1)
+        .get();
 
-      if (teamSnapshot.docs.isNotEmpty) {
-        return teamSnapshot.docs.first.id;
-      } else {
-        throw Exception('No se encontró el equipo seleccionado');
-      }
-    } catch (e) {
-        throw Exception('Error al obtener el teamId: $e');
-      }
+    if (teamSnapshot.docs.isNotEmpty) {
+      return teamSnapshot.docs.first.id;
+     } else {
+      throw Exception('No se encontró el equipo seleccionado');
     }
-
+  } catch (e) {
+        throw Exception('Error al obtener el teamId: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,16 +197,16 @@ void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<St
         slivers: [
           SliverAppBar(
             title: const Text('Estadísticas Generales'),
-            pinned: false, // El AppBar no se mantiene fijo
-            floating: true, // Aparece al hacer scroll hacia arriba
-            snap: true, // Permite que el AppBar aparezca rápidamente cuando se hace scroll hacia arriba
+            pinned: false, 
+            floating: true,
+            snap: true,
             actions: [
               IconButton(
                 icon: const Icon(Icons.person_pin_circle_rounded),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => IndividualStatsPlayerScreen()), // Navega a la InfoPage
+                    MaterialPageRoute(builder: (context) => IndividualStatsPlayerScreen()), 
                   );
                 },
               ),
@@ -219,9 +214,9 @@ void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<St
                 icon: const Icon(Icons.info_outline),
                 onPressed: () {
                   setState(() {
-                    _isInfoExpanded = !_isInfoExpanded; // Cambia el estado del infoExpanded
+                    _isInfoExpanded = !_isInfoExpanded; 
                     if (_isInfoExpanded) {
-                      _isSearchingExpanded = false; // Cierra el filtro si se abre la info
+                      _isSearchingExpanded = false; 
                     }
                   });
                 },
@@ -230,9 +225,9 @@ void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<St
                 icon: const Icon(Icons.filter_alt_outlined),
                 onPressed: () {
                   setState(() {
-                    _isSearchingExpanded = !_isSearchingExpanded; // Cambia el estado del isSearchingExpanded
+                    _isSearchingExpanded = !_isSearchingExpanded; 
                     if (_isSearchingExpanded) {
-                      _isInfoExpanded = false; // Cierra la info si se abre el filtro
+                      _isInfoExpanded = false; 
                     }
                   });
                 },
@@ -558,8 +553,8 @@ Widget _buildPieChart({required String title, required List<PieChartSectionData>
       ),
       const SizedBox(height: 20),
       Container(
-        width: 150, // Ancho del gráfico circular
-        height: 150, // Alto del gráfico circular
+        width: 150, 
+        height: 150, 
         child: PieChart(
           PieChartData(
             sections: sectionData,
@@ -573,7 +568,7 @@ Widget _buildPieChart({required String title, required List<PieChartSectionData>
 }
 
 Widget _buildSimpleBarChart({
-  required List<BarChartGroupData> data, required String title, // Controlar si se muestran los títulos numéricos del eje X
+  required List<BarChartGroupData> data, required String title, 
 }) {
   return SizedBox(
     height: 400,

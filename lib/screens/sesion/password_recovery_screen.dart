@@ -4,12 +4,6 @@
  *              que representa la pantalla de información de recuperación de la contraseña.
  * 
  * Autor: Gonzalo Márquez de Torres
- * 
- * Dependencias: 
- * - password_recovery_widget.dart: Proporciona el widget correspondiente a la pantalla de información de recuperación de contraseña.
- * 
- * Notas adicionales:
- * - Este archivo usa Material 3 para el diseño de la interfaz.
  */
 import 'package:CoachCraft/widgets/sesion/password_recovery_widget.dart';
 import 'package:flutter/material.dart';

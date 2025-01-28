@@ -1,8 +1,13 @@
+/*
+ * Archivo: multimedia_test.dart
+ * Descripción: Archivo de test correspondientes a la galeria multimedia.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/widgets/plays/upload_photo_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:CoachCraft/widgets/plays/upload_plays_form.dart';
-
 
 void main() {
   testWidgets('Test de validación de nombre vacío', (WidgetTester tester) async {

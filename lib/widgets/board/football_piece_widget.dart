@@ -6,6 +6,7 @@
  */
 import 'package:flutter/material.dart';
 
+/// Clase correspondiente con las fichas de los jugadores.
 class FootballPiece extends StatefulWidget {
   final Offset position;
   final String image;
@@ -20,6 +21,7 @@ class FootballPiece extends StatefulWidget {
   _FootballPieceState createState() => _FootballPieceState();
 }
 
+/// Clase correspondiente al estado de las fichas de los jugadores.
 class _FootballPieceState extends State<FootballPiece> {
   late Offset _position;
 

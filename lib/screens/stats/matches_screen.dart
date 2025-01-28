@@ -1,3 +1,9 @@
+/*
+ * Archivo: matches_screen.dart
+ * Descripción: Este archivo contiene la pantalla de los partidos de un equipo
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/services/match/match_service.dart';
 import 'package:CoachCraft/widgets/match/filter_section.dart';
 import 'package:CoachCraft/widgets/match/match_form_widget.dart';
@@ -68,17 +74,13 @@ class _MatchesScreenState extends State<MatchesScreen> {
       final seasonDateRange = dateRange ?? _getDateRangeForSeason(season);
 
       _filteredMatches = _matches.where((match) {
-        // Convierte la fecha del partido
         final matchDate = DateTime.parse(match['matchDate']);
         // ignore: unused_local_variable
         final matchYear = DateFormat('yyyy').format(matchDate);
 
-        // Filtros
         final matchMatchesType = matchType == 'Todos' || match['matchType'] == matchType;
         final matchMatchesSeason = season == 'Todos' || (matchDate.isAfter(seasonDateRange.start) && matchDate.isBefore(seasonDateRange.end));
         final matchMatchesRival = rival.isEmpty || match['rivalTeam'].toLowerCase().contains(rival.toLowerCase());
-        
-        // Filtro de fechas (este ya está implícito con seasonDateRange)
         final matchMatchesDate = dateRange == null || (matchDate.isAfter(seasonDateRange.start) && matchDate.isBefore(seasonDateRange.end));
 
         // Devuelve true si el partido cumple con todos los filtros
@@ -93,8 +95,8 @@ class _MatchesScreenState extends State<MatchesScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            floating: true, // Desaparece al hacer scroll hacia abajo
-            snap: true, // Reaparece rápidamente al hacer scroll hacia arriba
+            floating: true,
+            snap: true, 
             title: const Text('Resultados de Partidos'),
             actions: [
               IconButton(
@@ -102,7 +104,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 onPressed: () {
                   setState(() {
                     _isCreatingMatchExpanded = !_isCreatingMatchExpanded;
-                    _isSearchingMatchExpanded = false; // Colapsa el filtro si expandes la creación
+                    _isSearchingMatchExpanded = false; 
                   });
                 },
               ),
@@ -111,7 +113,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 onPressed: () {
                   setState(() {
                     _isSearchingMatchExpanded = !_isSearchingMatchExpanded;
-                    _isCreatingMatchExpanded = false; // Colapsa la creación si expandes el filtro
+                    _isCreatingMatchExpanded = false; 
                   });
                 },
               ),
@@ -127,7 +129,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                     children: [
                       // Formulario para crear un nuevo partido
                       if (_isCreatingMatchExpanded) ...[
-                        MatchForm(onMatchCreated: _fetchMatches), // Llama _fetchMatches después de la creación
+                        MatchForm(onMatchCreated: _fetchMatches), 
                         const SizedBox(height: 8.0),
                       ],
                       // Formulario para buscar partidos
@@ -140,7 +142,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                               _matchType = matchType;
                               _rival = rival;
                               _dateRange = dateRange; 
-                              _filterMatches(matchType, season, rival, dateRange); // Aplica los filtros
+                              _filterMatches(matchType, season, rival, dateRange);
                             });
                           },
                         ),

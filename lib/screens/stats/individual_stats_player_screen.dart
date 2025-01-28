@@ -1,3 +1,10 @@
+/*
+ * Archivo: individual_stats_player_screen.dart
+ * Descripción: Este archivo contiene la definición de la pantalla de selección 
+ *              de jugadores para obtener las estadísticas individuales.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:CoachCraft/provider/team_provider.dart';
 import 'package:CoachCraft/screens/stats/individual_stats_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

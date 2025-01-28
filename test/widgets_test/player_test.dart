@@ -1,3 +1,9 @@
+/*
+ * Archivo: player_test.dart
+ * Descripción: Archivo de test correspondientes a los jugadores.
+ * 
+ * Autor: Gonzalo Márquez de Torres
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:CoachCraft/widgets/player/player_widget.dart'; // Asegúrate de importar correctamente
