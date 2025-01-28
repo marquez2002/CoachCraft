@@ -37,4 +37,4 @@ Para clonar e instalar el proyecto en tu máquina local, sigue estos pasos:
 
 3. **Ejecutar la aplicación**:
    ```bash
-   flutter run
+   flutter run --release
