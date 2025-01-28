@@ -34,168 +34,141 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
   bool _isInfoExpanded = false;
 
   // Nuevas variables
-  String _season = 'Todos'; // Almacenar la temporada seleccionada
-  String _matchType = 'Todos'; // Almacenar el tipo
-  DateTimeRange? _dateRange;
+  String _season = 'Todos'; 
+  String _matchType = 'Todos'; 
   int matchesCount = 0; // Contador de partidos
 
   @override
   void initState() {
     super.initState();
-    fetchGeneralStats(_season, _matchType, _dateRange); // Carga inicial de estadísticas
+    fetchGeneralStats(_season, _matchType, null); // Usa las variables de clase directamente
   }
 
-  DateTime getStartDate(String period) {
-    DateTime now = DateTime.now();
+  
 
-    if (period == 'semanal') {
-      return now.subtract(const Duration(days: 7));
-    } else if (period == 'mensual') {
-      return DateTime(now.year, now.month - 1, now.day);
-    } else {
-      DateTime augustFirst = DateTime(now.year, 8, 1);
+DateTimeRange _getDateRangeForSeason(String season) {
+  if (season == 'Todos') {
+    // Si la temporada es 'Todos', devolvemos un rango de fechas muy amplio
+    return DateTimeRange(
+      start: DateTime(1900, 1, 1),  
+      end: DateTime(2100, 12, 31),
+    );
+  } else {
+    // La temporada está en el formato "2022-23"
+    final yearStart = int.parse(season.split('-')[0]); // Año de inicio
+    final yearEnd = int.parse(season.split('-')[1]);   // Año de fin
 
-      if (now.isBefore(augustFirst)) {
-        return DateTime(now.year - 1, 8, 1);
-      } else {
-        return augustFirst;
-      }
+    // El inicio de la temporada es el 1 de agosto del año de inicio
+    final startDate = DateTime(yearStart, 8, 1); // Inicio: 1 de agosto
+
+    // El final de la temporada es el 31 de julio del año siguiente al de inicio
+    final endDate = DateTime(2000+yearEnd, 7, 31); // Fin: 31 de julio del siguiente año
+
+    return DateTimeRange(start: startDate, end: endDate);
+  }
+}
+
+Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
+  setState(() => isLoading = true); // Inicia el estado de carga
+  try {
+    // Obtener ID del equipo seleccionado
+    String? teamId = await getTeamId(context);
+    if (teamId == null) {
+      throw Exception('El ID del equipo es null');
     }
-  }
 
-  // Fetch general stats from Firestore con filtrado de temporada y tipo de partido
-  Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
-    setState(() => isLoading = true); // Inicia el estado de carga
-    try {
-      // Obtener ID del equipo seleccionado
-      String? teamId = await getTeamId(context);
-      if (teamId == null) {
-        throw Exception('El ID del equipo es null');
-      }
+    // Obtener el rango de fechas para la temporada
+    DateTimeRange seasonDateRange = _getDateRangeForSeason(season);
+    
+    print('Buscando partidos desde: ${seasonDateRange.start} hasta ${seasonDateRange.end} para el equipo: $teamId');
 
-      // Obtener la fecha de inicio según la temporada seleccionada
-      DateTime startDate = season != 'Todos' ? getStartDate(season) : DateTime(1900); 
-      print("Buscando partidos desde: $startDate para el equipo: $teamId");
+    // Construir la consulta inicial con filtro de fechas
+    Query matchesQuery = FirebaseFirestore.instance
+        .collection('teams')
+        .doc(teamId)
+        .collection('matches')
+        .where('matchDate', isGreaterThanOrEqualTo: seasonDateRange.start.toIso8601String())
+        .where('matchDate', isLessThanOrEqualTo: seasonDateRange.end.toIso8601String());
 
-      // Convertir la fecha de inicio a String para Firestore
-      String startDateAsString = startDate.toIso8601String();
+    // Aplicar filtro de tipo de partido si corresponde
+    if (matchType != 'Todos') {
+      matchesQuery = matchesQuery.where('matchType', isEqualTo: matchType);
+    }
 
-      // Iniciar la consulta con filtro de fecha
-      Query matchesQuery = FirebaseFirestore.instance
-          .collection('teams')
-          .doc(teamId)
-          .collection('matches')
-          .where('matchDate', isGreaterThanOrEqualTo: startDateAsString);
+    // Ejecutar la consulta y obtener los partidos
+    QuerySnapshot matchesSnapshot = await matchesQuery.get();
+    print('Partidos encontrados: ${matchesSnapshot.docs.length}');
+    matchesCount = matchesSnapshot.docs.length;
 
-      // Aplicar filtro de tipo de partido si no es "Todos"
-      if (matchType != 'Todos') {
-        matchesQuery = matchesQuery.where('matchType', isEqualTo: matchType);
-      }
+    // Reiniciar las estadísticas acumuladas
+    matchesStats.clear();
+    Map<String, dynamic> statsAccumulated = {
+      'goals': 0,
+      'assists': 0,
+      'saves': 0,
+      'shotsReceived': 0,
+      'goalsReceived': 0,
+      'shots': 0,
+      'shotsOnGoal': 0,
+      'yellowCards': 0,
+      'redCards': 0,
+      'foul': 0,
+    };
 
-      // Ejecutar la consulta
-      QuerySnapshot matchesSnapshot = await matchesQuery.get();
-      print("Partidos encontrados: ${matchesSnapshot.docs.length}");
-      matchesCount = matchesSnapshot.docs.length;
+    final statKeys = statsAccumulated.keys.toList(); // Lista de claves para estadísticas
 
-      // Limpiar estadísticas previas y preparar el acumulador
-      matchesStats.clear(); 
-      Map<String, dynamic> statsAccumulated = {
-        'goals': 0,
-        'assists': 0,
-        'saves': 0,
-        'shotsReceived': 0,
-        'goalsReceived': 0,
-        'shots': 0,
-        'shotsOnGoal': 0,
-        'yellowCards': 0,
-        'redCards': 0,
-        'foul': 0,
+    // Iterar sobre los partidos encontrados
+    for (var match in matchesSnapshot.docs) {
+      print("Procesando partido con ID: ${match.id}");
+
+      // Extraer datos del partido
+      String matchName = match['rivalTeam'] ?? 'Partido sin nombre';
+      DateTime matchDate = DateTime.parse(match['matchDate']);
+      String formattedDate = DateFormat('dd-MM-yyyy').format(matchDate);
+
+      // Inicializar estadísticas para el partido
+      Map<String, dynamic> matchStats = {
+        'matchName': matchName,
+        'matchDate': formattedDate,
+        ...statsAccumulated.map((key, _) => MapEntry(key, 0)),
       };
 
-      // Iterar a través de los partidos encontrados
-      for (var match in matchesSnapshot.docs) {
-        print("Procesando partido con ID: ${match.id}");
+      // Consultar los jugadores del partido
+      QuerySnapshot playerSnapshot = await match.reference.collection('players').get();
+      print('Jugadores encontrados en el partido: ${playerSnapshot.docs.length}');
 
-        // Obtener el nombre y la fecha del partido
-        String matchName = match['rivalTeam'] ?? 'Partido sin nombre';
-        DateTime matchDate = DateTime.parse(match['matchDate']);
-        String formattedDate = DateFormat('dd-MM-yyyy').format(matchDate);
+      // Sumar estadísticas de cada jugador
+      for (var player in playerSnapshot.docs) {
+        Map<String, dynamic> playerData = player.data() as Map<String, dynamic>;
 
-        // Inicializar estadísticas para el partido actual
-        Map<String, dynamic> matchStats = {
-          'matchName': matchName,
-          'matchDate': formattedDate,
-          'goals': 0,
-          'assists': 0,
-          'saves': 0,
-          'shotsReceived': 0,
-          'goalsReceived': 0,
-          'shots': 0,
-          'shotsOnGoal': 0,
-          'yellowCards': 0,
-          'redCards': 0,
-          'foul': 0,
-        };
-
-        // Acceder a la colección de jugadores dentro de cada partido
-        QuerySnapshot playerSnapshot = await FirebaseFirestore.instance
-            .collection('teams')
-            .doc(teamId)
-            .collection('matches')
-            .doc(match.id)
-            .collection('players')
-            .get();
-
-        print("Jugadores encontrados en el partido: ${playerSnapshot.docs.length}");
-
-        // Acumular las estadísticas de los jugadores para el partido actual
-        for (var player in playerSnapshot.docs) {
-          Map<String, dynamic> playerData = player.data() as Map<String, dynamic>;
-
-          print("Datos del jugador: $playerData");
-
-          // Asegurarse de que las claves existen y no son nulas
-          matchStats['goals'] += playerData['goals'] ?? 0;
-          matchStats['assists'] += playerData['assists'] ?? 0;
-          matchStats['saves'] += playerData['saves'] ?? 0;
-          matchStats['shotsReceived'] += playerData['shotsReceived'] ?? 0;
-          matchStats['goalsReceived'] += playerData['goalsReceived'] ?? 0;
-          matchStats['shots'] += playerData['shots'] ?? 0;
-          matchStats['shotsOnGoal'] += playerData['shotsOnGoal'] ?? 0;
-          matchStats['yellowCards'] += playerData['yellowCards'] ?? 0;
-          matchStats['redCards'] += playerData['redCards'] ?? 0;
-          matchStats['foul'] += playerData['foul'] ?? 0;
-        }
-
-        // Acumular estadísticas generales
-        statsAccumulated['goals'] += matchStats['goals'];
-        statsAccumulated['assists'] += matchStats['assists'];
-        statsAccumulated['saves'] += matchStats['saves'];
-        statsAccumulated['shotsReceived'] += matchStats['shotsReceived'];
-        statsAccumulated['goalsReceived'] += matchStats['goalsReceived'];
-        statsAccumulated['shots'] += matchStats['shots'];
-        statsAccumulated['shotsOnGoal'] += matchStats['shotsOnGoal'];
-        statsAccumulated['yellowCards'] += matchStats['yellowCards'];
-        statsAccumulated['redCards'] += matchStats['redCards'];
-        statsAccumulated['foul'] += matchStats['foul'];
-
-        // Añadir las estadísticas de este partido a la lista de partidos
-        matchesStats.add(matchStats);
+        // Sumar cada estadística con un helper
+        _addStats(matchStats, playerData, statKeys);
       }
 
-      // Actualizar el estado con las estadísticas acumuladas
-      setState(() {
-        generalStats = statsAccumulated; // Actualizar estadísticas generales
-        isLoading = false; // Finalizar estado de carga
-      });
+      // Acumular estadísticas generales
+      _addStats(statsAccumulated, matchStats, statKeys);
 
-    } catch (e) {
-      print("Error al obtener estadísticas: $e");
-      setState(() {
-        isLoading = false; // Finalizar estado de carga si hay error
-      });
+      // Agregar estadísticas del partido a la lista
+      matchesStats.add(matchStats);
     }
+
+    // Imprimir estadísticas acumuladas para depuración
+    print('Estadísticas acumuladas: $statsAccumulated');
+  } catch (e) {
+    print('[ERROR] Ocurrió un error al obtener las estadísticas: $e');
+  } finally {
+    setState(() => isLoading = false); // Detener el indicador de carga
   }
+}
+
+// Helper para acumular estadísticas
+void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<String> keys) {
+  for (var key in keys) {
+    target[key] = (target[key] ?? 0) + (source[key] ?? 0);
+  }
+}
+
+
 
   Future<String?> getTeamId(BuildContext context) async {
     try {
@@ -221,12 +194,6 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
       }
     }
 
-      // Función para obtener el rango de fechas según la temporada
-    DateTimeRange _getDateRangeForSeason(String season) {
-      final startDate = DateTime(int.parse(season.split('-')[0]), 8, 1); // Inicio: 1 de agosto
-      final endDate = DateTime(int.parse(season.split('-')[1]), 7, 31); // Fin: 31 de julio del siguiente año
-      return DateTimeRange(start: startDate, end: endDate);
-    }
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +261,6 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
                               setState(() {
                                 _season = season;
                                 _matchType = matchType;
-                                // Aquí estamos pasando también el dateRange
                                 fetchGeneralStats(_season, _matchType, dateRange);
                               });
                             },
@@ -644,4 +610,3 @@ Widget _buildSimpleBarChart({
     ),
   );
 }
-
