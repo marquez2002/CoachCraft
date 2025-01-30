@@ -52,11 +52,9 @@ class _PhotosScreenState extends State<PhotosScreen> {
             ),
 
           // Lista de videos usando SliverToBoxAdapter
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height, 
-              child: PhotosList(), 
-            ),
+          SliverFillRemaining(
+            hasScrollBody: true,
+            child: PhotosList(), 
           ),
         ],
       ),

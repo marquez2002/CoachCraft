@@ -53,11 +53,9 @@ class _RecordingPlayScreenState extends State<RecordingPlayScreen> {
               ),
             ),
 
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height, 
+          SliverFillRemaining(
+              hasScrollBody: true,
               child: VideoList(), 
-            ),
           ),
         ],
       ),

@@ -27,7 +27,7 @@ void main() async {
   ]);
 
   // Ocultar barras de navegación y estado
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
 
   runApp(const MyApp());
 }

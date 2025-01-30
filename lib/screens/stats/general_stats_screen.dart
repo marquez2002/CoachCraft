@@ -44,6 +44,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
   String _season = 'Todos'; 
   String _matchType = 'Todos'; 
   int matchesCount = 0; // Contador de partidos
+  
 
   @override
   void initState() {
@@ -68,102 +69,141 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
     }
   }
 
-  Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
-    setState(() => isLoading = true); 
+ Future<void> fetchGeneralStats(String season, String matchType, DateTimeRange? dateRange) async {
+    setState(() => isLoading = true);
     try {
-      // Obtener ID del equipo seleccionado
       String? teamId = await getTeamId(context);
       if (teamId == null) {
         throw Exception('El ID del equipo es null');
       }
 
-      // Obtener el rango de fechas para la temporada
-      DateTimeRange seasonDateRange = _getDateRangeForSeason(season);
       
-      print('Buscando partidos desde: ${seasonDateRange.start} hasta ${seasonDateRange.end} para el equipo: $teamId');
-
-      // Construir la consulta inicial con filtro de fechas
+      DateTimeRange seasonDateRange = _getDateRangeForSeason(season);
       Query matchesQuery = FirebaseFirestore.instance
-          .collection('teams')
-          .doc(teamId)
-          .collection('matches')
-          .where('matchDate', isGreaterThanOrEqualTo: seasonDateRange.start.toIso8601String())
-          .where('matchDate', isLessThanOrEqualTo: seasonDateRange.end.toIso8601String());
+            .collection('teams')
+            .doc(teamId)
+            .collection('matches')
+            .where('matchDate', isGreaterThanOrEqualTo: seasonDateRange.start.toIso8601String())
+            .where('matchDate', isLessThanOrEqualTo: seasonDateRange.end.toIso8601String());
 
-      // Aplicar filtro de tipo de partido si corresponde
-      if (matchType != 'Todos') {
-        matchesQuery = matchesQuery.where('matchType', isEqualTo: matchType);
-      }
+        // Aplicar filtro de tipo de partido si corresponde
+        if (matchType != 'Todos') {
+          matchesQuery = matchesQuery.where('matchType', isEqualTo: matchType);
+        }
 
-      // Ejecutar la consulta y obtener los partidos
-      QuerySnapshot matchesSnapshot = await matchesQuery.get();
+        // Ejecutar la consulta y obtener los partidos
+        QuerySnapshot matchesSnapshot = await matchesQuery.get();
+
       print('Partidos encontrados: ${matchesSnapshot.docs.length}');
       matchesCount = matchesSnapshot.docs.length;
 
-      // Reiniciar las estadísticas acumuladas
-      matchesStats.clear();
+      // Inicializar estadísticas generales
       Map<String, dynamic> statsAccumulated = {
         'goals': 0,
         'assists': 0,
         'saves': 0,
-        'shotsReceived': 0,
         'goalsReceived': 0,
+        'shotsReceived': 0,
         'shots': 0,
         'shotsOnGoal': 0,
         'yellowCards': 0,
         'redCards': 0,
         'foul': 0,
+        'tackle': 0,
+        'succesfulTackle': 0,
       };
 
-      final statKeys = statsAccumulated.keys.toList(); 
+      List<Map<String, dynamic>> matchStatsList = [];
 
-      // Iterar sobre los partidos encontrados
       for (var match in matchesSnapshot.docs) {
         print('Procesando partido con ID: ${match.id}');
 
-        // Extraer datos del partido
-        String matchName = match['rivalTeam'] ?? 'Partido sin nombre';
-        DateTime matchDate = DateTime.parse(match['matchDate']);
-        String formattedDate = DateFormat('dd-MM-yyyy').format(matchDate);
+        Map<String, dynamic> matchData = match.data() as Map<String, dynamic>;
 
-        // Inicializar estadísticas para el partido
-        Map<String, dynamic> matchStats = {
-          'matchName': matchName,
-          'matchDate': formattedDate,
-          ...statsAccumulated.map((key, _) => MapEntry(key, 0)),
-        };
+        // Obtener datos del partido
+        String rivalName = matchData['rivalTeam'] ?? 'Desconocido';
+        String matchDate = matchData['matchDate'] ?? '';
 
-        // Consultar los jugadores del partido
-        QuerySnapshot playerSnapshot = await match.reference.collection('players').get();
+        DateTime? parsedDate;
+
+        if (matchDate.isNotEmpty) {
+          // Intentamos convertir la cadena en un objeto DateTime
+          parsedDate = DateTime.tryParse(matchDate);
+
+          if (parsedDate != null) {
+            // Si se pudo convertir correctamente, la formateamos en dd-MM-yyyy
+            matchDate = DateFormat('dd-MM-yyyy').format(parsedDate);
+          } else {
+            // Si no se pudo convertir, dejamos el texto como "Fecha no disponible"
+            matchDate = 'Fecha no disponible';
+          }
+        } else {
+          matchDate = 'Fecha no disponible';
+        } 
+
+        print('Rival: $rivalName, Fecha: $matchDate');
+
+        QuerySnapshot playerSnapshot = await FirebaseFirestore.instance
+            .collection('teams')
+            .doc(teamId)
+            .collection('matches')
+            .doc(match.id)
+            .collection('players')
+            .get();
+
         print('Jugadores encontrados en el partido: ${playerSnapshot.docs.length}');
 
-        // Sumar estadísticas de cada jugador
+        // Mapa para estadísticas del partido
+        Map<String, dynamic> matchStats = {
+          'matchName': rivalName,
+          'matchDate': matchDate,
+          'goals': 0,
+          'assists': 0,
+          'saves': 0,
+          'goalsReceived': 0,
+          'shotsReceived': 0,
+          'shots': 0,
+          'shotsOnGoal': 0,
+          'yellowCards': 0,
+          'redCards': 0,
+          'foul': 0,
+          'tackle': 0,
+          'succesfulTackle': 0,
+        };
+
+        // Acumular estadísticas de los jugadores
         for (var player in playerSnapshot.docs) {
           Map<String, dynamic> playerData = player.data() as Map<String, dynamic>;
-          
-          // Sumar cada estadística con un helper
-          _addStats(matchStats, playerData, statKeys);
+
+          print('Datos del jugador: $playerData');
+
+          // Acumular en estadísticas generales
+          for (var key in statsAccumulated.keys) {
+            statsAccumulated[key] += playerData[key] ?? 0;
+            matchStats[key] += playerData[key] ?? 0;
+          }
         }
 
-        // Acumular estadísticas generales
-        _addStats(statsAccumulated, matchStats, statKeys);
-
-        // Agregar estadísticas del partido a la lista
-        matchesStats.add(matchStats);
+        // Guardar estadísticas del partido
+        matchStatsList.add(matchStats);
       }
 
-      // Imprimir estadísticas acumuladas para depuración
-      print('Estadísticas acumuladas: $statsAccumulated');
+      // Actualizar estado con estadísticas generales y por partido
+      setState(() {
+        generalStats = statsAccumulated;
+        matchesStats = matchStatsList;
+      });
+
+      print('Estadísticas acumuladas: $generalStats');
+      print('Estadísticas por partido: $matchStatsList');
+
     } catch (e) {
-      print('[ERROR] Ocurrió un error al obtener las estadísticas: $e');
+      print('Error al obtener las estadísticas: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al obtener estadísticas: $e")),
+      );
     } finally {
       setState(() => isLoading = false);
-    }
-  }
-
-  void _addStats(Map<String, dynamic> target, Map<String, dynamic> source, List<String> keys) {
-    for (var key in keys) {
-      target[key] = (target[key] ?? 0) + (source[key] ?? 0);
     }
   }
 
@@ -190,7 +230,7 @@ class _GeneralStatsScreenState extends State<GeneralStatsScreen> {
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
@@ -571,7 +611,7 @@ Widget _buildSimpleBarChart({
   required List<BarChartGroupData> data, required String title, 
 }) {
   return SizedBox(
-    height: 400,
+    height: 450,
     child: BarChart(
       BarChartData(
         barGroups: data,
@@ -584,7 +624,7 @@ Widget _buildSimpleBarChart({
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 10,
+              reservedSize: 100,
               getTitlesWidget: (double value, TitleMeta meta) {
                 switch (value.toInt()) {
                   case 0:
